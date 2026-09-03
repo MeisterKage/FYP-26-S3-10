@@ -1,0 +1,104 @@
+/* ============================================================================
+   Design tokens
+   ----------------------------------------------------------------------------
+   One hue. #133955 is the client's brand ink; every neutral on this page is the
+   same 205deg hue at a different lightness, so nothing on screen is a true gray.
+   That is what makes a monochromatic page read as *chosen* rather than drained:
+   the shadows in the paper are the same colour as the ink in the type.
+
+   Contrast was computed, not eyeballed. Every text token clears WCAG AA (4.5:1)
+   on both --paper and --canvas. Ratios are noted per token; if you add a colour,
+   verify it before shipping it.
+   ========================================================================== */
+
+:root {
+  /* --- surfaces ------------------------------------------------------------
+     Elevation is a value shift, never a shadow. Three planes only, and they sit
+     close together on purpose: the reference separates surfaces "by colour value
+     alone", so a hairline rule does the work a drop shadow would.             */
+  --paper: #fcfdfd; /* cards, article body, elevated panels */
+  --canvas: #f2f5f8; /* the page itself -- stock, not white */
+  --sunken: #e5ecf0; /* wells, inset panels, meter troughs */
+
+  /* --- lines --------------------------------------------------------------- */
+  --hair: #ccd8e0; /* default 1px rule between related things */
+  --rule: #9ab1c1; /* emphatic divider, meter ticks (2.03:1 -- non-text only) */
+
+  /* --- ink ----------------------------------------------------------------- */
+  --mute: #587184; /* captions, metadata          4.67 canvas / 5.01 paper */
+  --quiet: #446074; /* secondary text              6.05 / 6.50              */
+  --body: #294c65; /* running body copy           8.29 / 8.90              */
+  --ink: #133955; /* headings, primary text      11.00 / 11.82  <- brand   */
+  --deep: #0a2233; /* filled buttons only         15.98 against --paper     */
+
+  /* --- type ----------------------------------------------------------------
+     Display is a transitional book serif; UI is a humanist grotesque; body is a
+     serif cut for screen reading. Three voices, each with one job.           */
+  --font-display: "Playfair Display", "Libre Caslon Text", Georgia, serif;
+  --font-ui: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Serif 4", Charter, Georgia, "Times New Roman", serif;
+
+  /* Minor-third scale (1.2). Display sizes are fluid so the masthead never
+     overflows at 360px, which a fixed 120px would.                           */
+  --t-display: clamp(2.75rem, 1.2rem + 7vw, 5.5rem);
+  --t-title: clamp(2rem, 1.1rem + 3.6vw, 3.25rem);
+  --t-heading: clamp(1.5rem, 1.1rem + 1.4vw, 2rem);
+  --t-sub: 1.25rem;
+  --t-lead: 1.1875rem;
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-caption: 0.8125rem;
+  --t-micro: 0.6875rem;
+
+  --lh-display: 0.9;
+  --lh-tight: 1.15;
+  --lh-heading: 1.25;
+  --lh-body: 1.65; /* reading measure wants air; the reference's 1.2 is for cards */
+
+  --track-display: -0.035em;
+  --track-title: -0.025em;
+  --track-tight: -0.011em;
+  --track-label: 0.08em; /* letterspaced small caps for labels */
+
+  /* --- space ---------------------------------------------------------------
+     8px base, doubling. Named by intent so a component asks for "section" and
+     cannot invent 37px.                                                       */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+  --s-10: 8rem;
+
+  /* --- measure & shell ----------------------------------------------------- */
+  --w-page: 1200px; /* outer shell */
+  --w-wide: 960px; /* listings, dashboards */
+  --w-read: 40rem; /* ~68ch of body serif -- the reading column */
+  --w-form: 26rem;
+
+  /* --- shape ---------------------------------------------------------------
+     Pills for actions, square for everything that holds content. The contrast
+     between the two is the whole shape language; softening the cards to 8px
+     would erase it.                                                           */
+  --r-pill: 9999px;
+  --r-flat: 0;
+
+  /* --- motion --------------------------------------------------------------
+     One curve. Exponential ease-out: fast departure, long settle.             */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --fast: 120ms;
+  --mid: 260ms;
+  --slow: 620ms;
+}
+
+/* The palette is deliberately single-mode. The reference is a paper stock at
+   golden hour; a dark variant would be a different design, not this one in
+   another skin. Declared so the browser paints form controls and scrollbars to
+   match rather than guessing. */
+:root {
+  color-scheme: light;
+}

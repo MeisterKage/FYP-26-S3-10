@@ -1,0 +1,363 @@
+/* ============================================================================
+   Page layouts
+   ========================================================================== */
+
+/* --- front page lead ------------------------------------------------------
+   The lead runs against a margin column carrying its score. On narrow screens
+   the score moves below the headline rather than shrinking — a 40px meter is
+   not a smaller meter, it is an unreadable one. */
+
+.lead-article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  gap: var(--s-8);
+  align-items: start;
+  padding-bottom: var(--s-8);
+  border-bottom: 1px solid var(--ink);
+}
+
+.lead-aside {
+  padding-top: var(--s-2);
+  border-left: 1px solid var(--hair);
+  padding-left: var(--s-5);
+}
+
+.lead-trace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-5);
+  font-size: var(--t-caption);
+}
+.lead-trace svg {
+  transition: transform var(--mid) var(--ease);
+}
+.lead-trace:hover svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 60rem) {
+  .lead-article {
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+  }
+  .lead-aside {
+    border-left: none;
+    border-top: 1px solid var(--hair);
+    padding-left: 0;
+    padding-top: var(--s-5);
+    max-width: 22rem;
+  }
+}
+
+/* --- article --------------------------------------------------------------
+   The one authored motion in the product: the reading column rises a few pixels
+   as it settles. Once, on the page that matters, from an already-visible
+   default so nothing is hidden if the animation never runs. */
+
+.article {
+  animation: settle var(--slow) var(--ease) both;
+}
+@keyframes settle {
+  from {
+    opacity: 0.55;
+    transform: translateY(6px);
+  }
+}
+
+.article-head {
+  max-width: var(--w-read);
+  padding-bottom: var(--s-6);
+}
+
+.article-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: minmax(0, var(--w-read)) 16rem;
+  gap: var(--s-8);
+  align-items: start;
+}
+
+.article-body {
+  min-width: 0;
+}
+
+/* The score travels with the reader down a long article. */
+.article-margin {
+  position: sticky;
+  top: 6rem;
+}
+
+.margin-card {
+  border-top: 2px solid var(--ink);
+  padding-top: var(--s-4);
+}
+
+@media (max-width: 64rem) {
+  .article-grid {
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+  }
+  .article-margin {
+    position: static;
+    order: -1;
+    max-width: 22rem;
+  }
+}
+
+.paywall {
+  border-top: 1px solid var(--ink);
+  margin-top: var(--s-6);
+  padding-top: var(--s-6);
+  max-width: var(--w-read);
+}
+
+/* Sources are numbered like footnotes, because that is what they are. */
+.sources {
+  margin-top: var(--s-8);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+  max-width: var(--w-read);
+}
+.sources-count {
+  margin-left: var(--s-2);
+  /* --rule is a line colour (2.03:1) and fails AA as text. --mute is the
+     lightest ink that still passes. */
+  color: var(--mute);
+}
+.sources-list {
+  margin-top: var(--s-4);
+}
+.sources-list li {
+  display: flex;
+  gap: var(--s-3);
+  padding-block: var(--s-2);
+  font-size: var(--t-small);
+  line-height: 1.5;
+}
+.sources-num {
+  flex: none;
+  width: 1.5rem;
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+  font-variant-numeric: tabular-nums;
+}
+.sources-list a {
+  word-break: break-word;
+}
+
+.article-foot {
+  margin-top: var(--s-7);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+  max-width: var(--w-read);
+}
+
+/* --- about ---------------------------------------------------------------- */
+
+.about .terms > * + * {
+  margin-top: var(--s-6);
+}
+.term > dd {
+  margin: var(--s-2) 0 0;
+}
+
+.formula {
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--hair);
+  padding-block: var(--s-4);
+}
+.formula .ledger-row {
+  font-size: var(--t-small);
+  padding-block: var(--s-2);
+}
+
+.bands > * + * {
+  margin-top: var(--s-6);
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--hair);
+}
+.band-row {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  gap: var(--s-6);
+  align-items: start;
+}
+@media (max-width: 46rem) {
+  .band-row {
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+  }
+}
+
+/* --- auth ----------------------------------------------------------------- */
+
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 26rem) minmax(0, 20rem);
+  gap: var(--s-9);
+  align-items: start;
+  padding-top: var(--s-6);
+}
+.auth-aside {
+  border-left: 1px solid var(--hair);
+  padding-left: var(--s-6);
+  padding-top: var(--s-2);
+}
+.auth-aside .lead {
+  font-size: var(--t-body);
+}
+
+@media (max-width: 56rem) {
+  .auth {
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+    max-width: 30rem;
+  }
+  .auth-aside {
+    border-left: none;
+    border-top: 1px solid var(--hair);
+    padding-left: 0;
+    padding-top: var(--s-5);
+    order: -1;
+  }
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.fieldset legend {
+  padding: 0;
+}
+
+/* --- search --------------------------------------------------------------- */
+
+.search-form {
+  display: flex;
+  gap: var(--s-3);
+  position: relative;
+  max-width: 34rem;
+}
+.search-icon {
+  position: absolute;
+  left: var(--s-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mute);
+  pointer-events: none;
+}
+.search-input {
+  padding-left: 2.5rem;
+}
+/* Safari draws its own clear button; it belongs to no design system. */
+.search-input::-webkit-search-decoration,
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+/* --- dashboards ----------------------------------------------------------- */
+
+.dash-head {
+  display: flex;
+  gap: var(--s-5);
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding-bottom: var(--s-5);
+  border-bottom: 1px solid var(--hair);
+}
+.dash-head > :last-child:not(:only-child) {
+  margin-left: auto;
+}
+
+/* --- review queue --------------------------------------------------------- */
+
+.submission {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  gap: var(--s-7);
+  align-items: start;
+  padding-block: var(--s-6);
+  border-bottom: 1px solid var(--hair);
+}
+.submission:first-child {
+  padding-top: 0;
+}
+
+.submission-aside {
+  border-left: 1px solid var(--hair);
+  padding-left: var(--s-5);
+}
+
+.review-body summary {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  cursor: pointer;
+  padding: var(--s-2) 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.review-body summary::-webkit-details-marker {
+  display: none;
+}
+/* A drawn caret, so the disclosure matches the icon set rather than the OS. */
+.review-body summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--mid) var(--ease);
+}
+.review-body[open] summary::before {
+  transform: rotate(45deg);
+}
+.review-body summary:hover {
+  color: var(--ink);
+}
+.review-body .prose {
+  border-left: 1px solid var(--hair);
+  padding-left: var(--s-5);
+}
+
+.review-sources {
+  border-top: 1px solid var(--hair);
+  padding-top: var(--s-4);
+}
+
+.reject {
+  max-width: 34rem;
+}
+
+@media (max-width: 64rem) {
+  .submission {
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+  .submission-aside {
+    border-left: none;
+    border-top: 1px solid var(--hair);
+    padding-left: 0;
+    padding-top: var(--s-4);
+    order: -1;
+    max-width: 22rem;
+  }
+}

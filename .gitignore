@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Environment / secrets  -- NEVER commit these
+.env
+.env.local
+*.local.env
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Flask / pytest
+instance/
+.pytest_cache/
+
+# Local database files (Supabase is the real database)
+*.db
+
+# Visual inspection output — regenerate with `node shots.mjs`
+frontend/shots/
