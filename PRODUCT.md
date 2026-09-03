@@ -84,8 +84,9 @@ no shadows, and typographic rather than coloured links.
 - 50 seeded demo articles, six role accounts, and a working scoring engine.
 - No real user research, testimonials, press, partnerships, traffic figures, or
   named customers exist. None may be invented in interface copy.
-- The platform has never been deployed, so no uptime, scale, or adoption claim is
-  true.
+- The platform is deployed on Render against the Supabase database, for
+  demonstration only. It has no real users, so no uptime, scale, or adoption
+  claim is true.
 
 ## Product principles
 

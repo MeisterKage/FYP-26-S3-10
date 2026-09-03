@@ -33,3 +33,6 @@ instance/
 
 # Visual inspection output; regenerate with `node shots.mjs`
 frontend/shots/
+
+# Demo credentials for the live site. Local only.
+DEMO-ACCOUNTS.md

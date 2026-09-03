@@ -3,8 +3,8 @@
 # Supabase already hosts the database and cannot host a website, so these are
 # the only two things left to deploy:
 #
-#   fyp-frontend  the built React app, served as static files (free)
-#   fyp-api       Flask under gunicorn (free)
+#   fyp-26-s3-10-web   the built React app, served as static files (free)
+#   fyp-26-s3-10-api   Flask under gunicorn (free)
 #
 # DATABASE_URL is sync:false, so the Supabase connection string is typed into
 # the Render dashboard and never committed here.
@@ -16,7 +16,12 @@ services:
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --workers 2 --timeout 60 wsgi:app
+    # One worker on purpose. The rate limiter in app/ratelimit.py counts in
+    # process memory, so each extra worker carries its own budget and the
+    # configured limits are multiplied by the worker count. One worker keeps
+    # deployed behaviour identical to what tests/test_rate_limit.py verifies.
+    # Raise this only alongside RATELIMIT_STORAGE_URI pointing at Redis.
+    startCommand: gunicorn --workers 1 --timeout 60 wsgi:app
     healthCheckPath: /api/scoring/formula
     envVars:
       - key: PYTHON_VERSION
