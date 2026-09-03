@@ -1,8 +1,8 @@
 /**
  * Route table and page shell.
  *
- * Role checks here govern *navigation* only. Flask decides what a request may
- * do (PDD Section 3); hiding a link is a courtesy, never the control.
+ * Role checks here govern navigation only. Flask decides what a request may do
+ * (PDD Section 3); hiding a link is a courtesy, not a control.
  */
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 

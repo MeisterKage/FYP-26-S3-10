@@ -1,6 +1,6 @@
 """Flask application factory.
 
-The eight blueprints below map onto the functional modules in PDD Section 2.2 --
+The eight blueprints below map onto the functional modules in PDD Section 2.2,
 onto platform capabilities, not onto database tables.
 """
 from flask import Flask, jsonify

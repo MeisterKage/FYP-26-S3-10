@@ -3,11 +3,11 @@
  *
  * Byline, date, credibility, and accuracy all sit above the body. The score's
  * arithmetic sits beside the article in a margin column on wide screens and
- * folds under the headline on narrow ones — the reference calls its supporting
- * material marginalia, and a score you have to hunt for is not disclosed.
+ * folds under the headline on narrow ones. The reference calls its supporting
+ * material marginalia, and a score the reader has to hunt for is not disclosed.
  *
  * A paywalled article arrives from the server without a body at all, so this
- * renders what it was given rather than hiding content it was trusted with.
+ * renders whatever it was given.
  */
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -169,7 +169,7 @@ export default function ArticlePage() {
           <footer className="article-foot">
             {reported ? (
               <Notice tone="quiet">
-                Thank you — an editor will review this article.
+                Thank you. An editor will review this article.
               </Notice>
             ) : (
               user && (

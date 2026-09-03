@@ -82,7 +82,7 @@ def dispatch_pending(limit: int = 200) -> int:
     """Email every notification not yet dispatched, honouring per-user toggles.
 
     Returns the number sent. A user who has switched an event type off gets the
-    in-app notification but no email -- the toggle governs delivery, not the record.
+    in-app notification but no email; the toggle governs delivery, not the record.
     """
     pending = (
         Notification.query.filter_by(emailed_at=None)

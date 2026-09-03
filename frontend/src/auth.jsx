@@ -1,8 +1,8 @@
 /**
  * Session state, shared across the four role-specific views (PDD Section 2.2).
  *
- * The role here drives *navigation* only. It is never the authority on what a
- * user may do -- Flask decides that on every request (PDD Section 3). Hiding a
+ * The role here drives navigation only. It is never the authority on what a user
+ * may do, because Flask decides that on every request (PDD Section 3). Hiding a
  * button is a courtesy; the server is the control.
  */
 import { createContext, useContext, useEffect, useMemo, useState } from "react";

@@ -1,13 +1,13 @@
 """Lock down the public schema against Supabase's Data API
 
 Supabase exposes every table in `public` over PostgREST at
-https://<ref>.supabase.co/rest/v1/, authorised by the `anon` key -- which is
+https://<ref>.supabase.co/rest/v1/, authorised by the `anon` key, which is
 public by design and ships inside frontend code. Supabase's default privileges
 grant anon and authenticated FULL rights (SELECT/INSERT/UPDATE/DELETE/TRUNCATE)
 on every new table, so the moment `flask db upgrade` created our schema, anyone
 who knew the project ref could read `users.password_hash`, forge an
 administrator by UPDATEing `users.role`, rewrite credibility scores, or TRUNCATE
-the lot -- without ever touching Flask.
+the lot, without ever touching Flask.
 
 That directly contradicts PDD Section 2.1: "No client ever queries the database
 directly." This migration makes the database enforce what the architecture
@@ -19,7 +19,7 @@ Three layers, because any one of them can be undone by accident:
   2. ALTER DEFAULT PRIVILEGES so tables created by *future* migrations are not
      auto-granted again. Without this, the next migration silently reopens it.
   3. ENABLE ROW LEVEL SECURITY on every table, with no policies. No policy means
-     no rows for anyone the policy system applies to -- a default-deny backstop
+     no rows for anyone the policy system applies to, a default-deny backstop
      if the grants ever return.
 
 The Flask connection is unaffected: it connects as `postgres`, which owns these
@@ -88,7 +88,7 @@ def downgrade():
     """Reopen the schema.
 
     Restores Supabase's stock posture. Only useful if you later decide to serve
-    this database through PostgREST directly -- in which case you must write RLS
+    this database through PostgREST directly, in which case you must write RLS
     policies before running this, or you reintroduce the hole it closed.
     """
     conn = op.get_bind()

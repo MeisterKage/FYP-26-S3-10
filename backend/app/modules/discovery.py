@@ -5,7 +5,7 @@ Covers PDD Figures 5.4 (trending), 5.5 (by category), 5.6 (article), 5.7 (search
 
 Search is rule-based keyword matching against title, tags, and category, exactly
 as PDD Figure 5.7 states. There is deliberately no semantic or predictive
-matching -- the platform's whole pitch is that its ranking is inspectable.
+matching, because the ranking has to stay inspectable.
 """
 from __future__ import annotations
 
@@ -177,8 +177,8 @@ def read_article(slug: str):
         raise ApiError("Article not found.", status=404)
 
     # A view counter is the least important thing on this page. If the write
-    # fails -- a dropped pooled connection, a lock -- the reader should still get
-    # the article, so this failure is logged and swallowed rather than raised.
+    # fails on a dropped pooled connection or a lock, the reader should still
+    # get the article, so this failure is logged and swallowed rather than raised.
     try:
         article.view_count += 1
         db.session.commit()

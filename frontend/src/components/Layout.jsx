@@ -77,7 +77,7 @@ export function Footer() {
     <footer className="footer">
       <div className="shell footer-inner">
         <p>
-          The Record — every article scored by a published formula.
+          The Record. Every article scored by a published formula.
         </p>
         <nav aria-label="Footer">
           <Link className="link-quiet" to="/about">

@@ -5,7 +5,7 @@ User so the permission model is enforceable against one table (PDD Section 4).
 
 PREMIUM_REGISTERED is listed by the PDD as a tier, but premium access is really a
 time-bounded entitlement. We therefore store the tier on the user AND derive live
-premium access from an active Subscription row -- see User.has_premium_access.
+premium access from an active Subscription row. See User.has_premium_access.
 The role field alone must never be the paywall check, or a lapsed subscriber keeps
 access forever.
 """

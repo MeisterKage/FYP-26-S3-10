@@ -1,13 +1,12 @@
 /**
  * How scoring works (PDD Figure 5.2).
  *
- * This page is the product's whole claim: PRD 1.3.3 promises "a disclosed
- * formula rather than a hidden or predictive model", and a promise of disclosure
- * that has no page is not disclosure.
+ * PRD 1.3.3 promises "a disclosed formula rather than a hidden or predictive
+ * model", and this is the page where that promise is kept.
  *
- * The constants are fetched, never hard-coded. Administrators can change every
- * threshold at runtime (PRD 1.3.2), and a page that printed last month's numbers
- * would be worse than printing none.
+ * The constants are fetched rather than hard-coded. Administrators can change
+ * every threshold at runtime (PRD 1.3.2), so a page printing last month's
+ * numbers would be worse than printing none.
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -69,7 +68,7 @@ export default function AboutPage() {
             only once they have published{" "}
             {v ? <strong>{v.min_articles_for_accuracy} articles</strong> : "a set minimum"};
             before that their profile reads <em>new contributor</em>, which is not
-            a low score — it is no score.
+            a low score. It is no score at all.
           </Term>
 
           <Term name="Credibility Score">
@@ -123,8 +122,8 @@ export default function AboutPage() {
 
           <p className="meta mt-5">
             These figures are live. An administrator can change any of them, and
-            when they do, every published score is recalculated — this page will
-            show the new numbers immediately.
+            when they do, every published score is recalculated and this page
+            shows the new numbers immediately.
           </p>
         </section>
       )}

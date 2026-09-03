@@ -49,7 +49,7 @@ def slugify(title: str, article_id: int | None = None) -> str:
 def _clean_tags(data: dict) -> str | None:
     """Normalise the tags list.
 
-    require_list rejects a bare string. Iterating one would not raise -- it would
+    require_list rejects a bare string. Iterating one would not raise; it would
     quietly produce a tag per character ("news" becomes n,e,w,s), which is the
     kind of bug that survives to the demo because nothing ever errors.
     """
@@ -70,7 +70,7 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
     """Serialise an article.
 
     The premium paywall is enforced HERE, by omitting the body from the payload.
-    Never send a premium body and hide it in the client -- the response is
+    Never send a premium body and hide it in the client; the response is
     trivially readable in devtools.
     """
     payload = {
@@ -284,7 +284,7 @@ def unpublish_or_delete(article_id: int):
     """PDD Figure 5.43.
 
     A draft is deleted outright. A published article is unpublished, never
-    destroyed -- its revision and correction history is part of the platform's
+    destroyed; its revision and correction history is part of the platform's
     accountability record.
     """
     article = _owned_article(article_id)
@@ -354,7 +354,7 @@ def _replace_sources(article: Article, sources: list) -> None:
     """Rewrite the article's source links.
 
     Source count feeds the Credibility Score, so this deliberately validates
-    shape before persisting -- a malformed URL must not silently earn points.
+    shape before persisting; a malformed URL must not silently earn points.
     """
     ArticleSource.query.filter_by(article_id=article.id).delete()
 

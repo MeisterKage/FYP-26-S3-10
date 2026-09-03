@@ -66,7 +66,7 @@ export default function RegisterPage() {
       <div className="auth-form">
         <h1 className="title">Create an account</h1>
         <p className="lead mt-4">
-          Comment, follow writers, save what you are reading — and apply to write.
+          Comment, follow writers, save what you are reading, and apply to write.
         </p>
 
         <form className="form mt-6" onSubmit={submit} noValidate>
@@ -125,7 +125,7 @@ export default function RegisterPage() {
             <fieldset className="fieldset">
               <legend className="field-label">
                 What are you interested in?
-                <span className="field-hint"> Optional — shapes your front page.</span>
+                <span className="field-hint"> Optional. Shapes your front page.</span>
               </legend>
               <div className="chips mt-3">
                 {categories.map((category) => (

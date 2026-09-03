@@ -2,17 +2,17 @@
  * The credibility instruments.
  *
  * The reference style forbids chromatic colour in UI, which rules out the
- * green/amber/red badge this data invites. That constraint produced a better
- * answer: a publication that colour-codes its own trustworthiness looks like a
- * browser security warning. An instrument reading looks like a masthead.
+ * green/amber/red badge this data invites. That suits the product: a publication
+ * that colour-codes its own trustworthiness ends up looking like a browser
+ * security warning.
  *
- * Every reading carries three independent encodings, so none of them is colour:
- *   1. fill length  — the quantity
- *   2. ink value    — the band, expressed as weight within one hue
- *   3. the band word — always rendered, always the authority
+ * Every reading carries three independent encodings, none of them colour:
+ *   1. fill length, the quantity
+ *   2. ink value, the band, expressed as weight within one hue
+ *   3. the band word, always rendered and always the authority
  *
- * "Disputed" additionally switches to a hatched fill, so the state that matters
- * most survives grayscale printing and colour-blind vision.
+ * "Disputed" also switches to a hatched fill, so the state that matters most
+ * survives grayscale printing and colour-blind vision.
  */
 import { ScaleIcon } from "./Icon";
 
@@ -82,8 +82,8 @@ const LEDGER_ROWS = [
  *
  * PRD 1.3.3 promises a reader can "trace exactly why an article's score is what
  * it is". That promise is only kept if the arithmetic is on the page, so it is
- * a ledger with dotted leaders and a ruled total — not a tooltip a reader has
- * to hunt for and cannot print.
+ * a ledger with dotted leaders and a ruled total, rather than a tooltip the
+ * reader has to hunt for and cannot print.
  */
 export function CredibilityLedger({ credibility }) {
   const breakdown = credibility?.breakdown;
@@ -123,7 +123,7 @@ export function CredibilityLedger({ credibility }) {
  * A contributor's accuracy rate.
  *
  * A withheld rate is a legitimate state, not a bad score, so it renders as a
- * word. Rendering it as 0% — or with a meter at zero — would say the opposite
+ * word. Rendering it as 0%, or with a meter at zero, would say the opposite
  * of what it means.
  */
 export function AccuracyRate({ rate, prefix = "" }) {
@@ -140,7 +140,7 @@ export function FormulaNote({ compact = false }) {
   if (compact) {
     return (
       <p className="meta">
-        Every score comes from a published formula — contributor accuracy,
+        Every score comes from a published formula: contributor accuracy,
         verified sources, and logged corrections. Nothing is predicted.
       </p>
     );

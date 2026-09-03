@@ -3,7 +3,7 @@
 Covers PDD Figures 5.8, 5.17-5.20, 5.29-5.36.
 
 Per PDD Section 3, this service forwards reader-submitted reports to Moderation
-rather than acting on them itself -- the decision to escalate stays with a human.
+rather than acting on them itself; the decision to escalate stays with a human.
 """
 from __future__ import annotations
 

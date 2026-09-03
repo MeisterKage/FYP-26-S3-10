@@ -13,7 +13,7 @@ handler below, a wrong HTTP method returns an HTML error page, and `response
 Three things are guaranteed here:
 
   1. No response is ever HTML.
-  2. No internal detail -- exception text, SQL, stack trace -- reaches a client.
+  2. No internal detail (exception text, SQL, stack trace) reaches a client.
   3. No failed request leaves a dirty session behind for the next one.
 """
 from __future__ import annotations
@@ -122,8 +122,8 @@ def register_error_handlers(app):
         """The backstop.
 
         Anything not handled above is a bug. It is logged in full for us and
-        reported as a bare 500 to the client -- an exception message can carry a
-        query, a file path, or a value from another user's row.
+        reported as a bare 500 to the client, because an exception message can
+        carry a query, a file path, or a value from another user's row.
         """
         _safe_rollback(db)
         log.exception("Unhandled exception")

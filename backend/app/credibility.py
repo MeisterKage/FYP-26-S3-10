@@ -69,7 +69,7 @@ class ScoreBreakdown:
     """A score plus the arithmetic that produced it.
 
     Returned to the client so the article page can show readers exactly why the
-    score is what it is -- the transparency claim in PRD Section 1.3.3 holds only
+    score is what it is. The transparency claim in PRD Section 1.3.3 holds only
     if the breakdown travels with the number.
     """
 

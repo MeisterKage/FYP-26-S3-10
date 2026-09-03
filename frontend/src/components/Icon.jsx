@@ -2,9 +2,9 @@
  * Icon set.
  *
  * Drawn here rather than pulled from a library so the stroke weight, cap, and
- * join match the hairline rules used everywhere else in the system — 1.5 at
- * 20px, round caps, no fills. An icon that is 2px heavier than the rule beside
- * it is the detail that makes a page look assembled.
+ * join match the hairline rules used everywhere else in the system: 1.5 at 20px,
+ * round caps, no fills. An icon 2px heavier than the rule beside it is the kind
+ * of detail that makes a page look assembled.
  *
  * Everything is currentColor, so icons inherit whichever ink their context sets.
  */

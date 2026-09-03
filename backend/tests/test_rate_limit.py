@@ -95,7 +95,7 @@ def test_throttling_one_target_does_not_lock_out_another(limited_client):
 
 
 def test_password_reset_requests_are_throttled(limited_client):
-    """Each request sends mail to an address the caller chose -- unthrottled,
+    """Each request sends mail to an address the caller chose, unthrottled,
     that is an outbound spam relay."""
     statuses = [
         limited_client.post(

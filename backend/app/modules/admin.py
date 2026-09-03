@@ -421,7 +421,7 @@ def update_settings():
     """Changing a threshold changes every published score, so rescore everything.
 
     This is O(articles) and is fine at project scale. At real scale it would be a
-    background job -- worth saying so in the report rather than pretending
+    background job, worth saying so in the report rather than pretending
     otherwise.
     """
     data = json_body().get("settings")
@@ -440,7 +440,7 @@ def update_settings():
     for key in data:
         # require_number rejects NaN and infinity. Both survive a naive `< 0`
         # check (every comparison with NaN is False), and Postgres stores both
-        # happily -- which would drive every credibility score to nonsense with
+        # happily, which would drive every credibility score to nonsense with
         # no error anywhere.
         numeric = require_number(data, key, minimum=0, maximum=SETTING_CEILING)
 

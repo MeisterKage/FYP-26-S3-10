@@ -1,8 +1,8 @@
 """The three external services in PDD Section 2.1, stubbed behind interfaces.
 
-v1 ships the interfaces and logs what *would* have happened. That keeps the demo
-honest -- an examiner can see the call site and the recorded intent -- and means
-swapping in a real provider later is one class, not a refactor.
+v1 ships the interfaces and logs what *would* have happened. An examiner can see the call site
+and the recorded intent, and swapping in a real provider later replaces one
+class rather than forcing a refactor.
 
 Do not inline calls to a real provider at the call sites. Everything goes through
 these objects so the seam stays visible in the component diagram.
@@ -76,7 +76,7 @@ class PaymentGateway:
 class SocialShareService:
     """Builds the preview card carrying headline and credibility score (PDD Fig 5.8).
 
-    Share URLs are real and need no API key or stub -- each platform accepts a
+    Share URLs are real and need no API key or stub: each platform accepts a
     plain GET. Only the preview metadata is our responsibility.
     """
 

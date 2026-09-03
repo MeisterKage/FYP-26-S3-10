@@ -83,7 +83,7 @@ async function shoot(browser, { name, path, viewport, token, full = true }) {
     problems.push(`[overflow] ${name}/${viewport}: page scrolls ${overflow}px sideways`);
   }
 
-  // Elements wider than the viewport *that nothing can scroll* — the real cause
+  // Elements wider than the viewport *that nothing can scroll*: the real cause
   // of sideways drift, and of content clipped with no way to reach it.
   const wide = await page.evaluate(() => {
     const vw = document.documentElement.clientWidth;

@@ -91,8 +91,8 @@ export default function LoginPage() {
       <aside className="auth-aside">
         <p className="lead">
           Every article on The Record carries a credibility score produced by a
-          published formula — and the arithmetic behind it sits beside the
-          article, where you can check it.
+          published formula. The arithmetic behind it sits beside the article,
+          where you can check it.
         </p>
         <Link className="link-quiet mt-5" to="/about" style={{ display: "inline-block" }}>
           How scoring works

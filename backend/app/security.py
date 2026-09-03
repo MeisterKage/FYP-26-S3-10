@@ -3,7 +3,7 @@
 Every request from the client passes through here before reaching an application
 service, "so role-based access control is enforced in one place rather than
 scattered across individual endpoints". Route handlers therefore never inspect
-`current_user.role` themselves -- they declare what they need with a decorator.
+`current_user.role` themselves; they declare what they need with a decorator.
 """
 from __future__ import annotations
 
@@ -100,7 +100,7 @@ def load_current_user() -> None:
     """Populate g.current_user from the Authorization header, if present.
 
     Registered as a before_request hook, so it runs for every route including
-    public ones -- an Unregistered User is simply g.current_user is None.
+    public ones; an Unregistered User is simply g.current_user is None.
     """
     from .models import User
 
@@ -111,7 +111,7 @@ def load_current_user() -> None:
 
     claims = decode_access_token(header[7:])
 
-    # The signature is valid, but the payload shape is not guaranteed -- a token
+    # The signature is valid, but the payload shape is not guaranteed, a token
     # issued by an earlier version of this code may not carry a usable subject.
     # That is an invalid session, not a server crash.
     try:
@@ -151,7 +151,7 @@ def roles_required(*roles: Role):
     """Restrict a route to the given tiers.
 
     System administrators are NOT implicitly granted every route. Where an admin
-    should have access, list Role.SYSTEM_ADMIN explicitly -- an implicit
+    should have access, list Role.SYSTEM_ADMIN explicitly, an implicit
     god-role is how privilege checks quietly stop meaning anything.
     """
     allowed = frozenset(roles)

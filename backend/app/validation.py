@@ -2,7 +2,7 @@
 
 A JSON body is attacker-controlled and arbitrarily shaped: any field can arrive
 as the wrong type, and Python will often do something plausible-looking with it
-rather than fail. `",".join(x for x in "notalist")` does not raise -- it quietly
+rather than fail. `",".join(x for x in "notalist")` does not raise; it quietly
 produces "n,o,t,a,l,i,s,t". `float("nan")` succeeds, and `nan < 0` is False, so a
 naive range check passes it straight through to the database.
 
@@ -76,7 +76,7 @@ def require_number(
 
     NaN and infinity are rejected explicitly. Both survive a naive `< 0` check
     (every comparison against NaN is False), and Postgres accepts both as valid
-    double precision values -- so without this they would be stored, and every
+    double precision values, so without this they would be stored, and every
     calculation downstream would silently produce nonsense.
     """
     raw = data.get(field, MISSING)

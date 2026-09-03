@@ -4,7 +4,7 @@
 
 /* --- front page lead ------------------------------------------------------
    The lead runs against a margin column carrying its score. On narrow screens
-   the score moves below the headline rather than shrinking — a 40px meter is
+   the score moves below the headline rather than shrinking, because a 40px meter is
    not a smaller meter, it is an unreadable one. */
 
 .lead-article {

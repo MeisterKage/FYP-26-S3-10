@@ -1,9 +1,9 @@
 /**
- * A writer's own work (PDD Figures 5.41–5.46).
+ * A writer's own work (PDD Figures 5.41 to 5.46).
  *
- * Operate mode: this is a workbench, not a front page. Scanability and status
- * outrank expression, so the display serif appears once at the top and the rest
- * is a ruled table with tabular figures.
+ * Operate mode. This is a workbench, so scanability and status outrank
+ * expression: the display serif appears once at the top and the rest is a ruled
+ * table with tabular figures.
  *
  * The writer's own accuracy rate leads, because it is the number that moves
  * every score below it.
@@ -61,8 +61,8 @@ export default function ContributorDashboard() {
           <p className="meta mt-3">
             {user.accuracyRate == null ? (
               <>
-                You are a <strong>new contributor</strong> — your accuracy rate
-                appears once you have published enough articles.
+                You are a <strong>new contributor</strong>, so your accuracy
+                rate appears once you have published enough articles.
               </>
             ) : (
               <>

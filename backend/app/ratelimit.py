@@ -6,10 +6,10 @@ attacker. Unlimited attempts against a login form defeats any password policy.
 
 Three endpoints need this:
 
-  * login -- credential stuffing and brute force
-  * password reset request -- an unthrottled mailer is an outbound spam relay
+  * login: credential stuffing and brute force
+  * password reset request: an unthrottled mailer is an outbound spam relay
     aimed at whichever address the attacker names
-  * register -- automated account creation
+  * register: automated account creation
 
 Two different keys are needed, and using the wrong one silently does nothing:
 
@@ -19,8 +19,8 @@ Two different keys are needed, and using the wrong one silently does nothing:
     bucket on purpose.
   * Registration is an attack by *volume* from one source, and every request
     carries a brand-new email. Keying it on the email would hand each signup its
-    own fresh bucket, so the limit would never trigger -- so registration is
-    keyed on address alone.
+    own fresh bucket, so the limit would never trigger. Registration is
+    therefore keyed on address alone.
 
 Storage is in-process memory by default, which is correct for development and
 for a single-process demo, but does not survive a restart and is not shared
@@ -53,7 +53,7 @@ def client_address() -> str:
 def _identity() -> str:
     """Key for attacks aimed at one account: client address plus target email.
 
-    Reading the JSON body here is safe -- Flask caches the parsed body, so the
+    Reading the JSON body here is safe: Flask caches the parsed body, so the
     view handler is unaffected, and `silent=True` means a malformed body degrades
     to limiting on address alone rather than raising inside the limiter.
     """
@@ -85,7 +85,7 @@ def register_rate_limit_handler(app) -> None:
     @app.errorhandler(RateLimitExceeded)
     def _rate_limited(exc: RateLimitExceeded):
         # Deliberately vague about which limit was hit and how much budget
-        # remains -- that detail is a tuning guide for whoever triggered it.
+        # remains; that detail is a tuning guide for whoever triggered it.
         return ApiError(
             "Too many attempts. Please wait a few minutes and try again.",
             status=429,

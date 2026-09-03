@@ -1,14 +1,13 @@
 /**
- * The editorial review queue (PDD Figures 5.48–5.49).
+ * The editorial review queue (PDD Figures 5.48 to 5.49).
  *
- * Operate mode, and the highest-stakes screen in the product: approving here
+ * Operate mode, and the screen with the most riding on it: approving here
  * publishes, and publishing is when a credibility score first becomes visible to
- * readers. So the queue shows the score an article *would* carry before the
- * editor commits, alongside the sourcing that produced it.
+ * readers. So the queue shows the score an article would carry before the editor
+ * commits, alongside the sourcing that produced it.
  *
  * An editor sees only their assigned categories. The server decides that, so an
- * empty queue is a legitimate state — and it says which, rather than sitting
- * blank and looking broken.
+ * empty queue is a legitimate state, and the page says which kind of empty it is.
  */
 import { useCallback, useEffect, useState } from "react";
 
@@ -238,8 +237,8 @@ export default function ReviewQueue() {
 
         {queue.note && (
           <Empty title="No categories are assigned to you yet">
-            An administrator assigns editors to categories. Until then this queue
-            stays empty — it is not a fault.
+            An administrator assigns editors to categories. Until then this
+            queue stays empty, which is not a fault.
           </Empty>
         )}
 

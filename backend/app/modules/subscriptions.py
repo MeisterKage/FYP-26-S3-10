@@ -3,7 +3,7 @@
 Covers PDD Figures 5.14, 5.24, 5.37-5.39, 5.47.
 
 Billing goes through the PaymentGateway stub in `integrations.py`. Nothing here
-touches a real payment provider, and the seam is deliberate -- swapping in Stripe
+touches a real payment provider, and the seam is deliberate: swapping in Stripe
 later replaces one class.
 """
 from __future__ import annotations
@@ -101,7 +101,7 @@ def subscribe(contributor_id: int):
     )
 
     # PDD lists PREMIUM_REGISTERED as a tier, but access itself is always checked
-    # against the live subscription -- see security.premium_required.
+    # against the live subscription; see security.premium_required.
     if g.current_user.role == Role.FREE_REGISTERED:
         g.current_user.role = Role.PREMIUM_REGISTERED
 

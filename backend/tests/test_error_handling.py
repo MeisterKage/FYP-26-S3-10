@@ -51,7 +51,7 @@ def auth_for(client, email):
 def assert_error_shape(response):
     """The contract frontend/src/api.js is written against."""
     assert response.headers["Content-Type"].startswith("application/json"), (
-        f"got {response.headers['Content-Type']} -- the client calls .json() on this "
+        f"got {response.headers['Content-Type']}, the client calls .json() on this "
         "and would throw a parse error instead of showing the message"
     )
     body = response.get_json()
@@ -129,7 +129,7 @@ def test_why_a_nan_threshold_mattered():
     """Demonstrates the damage the validation prevents, without the database.
 
     A NaN weight drives every article to 0 and brands the whole platform
-    'Disputed' -- with no exception raised anywhere.
+    'Disputed', with no exception raised anywhere.
     """
     poisoned = credibility_score(
         contributor_accuracy=100.0, source_count=5, correction_count=0,
@@ -183,7 +183,7 @@ def test_string_where_a_list_belongs_is_a_422_not_a_500(client, category):
 
 
 def test_tags_as_a_string_is_rejected_rather_than_iterated(client, category):
-    """Iterating a string does not raise -- it silently produces one tag per
+    """Iterating a string does not raise; it silently produces one tag per
     character, which is a bug that survives all the way to a demo."""
     make_user("tagger@example.com", Role.VERIFIED_CONTRIBUTOR)
     headers = auth_for(client, "tagger@example.com")

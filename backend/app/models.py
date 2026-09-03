@@ -86,7 +86,7 @@ class User(TimestampMixin, db.Model):
         return self.deleted_at is None and not self.is_suspended
 
     def has_premium_access(self, now: datetime | None = None) -> bool:
-        """Live paywall check. Never trust `role` alone -- it does not expire."""
+        """Live paywall check. Never trust `role` alone; it does not expire."""
         now = now or utcnow()
         return any(
             s.status == SubscriptionStatus.ACTIVE and s.period_end > now
@@ -184,7 +184,7 @@ class Article(TimestampMixin, db.Model):
     #: Sanitised HTML from the rich-text editor. Cleaned on write, never on read.
     body: Mapped[str] = mapped_column(Text)
     cover_image_url: Mapped[str | None] = mapped_column(String(500))
-    #: Comma-separated. Rule-based search only -- no semantic matching (PDD Fig 5.7).
+    #: Comma-separated. Rule-based search only, no semantic matching (PDD Fig 5.7).
     tags: Mapped[str | None] = mapped_column(String(500))
 
     status: Mapped[ArticleStatus] = mapped_column(
@@ -193,7 +193,7 @@ class Article(TimestampMixin, db.Model):
     )
     is_premium: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    #: Denormalised per PDD Section 4 -- read on nearly every fetch, so not a join.
+    #: Denormalised per PDD Section 4, read on nearly every fetch, so not a join.
     credibility_score: Mapped[float] = mapped_column(Float, default=0.0)
     credibility_band: Mapped[str | None] = mapped_column(String(20))
 
@@ -263,7 +263,7 @@ class ArticleSource(db.Model):
 
 
 class Correction(TimestampMixin, db.Model):
-    """A logged correction or retraction -- the direct trigger for rescoring."""
+    """A logged correction or retraction, the direct trigger for rescoring."""
 
     __tablename__ = "corrections"
 

@@ -1,7 +1,7 @@
 """Editor-to-category assignment.
 
 review.py has always scoped an editor's queue to their assigned categories, but
-until now nothing could write those assignments through the API -- only seed.py,
+until now nothing could write those assignments through the API, only seed.py,
 by inserting rows directly. That meant a newly promoted editor had a permanently
 empty review queue and no administrator could do anything about it.
 """

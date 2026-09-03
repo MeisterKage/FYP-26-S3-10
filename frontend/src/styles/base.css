@@ -1,5 +1,5 @@
 /* ============================================================================
-   Base — reset, page shell, and the browser's own surfaces
+   Base: reset, page shell, and the browser's own surfaces
    ----------------------------------------------------------------------------
    The parts nobody draws still carry the design: selection, the caret, the
    scrollbar, focus rings, underline offset, and the numerals in tabular data all
@@ -99,7 +99,7 @@ textarea {
   scrollbar-color: var(--rule) transparent;
 }
 
-/* WebKit — a thin rule in the page's own hue, not a gray slab. */
+/* WebKit: a thin rule in the page's own hue rather than a gray slab. */
 ::-webkit-scrollbar {
   width: 11px;
   height: 11px;
@@ -127,7 +127,7 @@ textarea {
   border-radius: 2px;
 }
 
-/* Underlines sit clear of descenders and stay hairline — the reference makes
+/* Underlines sit clear of descenders and stay hairline, because the reference makes
    links typographic rather than chromatic, so the underline is the whole
    affordance and its quality is the whole detail. */
 a {
@@ -172,7 +172,7 @@ table,
   padding-block: var(--s-7) var(--s-9);
 }
 
-/* Skip link — present, invisible until focused, then a real target. */
+/* Skip link: present, invisible until focused, then a real target. */
 .skip {
   position: absolute;
   left: var(--s-4);

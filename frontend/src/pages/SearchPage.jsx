@@ -2,8 +2,7 @@
  * Search (PDD Figure 5.7).
  *
  * Rule-based keyword matching against title, tags, and category. The page says
- * so plainly: the absence of clever ranking is a feature of this product, not an
- * omission to hide.
+ * so plainly, because the absence of clever ranking is deliberate here.
  */
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -79,7 +78,8 @@ export default function SearchPage() {
       </form>
 
       <p className="meta mt-4">
-        Keyword matching only — no semantic search, no personalised ranking.
+        Keyword matching only. There is no semantic search and no personalised
+        ranking.
         Results are ordered by credibility, then recency.
       </p>
 

@@ -131,8 +131,9 @@ def explain_article(article: Article, settings: dict | None = None):
 def rescore_contributor_articles(contributor: User) -> None:
     """A contributor's accuracy feeds every one of their articles.
 
-    So a correction on one article moves the score of all of them -- recompute the
-    set in a single transaction rather than leaving the others stale.
+    So a correction on one article moves the score of all of them, and we
+    recompute the set in a single transaction rather than leaving the others
+    stale.
     """
     cfg = load_settings()
     recalculate_accuracy(contributor, cfg)

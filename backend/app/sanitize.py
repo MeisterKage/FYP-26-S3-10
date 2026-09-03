@@ -29,7 +29,7 @@ ALLOWED_ATTRS = {
     "*": ["class"],
 }
 
-#: No `javascript:`, no `data:` -- both are script-execution vectors in an href.
+#: No `javascript:` and no `data:`; both are script-execution vectors in an href.
 ALLOWED_PROTOCOLS = ["http", "https", "mailto"]
 
 
@@ -50,7 +50,7 @@ def clean_article_body(raw_html: str) -> str:
 
 #: Tags whose *contents* are discarded, not just their angle brackets. Bleach's
 #: strip=True keeps inner text, so "<script>alert(1)</script>Headline" would
-#: otherwise survive as the literal title "alert(1)Headline" -- safe to render,
+#: otherwise survive as the literal title "alert(1)Headline": safe to render,
 #: but garbage to read.
 _CONTENT_BEARING = re.compile(
     r"<\s*(script|style|template)\b.*?<\s*/\s*\1\s*>", re.IGNORECASE | re.DOTALL
@@ -58,7 +58,7 @@ _CONTENT_BEARING = re.compile(
 
 
 def clean_plain_text(raw: str) -> str:
-    """For comments, bios, titles -- no markup permitted at all."""
+    """For comments, bios, and titles: no markup permitted at all."""
     without_scripts = _CONTENT_BEARING.sub("", raw or "")
     return bleach.clean(without_scripts, tags=[], attributes={}, strip=True).strip()
 

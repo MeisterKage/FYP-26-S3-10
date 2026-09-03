@@ -216,7 +216,7 @@ def hide_comment(comment_id: int):
 # --------------------------------------------------------------------------- #
 
 def duplicate_titles(title: str, exclude_article_id: int | None = None) -> list[int]:
-    """Rule-based duplicate check. Exact normalised title match -- no fuzzy logic."""
+    """Rule-based duplicate check. Exact normalised title match, no fuzzy logic."""
     normalised = " ".join(title.lower().split())
     query = Article.query.filter(func.lower(Article.title) == normalised)
     if exclude_article_id:

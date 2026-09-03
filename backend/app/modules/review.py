@@ -34,7 +34,7 @@ def _assigned_category_ids() -> list[int] | None:
 @bp.get("/review/queue")
 @roles_required(*REVIEW_ROLES)
 def review_queue():
-    """PDD Figure 5.48. Oldest submission first -- a queue, not a feed."""
+    """PDD Figure 5.48. Oldest submission first, a queue, not a feed."""
     query = Article.query.filter_by(status=ArticleStatus.PENDING)
 
     category_ids = _assigned_category_ids()
@@ -48,8 +48,8 @@ def review_queue():
 
     # A pending article has never been scored, so its stored credibility_score is
     # still the 0.0 default. Serving that reads to an editor as "this article is
-    # worthless" rather than "not yet scored" -- the opposite of true, on the one
-    # screen where it would bias the decision. Compute the score the article
+    # worthless" rather than "not yet scored". That is the opposite of true, on
+    # the one screen where it would bias the decision. Compute the score the article
     # *would* carry on publication instead. Read-only: explain_article persists
     # nothing.
     payload = []

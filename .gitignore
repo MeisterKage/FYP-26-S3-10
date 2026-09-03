@@ -5,7 +5,7 @@ __pycache__/
 venv/
 *.egg-info/
 
-# Environment / secrets  -- NEVER commit these
+# Environment / secrets. NEVER commit these.
 .env
 .env.local
 *.local.env
@@ -31,5 +31,5 @@ instance/
 # Local database files (Supabase is the real database)
 *.db
 
-# Visual inspection output — regenerate with `node shots.mjs`
+# Visual inspection output; regenerate with `node shots.mjs`
 frontend/shots/

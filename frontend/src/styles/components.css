@@ -343,14 +343,14 @@
 
 /* --- credibility ----------------------------------------------------------
    The centrepiece, and the reason this palette works. The reference forbids
-   chromatic colour, so the four bands cannot be a traffic light — which is a
+   chromatic colour, so the four bands cannot be a traffic light, which is a
    better answer anyway: red and green badges make a publication look like a
    virus scanner. Here the score is an instrument reading.
 
    Three encodings, none of them colour alone:
-     1. fill length  — the quantity
-     2. ink value    — the band, as weight rather than hue
-     3. the word     — always present, always the authority
+     1. fill length, the quantity
+     2. ink value, the band, as weight rather than hue
+     3. the word, always present and always the authority
    Disputed additionally switches the fill to a hatch, so the most consequential
    state is distinguishable by texture at a glance and in grayscale print.     */
 
@@ -497,7 +497,7 @@
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
-/* A dotted leader from label to figure — a ledger convention, and it makes a
+/* A dotted leader from label to figure is a ledger convention, and it makes a
    long sparse row readable without a table. */
 .ledger-row::before {
   content: "";
@@ -648,7 +648,7 @@
   border-bottom: 1px solid var(--ink);
   margin-bottom: var(--s-5);
 }
-/* :not(:only-child) — with a single child, margin-left:auto pushes the heading
+/* :not(:only-child): with a single child, margin-left:auto pushes the heading
    itself to the right instead of doing nothing. */
 .section-head > :last-child:not(:only-child) {
   margin-left: auto;
@@ -704,7 +704,7 @@
 }
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--mute); /* 5.01:1 on paper — placeholders are text too */
+  color: var(--mute); /* 5.01:1 on paper; placeholders are text too */
 }
 .input:hover,
 .textarea:hover {
@@ -728,7 +728,7 @@
 }
 
 /* An error names the problem and the recovery. It is marked by a rule and an
-   icon, never by turning red — there is no red in this world. */
+   icon, never by turning red, because there is no red in this world. */
 .field-error {
   display: flex;
   align-items: flex-start;

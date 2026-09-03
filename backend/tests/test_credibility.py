@@ -1,7 +1,7 @@
 """Unit tests for the scoring engine (PRD 7.5.1 names this explicitly).
 
 The engine is pure, so these tests need no database, no app context, and no
-fixtures -- which is the whole reason `credibility.py` does no I/O.
+fixtures, which is the whole reason `credibility.py` does no I/O.
 """
 import pytest
 

@@ -1,13 +1,13 @@
 /**
  * The front page (PDD Figures 5.4 and 5.16).
  *
- * A newspaper front, not a card grid: one lead article at display scale, then a
- * ruled index beneath it. Equal-sized cards would flatten exactly the hierarchy
- * the credibility scores exist to create.
+ * Laid out as a newspaper front: one lead article at display scale, then a ruled
+ * index beneath it. Equal-sized cards would flatten the hierarchy the
+ * credibility scores exist to create.
  *
  * Signed out, this is trending. Signed in with interests or follows, it becomes
- * the two personalised rows — falling back to trending rather than an empty
- * page, which Figure 5.16 requires explicitly.
+ * the two personalised rows, falling back to trending rather than an empty page,
+ * which Figure 5.16 requires explicitly.
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
