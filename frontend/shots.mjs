@@ -11,8 +11,10 @@ import { mkdirSync } from "node:fs";
 
 import { chromium } from "playwright";
 
-const WEB = "http://localhost:5173";
-const API = "http://127.0.0.1:5000/api";
+// Override for a deployed environment:
+//   WEB=https://... API=https://.../api node shots.mjs
+const WEB = process.env.WEB || "http://localhost:5173";
+const API = process.env.API || "http://127.0.0.1:5000/api";
 const OUT = "shots";
 
 const VIEWPORTS = {
