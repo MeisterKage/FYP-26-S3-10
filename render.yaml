@@ -1,0 +1,50 @@
+# Render blueprint: the whole project, one file, one dashboard.
+#
+# Supabase already hosts the database and cannot host a website, so these are
+# the only two things left to deploy:
+#
+#   fyp-frontend  the built React app, served as static files (free)
+#   fyp-api       Flask under gunicorn (free)
+#
+# DATABASE_URL is sync:false, so the Supabase connection string is typed into
+# the Render dashboard and never committed here.
+
+services:
+  - type: web
+    name: fyp-26-s3-10-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers 2 --timeout 60 wsgi:app
+    healthCheckPath: /api/scoring/formula
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.3"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      # Full URL with scheme, e.g. https://fyp-26-s3-10-web.onrender.com
+      # Render's fromService gives a bare hostname, which is not what either of
+      # these needs, so both are entered once in the dashboard.
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: fyp-26-s3-10-web
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # Full URL with scheme, e.g. https://fyp-26-s3-10-api.onrender.com
+      - key: VITE_API_BASE
+        sync: false
