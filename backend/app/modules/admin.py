@@ -110,15 +110,34 @@ def toggle_suspension(user_id: int):
 @bp.delete("/admin/users/<int:user_id>")
 @admin_only
 def delete_user(user_id: int):
-    """PDD Figure 5.53. Soft delete.
+    """PDD Figure 5.87. Soft delete, with a choice about the person's articles.
 
-    Credentials are scrubbed and the account is unusable, but published articles
-    survive under an "Account Removed" byline so the platform's accountability
-    record stays intact. Comments and likes are removed with the account.
+    Credentials are scrubbed and the account is unusable either way. What
+    happens to anything they published is the administrator's call:
+
+      keep    (default) articles stay live under an "Account Removed" byline,
+              so the platform's accountability record survives the account
+      remove  articles are unpublished, which retains the revision and
+              correction history rather than destroying it
+
+    Nothing here hard-deletes an article. A published piece that has been
+    corrected is part of the record of those corrections, and removing the row
+    would take the evidence with it.
     """
     from ..models import Comment, Like
 
     user = _target_user(user_id)
+    articles_action = json_body().get("articles", "keep")
+    if articles_action not in {"keep", "remove"}:
+        raise ApiError(
+            "Choose whether to keep or remove this account's articles.",
+            status=422, field="articles",
+        )
+
+    if articles_action == "remove":
+        Article.query.filter_by(
+            contributor_id=user.id, status=ArticleStatus.PUBLISHED
+        ).update({"status": ArticleStatus.UNPUBLISHED}, synchronize_session=False)
 
     Comment.query.filter_by(user_id=user.id).delete()
     Like.query.filter_by(user_id=user.id).delete()
@@ -129,9 +148,9 @@ def delete_user(user_id: int):
     user.password_hash = "!"
     user.bio = None
 
-    _audit("user.delete", "user", user.id)
+    _audit("user.delete", "user", user.id, f"articles={articles_action}")
     db.session.commit()
-    return jsonify({"message": "Account removed."})
+    return jsonify({"message": "Account removed.", "articles": articles_action})
 
 
 @bp.post("/admin/users/<int:user_id>/role")

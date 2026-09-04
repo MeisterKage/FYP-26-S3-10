@@ -20,6 +20,7 @@ import {
   CredibilityMeter,
 } from "../components/Credibility";
 import ArticleExtras from "../components/ArticleExtras";
+import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
@@ -31,6 +32,7 @@ export default function ArticlePage() {
   const [article, setArticle] = useState(null);
   const [error, setError] = useState(null);
   const [reported, setReported] = useState(false);
+  const [reporting, setReporting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,17 +78,6 @@ export default function ArticlePage() {
   }
 
   const date = formatDate(article.publishedAt);
-
-  async function report() {
-    const reason = window.prompt("What is inaccurate about this article?");
-    if (!reason) return;
-    try {
-      await api.post(`/articles/${article.id}/report`, { reason });
-      setReported(true);
-    } catch (e) {
-      setError(e.message);
-    }
-  }
 
   return (
     <article className="article">
@@ -180,12 +171,22 @@ export default function ArticlePage() {
                 Thank you. An editor will review this article.
               </Notice>
             ) : (
-              user && (
-                <Button variant="quiet" size="sm" onClick={report}>
+              user &&
+              (reporting ? (
+                <ReportPanel
+                  article={article}
+                  onDone={() => {
+                    setReporting(false);
+                    setReported(true);
+                  }}
+                  onCancel={() => setReporting(false)}
+                />
+              ) : (
+                <Button variant="quiet" size="sm" onClick={() => setReporting(true)}>
                   <FlagIcon size={16} />
                   Report an inaccuracy
                 </Button>
-              )
+              ))
             )}
             <ArticleExtras article={article} />
           </footer>

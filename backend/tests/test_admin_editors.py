@@ -161,3 +161,59 @@ def test_listing_requires_an_administrator(client):
     assert client.get(
         "/api/admin/editors", headers=auth_for(client, "editor8@example.com")
     ).status_code == 403
+
+
+# --------------------------------------------------------------------------- #
+#  Deleting an account: what happens to what they published (PDD Figure 5.87)
+# --------------------------------------------------------------------------- #
+
+def _published_by(writer, categories, title, slug):
+    article = Article(
+        contributor_id=writer.id, category_id=categories[0].id, title=title,
+        slug=slug, body="<p>Body</p>", status=ArticleStatus.PUBLISHED,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+    return article
+
+
+def test_removing_an_account_keeps_its_articles_by_default(client, categories):
+    make_user("delkeepadmin@example.com", Role.SYSTEM_ADMIN)
+    writer = make_user("delkeepwriter@example.com", Role.VERIFIED_CONTRIBUTOR)
+    article = _published_by(writer, categories, "Stays up", "stays-up")
+
+    response = client.delete(
+        f"/api/admin/users/{writer.id}", headers=auth_for(client, "delkeepadmin@example.com")
+    )
+
+    assert response.status_code == 200
+    assert Article.query.get(article.id).status == ArticleStatus.PUBLISHED
+
+
+def test_an_administrator_can_take_the_articles_down_with_the_account(client, categories):
+    make_user("delrmadmin@example.com", Role.SYSTEM_ADMIN)
+    writer = make_user("delrmwriter@example.com", Role.VERIFIED_CONTRIBUTOR)
+    article = _published_by(writer, categories, "Comes down", "comes-down")
+
+    response = client.delete(
+        f"/api/admin/users/{writer.id}",
+        json={"articles": "remove"},
+        headers=auth_for(client, "delrmadmin@example.com"),
+    )
+
+    assert response.status_code == 200
+    # Unpublished, never destroyed: the revision and correction history is the
+    # record of what was corrected, and deleting the row takes the evidence too.
+    assert Article.query.get(article.id).status == ArticleStatus.UNPUBLISHED
+
+
+def test_an_unknown_articles_choice_is_rejected(client, categories):
+    make_user("delbadadmin@example.com", Role.SYSTEM_ADMIN)
+    victim = make_user("delbadvictim@example.com", Role.FREE_REGISTERED)
+
+    response = client.delete(
+        f"/api/admin/users/{victim.id}",
+        json={"articles": "incinerate"},
+        headers=auth_for(client, "delbadadmin@example.com"),
+    )
+    assert response.status_code == 422

@@ -258,16 +258,28 @@ export default function ArticleEditor() {
     }
   }
 
+  // DELETE /articles/<id> does two different things depending on status: it
+  // destroys a draft, and it unpublishes a live article without destroying it.
+  // The button used to say "Delete" and warn "cannot be undone" for both, which
+  // was wrong and alarming for the reversible case.
+  const isLive = status === "published" || status === "scheduled";
+
   async function discard() {
     if (!articleId) {
       navigate("/dashboard");
       return;
     }
-    if (!window.confirm("Delete this draft? This cannot be undone.")) return;
+    const confirmation = isLive
+      ? "Take this article off the site? Readers will no longer see it. You can publish it again later."
+      : "Delete this draft? This cannot be undone.";
+    if (!window.confirm(confirmation)) return;
+
     setBusy("delete");
     try {
       await api.del(`/articles/${articleId}`);
-      navigate("/dashboard", { state: { notice: "Draft deleted." } });
+      navigate("/dashboard", {
+        state: { notice: isLive ? "Article unpublished." : "Draft deleted." },
+      });
     } catch (e) {
       handleError(e);
       setBusy(null);
@@ -497,7 +509,7 @@ export default function ArticleEditor() {
               busy={busy === "delete"}
               style={{ marginLeft: "auto" }}
             >
-              Delete
+              {isLive ? "Unpublish" : "Delete"}
             </Button>
           )}
         </div>

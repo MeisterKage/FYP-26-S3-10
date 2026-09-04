@@ -227,16 +227,30 @@ function Accounts({ onNotice }) {
                             variant="quiet"
                             busy={busy === u.id}
                             onClick={() => {
+                              // PDD Figure 5.87: what happens to anything they
+                              // published is the administrator's decision, not
+                              // a side effect of removing the account.
                               if (
                                 !window.confirm(
-                                  `Remove ${u.name}? Their articles stay published under "Account Removed". This cannot be undone.`,
+                                  `Remove ${u.name}? This cannot be undone.`,
                                 )
                               )
                                 return;
+                              const keep = window.confirm(
+                                `Keep ${u.name}'s published articles on the site under an "Account Removed" byline?
+
+OK  keeps them published
+Cancel  takes them off the site`,
+                              );
                               act(
                                 u,
-                                () => api.del(`/admin/users/${u.id}`),
-                                `${u.name} has been removed.`,
+                                () =>
+                                  api.del(`/admin/users/${u.id}`, {
+                                    articles: keep ? "keep" : "remove",
+                                  }),
+                                keep
+                                  ? `${u.name} removed. Their articles stay up under "Account Removed".`
+                                  : `${u.name} removed, and their articles are off the site.`,
                               );
                             }}
                           >

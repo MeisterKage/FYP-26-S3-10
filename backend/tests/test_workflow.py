@@ -694,3 +694,86 @@ def test_an_administrator_may_still_approve_their_own(client, category):
 
     token = token_for(client, "selfadmin@example.com")
     assert client.post(f"/api/review/{article.id}/approve", headers=auth(token)).status_code == 200
+
+
+# --------------------------------------------------------------------------- #
+#  Reporting an article: a fixed reason list (PDD Figure 5.26)
+# --------------------------------------------------------------------------- #
+
+def test_the_report_reasons_are_served_by_the_api(client):
+    """The form is built from this, so a hard-coded copy cannot drift from it."""
+    reasons = client.get("/api/report-reasons").get_json()["reasons"]
+    values = {r["value"] for r in reasons}
+    assert values == {"misleading", "spam", "harassment", "inappropriate", "other"}
+
+
+def _published_for_report(category, contributor):
+    article = Article(
+        contributor_id=contributor.id, category_id=category.id, title="Reportable",
+        slug="reportable", body="<p>Body</p>", status=ArticleStatus.PUBLISHED,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+    return article
+
+
+def test_a_report_without_a_reason_is_refused(client, category):
+    writer = make_user("reportwriter@example.com", Role.VERIFIED_CONTRIBUTOR)
+    make_user("reporter@example.com", Role.FREE_REGISTERED)
+    article = _published_for_report(category, writer)
+
+    token = token_for(client, "reporter@example.com")
+    response = client.post(
+        f"/api/articles/{article.id}/report", json={"detail": "just vibes"},
+        headers=auth(token),
+    )
+    assert response.status_code == 422
+    assert response.get_json()["error"]["field"] == "category"
+
+
+def test_an_invented_reason_is_refused(client, category):
+    writer = make_user("reportwriter2@example.com", Role.VERIFIED_CONTRIBUTOR)
+    make_user("reporter2@example.com", Role.FREE_REGISTERED)
+    article = _published_for_report(category, writer)
+
+    token = token_for(client, "reporter2@example.com")
+    response = client.post(
+        f"/api/articles/{article.id}/report", json={"category": "i-just-dislike-it"},
+        headers=auth(token),
+    )
+    assert response.status_code == 422
+
+
+def test_a_report_stores_the_label_and_any_detail(client, category):
+    """A moderator reads this text in the queue, so it has to be legible on its
+    own rather than a bare key like 'misleading'."""
+    from app.models import Report
+
+    writer = make_user("reportwriter3@example.com", Role.VERIFIED_CONTRIBUTOR)
+    make_user("reporter3@example.com", Role.FREE_REGISTERED)
+    article = _published_for_report(category, writer)
+
+    token = token_for(client, "reporter3@example.com")
+    response = client.post(
+        f"/api/articles/{article.id}/report",
+        json={"category": "misleading", "detail": "The funding figure is unsourced."},
+        headers=auth(token),
+    )
+
+    assert response.status_code == 201
+    stored = Report.query.filter_by(article_id=article.id).first()
+    assert stored.reason == "Misleading information: The funding figure is unsourced."
+
+
+def test_detail_is_optional(client, category):
+    from app.models import Report
+
+    writer = make_user("reportwriter4@example.com", Role.VERIFIED_CONTRIBUTOR)
+    make_user("reporter4@example.com", Role.FREE_REGISTERED)
+    article = _published_for_report(category, writer)
+
+    token = token_for(client, "reporter4@example.com")
+    assert client.post(
+        f"/api/articles/{article.id}/report", json={"category": "spam"}, headers=auth(token)
+    ).status_code == 201
+    assert Report.query.filter_by(article_id=article.id).first().reason == "Spam"

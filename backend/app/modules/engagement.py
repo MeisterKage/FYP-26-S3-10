@@ -259,16 +259,46 @@ def share(article_id: int):
     )
 
 
+#: PDD Figure 5.26. Keys are what the client sends; values are what a moderator
+#: reads in the queue.
+REPORT_REASONS = {
+    "misleading": "Misleading information",
+    "spam": "Spam",
+    "harassment": "Harassment",
+    "inappropriate": "Inappropriate content",
+    "other": "Other",
+}
+
+
+@bp.get("/report-reasons")
+def report_reasons():
+    """So the form is built from the server's list, not a copy that can drift."""
+    return jsonify(
+        {"reasons": [{"value": k, "label": v} for k, v in REPORT_REASONS.items()]}
+    )
+
+
 @bp.post("/articles/<int:article_id>/report")
 @login_required
 def report_article(article_id: int):
-    """PDD Figure 5.36. Forwarded to Moderation; never acted on here."""
+    """PDD Figure 5.26. Forwarded to Moderation; never acted on here.
+
+    The reason is chosen from a fixed list rather than typed. Free text made
+    every report a small essay for a moderator to interpret, and the same
+    complaint arrived worded five different ways. A fixed category plus optional
+    detail is sortable, and it is what the wireframe specifies.
+    """
     article = _published_article(article_id)
     data = json_body()
 
-    reason = clean_plain_text(data.get("reason") or "")
-    if not reason:
-        raise ApiError("Tell us what is inaccurate.", status=422, field="reason")
+    category = (data.get("category") or "").strip()
+    if category not in REPORT_REASONS:
+        raise ApiError(
+            "Choose a reason for the report.", status=422, field="category"
+        )
+
+    detail = clean_plain_text(data.get("detail") or "")[:1000]
+    reason = f"{REPORT_REASONS[category]}{': ' + detail if detail else ''}"
 
     if Report.query.filter_by(article_id=article.id, reporter_id=g.current_user.id).first():
         raise ApiError("You have already reported this article.", status=409)

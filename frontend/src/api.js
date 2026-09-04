@@ -67,7 +67,9 @@ export const api = {
   post: (path, body) => request(path, { method: "POST", body }),
   patch: (path, body) => request(path, { method: "PATCH", body }),
   put: (path, body) => request(path, { method: "PUT", body }),
-  del: (path) => request(path, { method: "DELETE" }),
+  // DELETE carries a body in one place: removing an account also decides what
+  // happens to that account's published articles.
+  del: (path, body) => request(path, { method: "DELETE", body }),
 
   // Auth is the one group that must work without a token.
   login: (email, password) =>
