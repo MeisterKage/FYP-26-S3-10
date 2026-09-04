@@ -15,6 +15,8 @@
  */
 import { useCallback, useEffect, useState } from "react";
 
+import { Link } from "react-router-dom";
+
 import { api } from "../api";
 import { ROLES, useAuth } from "../auth";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
@@ -24,6 +26,8 @@ const TABS = [
   ["users", "Accounts"],
   ["applications", "Applications"],
   ["editors", "Editors"],
+  ["articles", "Articles"],
+  ["disputes", "Disputes"],
   ["categories", "Categories"],
   ["scoring", "Scoring"],
   ["logs", "Logs"],
@@ -719,6 +723,241 @@ function Logs() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Article moderation (PDD Figure 5.93)                               */
+/* ------------------------------------------------------------------ */
+
+const ARTICLE_STATUSES = [
+  "", "published", "pending", "scheduled", "unpublished", "retracted", "rejected", "draft",
+];
+
+const ACTION_LABELS = {
+  suspend: "Take off the site",
+  reinstate: "Put back up",
+  reject: "Reject",
+};
+
+function Articles({ onNotice }) {
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("");
+  const state = useResource(
+    `/admin/articles?q=${encodeURIComponent(query)}&status=${status}`,
+  );
+  const [busy, setBusy] = useState(null);
+
+  async function moderate(article, action) {
+    if (
+      action === "suspend" &&
+      !window.confirm(
+        `Take “${article.title}” off the site? It is not deleted and can go back up.`,
+      )
+    )
+      return;
+
+    setBusy(article.id);
+    try {
+      await api.post(`/admin/articles/${article.id}/moderate`, { action });
+      onNotice(
+        `“${article.title}” is now ${action === "reinstate" ? "live" : "off the site"}.`,
+      );
+      state.reload();
+    } catch (e) {
+      state.setError(e.message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <>
+      <div className="filter-bar">
+        <input
+          className="input"
+          type="search"
+          placeholder="Search headlines"
+          aria-label="Search articles"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <select
+          className="input"
+          aria-label="Filter by status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          {ARTICLE_STATUSES.map((s) => (
+            <option key={s || "any"} value={s}>
+              {s ? s[0].toUpperCase() + s.slice(1) : "Any status"}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <Panel state={state}>
+        {(d) =>
+          d.articles.length === 0 ? (
+            <Empty title="No articles match">Try a different search or status.</Empty>
+          ) : (
+            <div className="table-scroll mt-5">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Article</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.articles.map((a) => (
+                    <tr key={a.id}>
+                      <td>
+                        <Link className="link-quiet" to={`/articles/${a.slug}`}>
+                          {a.title}
+                        </Link>
+                        <br />
+                        <span className="meta">{a.contributor}</span>
+                      </td>
+                      <td>
+                        <span className="status" data-status={a.status}>
+                          {a.status}
+                        </span>
+                      </td>
+                      <td
+                        className="meta tabular"
+                        data-blank={!a.credibilityScore || undefined}
+                      >
+                        {a.credibilityScore ? Math.round(a.credibilityScore) : "—"}
+                      </td>
+                      <td>
+                        {/* Only the actions that apply to this status. The
+                            server enforces the same table. */}
+                        <div className="row gap-2">
+                          {a.actions.map((action) => (
+                            <Button
+                              key={action}
+                              size="sm"
+                              variant={action === "reinstate" ? "outline" : "quiet"}
+                              busy={busy === a.id}
+                              onClick={() => moderate(a, action)}
+                            >
+                              {ACTION_LABELS[action] || action}
+                            </Button>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        }
+      </Panel>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Credibility disputes (PDD Figure 5.94)                             */
+/* ------------------------------------------------------------------ */
+
+function Disputes({ onNotice }) {
+  const state = useResource("/moderation/disputes");
+  const [busy, setBusy] = useState(null);
+
+  async function resolve(dispute, outcome) {
+    const note = window.prompt(
+      outcome === "reverse"
+        ? "Note for the writer (optional)"
+        : "Tell the writer why the correction stands (optional)",
+    );
+    if (note === null) return;
+
+    setBusy(dispute.id);
+    try {
+      await api.post(`/moderation/disputes/${dispute.id}/resolve`, { outcome, note });
+      onNotice(
+        outcome === "reverse"
+          ? "Correction reversed and scores restored."
+          : "Correction stands. The writer has been told.",
+      );
+      state.reload();
+    } catch (e) {
+      state.setError(e.message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <Panel state={state}>
+      {(d) =>
+        d.disputes.length === 0 ? (
+          <Empty title="No disputes waiting">
+            A writer can challenge a correction logged against their article. It
+            arrives here with the correction and its effect on the score attached.
+          </Empty>
+        ) : (
+          <div className="stack">
+            {d.disputes.map((x) => (
+              <article className="submission" key={x.id}>
+                <div className="submission-main">
+                  <h3 className="entry-title">
+                    <Link className="link-quiet" to={`/articles/${x.article.slug}`}>
+                      {x.article.title}
+                    </Link>
+                  </h3>
+                  <p className="entry-meta mt-3">
+                    <span>{x.contributor.name}</span>
+                    <span className="dot" aria-hidden="true" />
+                    <span className="tabular">
+                      Score {Math.round(x.article.credibilityScore ?? 0)}
+                    </span>
+                    <span className="dot" aria-hidden="true" />
+                    <span>Filed {formatDate(x.filedAt)}</span>
+                  </p>
+
+                  <p className="label mt-6">The correction being challenged</p>
+                  <p className="entry-summary mt-2">
+                    <span className="tag">{x.correction.type}</span> {x.correction.reason}
+                  </p>
+
+                  <p className="label mt-5">The writer&rsquo;s case</p>
+                  <p className="entry-summary mt-2">{x.case}</p>
+
+                  <div className="row gap-4 mt-6">
+                    <Button
+                      variant="primary"
+                      busy={busy === x.id}
+                      onClick={() => resolve(x, "reverse")}
+                    >
+                      Reverse the correction
+                    </Button>
+                    <Button
+                      variant="outline"
+                      busy={busy === x.id}
+                      onClick={() => resolve(x, "uphold")}
+                    >
+                      It stands
+                    </Button>
+                  </div>
+                  <p className="meta mt-4">
+                    Reversing restores this article&rsquo;s score and the writer&rsquo;s
+                    accuracy rate across everything they have published.
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        )
+      }
+    </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 
 export default function AdminConsole() {
   const { user } = useAuth();
@@ -734,6 +973,8 @@ export default function AdminConsole() {
     users: <Accounts onNotice={onNotice} />,
     applications: <Applications onNotice={onNotice} />,
     editors: <Editors onNotice={onNotice} />,
+    articles: <Articles onNotice={onNotice} />,
+    disputes: <Disputes onNotice={onNotice} />,
     categories: <Categories onNotice={onNotice} />,
     scoring: <Scoring onNotice={onNotice} />,
     logs: <Logs />,

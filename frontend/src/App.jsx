@@ -20,6 +20,7 @@ import ContributorProfile from "./pages/ContributorProfile";
 import ResetPassword from "./pages/ResetPassword";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
+import PricingPage from "./pages/PricingPage";
 import Moderation from "./pages/Moderation";
 import RegisterPage from "./pages/RegisterPage";
 import ReviewQueue from "./pages/ReviewQueue";
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/articles/:slug" element={<ArticlePage />} />
             <Route path="/categories/:slug" element={<CategoryPage />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />

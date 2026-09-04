@@ -17,7 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from ..enums import AUTHORING_ROLES, Role, SubscriptionStatus
 from ..errors import ApiError
 from ..extensions import db
-from ..integrations import payment_gateway, revenue_tier_for
+from ..integrations import REVENUE_TIERS, payment_gateway, revenue_tier_for
 from ..models import Payout, Subscription, User, utcnow
 from ..security import login_required, roles_required
 from ..validation import json_body
@@ -26,6 +26,33 @@ bp = Blueprint("subscriptions", __name__)
 
 #: Flat monthly price in cents for v1. Per-contributor pricing is a later step.
 DEFAULT_PRICE_CENTS = 500
+
+
+@bp.get("/subscription-tiers")
+def subscription_tiers():
+    """PDD Figure 5.3, public.
+
+    A visitor deciding whether to subscribe needs the context for why one
+    writer's price differs from another's: the platform's cut falls as a writer
+    gains subscribers, so more of a subscription reaches the writer over time.
+
+    Public and unauthenticated on purpose. This is the page that explains the
+    commercial model to someone who has not signed up yet.
+    """
+    return jsonify(
+        {
+            "monthlyPriceCents": DEFAULT_PRICE_CENTS,
+            "tiers": [
+                {
+                    "name": name,
+                    "fromSubscribers": threshold,
+                    "platformSharePercent": round(share * 100),
+                    "contributorSharePercent": round((1 - share) * 100),
+                }
+                for threshold, name, share in REVENUE_TIERS
+            ],
+        }
+    )
 
 
 @bp.get("/me/subscription")

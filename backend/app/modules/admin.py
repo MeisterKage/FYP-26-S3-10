@@ -540,3 +540,107 @@ def logs():
             ]
         }
     )
+
+
+# --------------------------------------------------------------------------- #
+#  Article moderation  (PDD Figure 5.93)
+# --------------------------------------------------------------------------- #
+
+#: What an administrator may do to an article, keyed by its current status. The
+#: interface renders only the relevant actions, and the server enforces the same
+#: table rather than trusting it.
+ARTICLE_ACTIONS = {
+    ArticleStatus.PUBLISHED: {"suspend"},
+    ArticleStatus.UNPUBLISHED: {"reinstate"},
+    ArticleStatus.RETRACTED: {"reinstate"},
+    ArticleStatus.PENDING: {"reject"},
+    ArticleStatus.SCHEDULED: {"suspend"},
+}
+
+
+@bp.get("/admin/articles")
+@admin_only
+def list_all_articles():
+    """Every article on the platform, not just one review queue.
+
+    An editor sees their assigned sections; an administrator answers for the
+    whole platform, which means being able to find any article regardless of who
+    reviews that section.
+    """
+    q = (request.args.get("q") or "").strip()
+    status = request.args.get("status")
+
+    query = Article.query
+    if q:
+        query = query.filter(Article.title.ilike(f"%{q}%"))
+    if status:
+        try:
+            query = query.filter(Article.status == ArticleStatus(status))
+        except ValueError:
+            raise ApiError(f"Unknown status '{status}'.", status=422, field="status")
+
+    articles = query.order_by(Article.updated_at.desc()).limit(100).all()
+    return jsonify(
+        {
+            "articles": [
+                {
+                    "id": a.id,
+                    "slug": a.slug,
+                    "title": a.title,
+                    "status": a.status.value,
+                    "contributor": a.contributor.byline,
+                    "credibilityScore": a.credibility_score,
+                    "publishedAt": a.published_at.isoformat() if a.published_at else None,
+                    "actions": sorted(ARTICLE_ACTIONS.get(a.status, set())),
+                }
+                for a in articles
+            ]
+        }
+    )
+
+
+@bp.post("/admin/articles/<int:article_id>/moderate")
+@admin_only
+def moderate_article(article_id: int):
+    """Suspend, reinstate, or reject any article.
+
+    Suspending unpublishes rather than deletes. A published article that was
+    later corrected is the record of that correction, so the row survives even
+    when the article comes off the site.
+    """
+    article = Article.query.get(article_id)
+    if article is None:
+        raise ApiError("Article not found.", status=404)
+
+    action = json_body().get("action")
+    allowed = ARTICLE_ACTIONS.get(article.status, set())
+    if action not in allowed:
+        raise ApiError(
+            f"An article that is {article.status.value} cannot be {action or 'acted on'}."
+            + (f" Available: {', '.join(sorted(allowed))}." if allowed else ""),
+            status=409, field="action",
+        )
+
+    if action == "suspend":
+        article.status = ArticleStatus.UNPUBLISHED
+        title, body = "Your article was taken down", "An administrator suspended it."
+    elif action == "reinstate":
+        article.status = ArticleStatus.PUBLISHED
+        title, body = "Your article is live again", "An administrator reinstated it."
+    else:
+        article.status = ArticleStatus.REJECTED
+        title, body = "Your submission was rejected", "An administrator rejected it."
+
+    db.session.add(
+        Notification(
+            user_id=article.contributor_id,
+            event_type=f"article.{action}",
+            title=title,
+            body=body,
+            link=f"/articles/{article.slug}",
+        )
+    )
+    _audit(f"article.{action}", "article", article.id)
+    db.session.commit()
+
+    return jsonify({"status": article.status.value})

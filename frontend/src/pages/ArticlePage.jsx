@@ -20,6 +20,7 @@ import {
   CredibilityMeter,
 } from "../components/Credibility";
 import ArticleExtras from "../components/ArticleExtras";
+import Corrections from "../components/Corrections";
 import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
@@ -164,6 +165,8 @@ export default function ArticlePage() {
               </p>
             </section>
           )}
+
+          <Corrections article={article} />
 
           <footer className="article-foot">
             {reported ? (

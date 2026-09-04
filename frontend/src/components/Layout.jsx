@@ -118,6 +118,9 @@ export function Footer() {
           <Link className="link-quiet" to="/about">
             How scoring works
           </Link>
+          <Link className="link-quiet" to="/pricing">
+            Subscriptions
+          </Link>
           <Link className="link-quiet" to="/search">
             Search
           </Link>

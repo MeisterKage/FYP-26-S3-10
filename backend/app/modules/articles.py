@@ -101,6 +101,19 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         "sources": [
             {"url": s.url, "label": s.label, "isValid": s.is_valid} for s in article.sources
         ],
+        # Public. A correction is why a score fell, and the product's claim is
+        # that a reader can trace that. It is also how the writer finds the
+        # correction they want to dispute.
+        "corrections": [
+            {
+                "id": c.id,
+                "type": c.correction_type.value,
+                "reason": c.reason,
+                "issuedAt": c.created_at.isoformat(),
+                "overturned": c.overturned_at is not None,
+            }
+            for c in sorted(article.corrections, key=lambda c: c.created_at, reverse=True)
+        ],
     }
 
     if not include_body:

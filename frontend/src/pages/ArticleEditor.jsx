@@ -14,6 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { api, ApiError } from "../api";
 import { SourceIcon } from "../components/Icon";
+import RichText from "../components/RichText";
 import { Button, Field, Notice, SectionHead, formatDate } from "../components/UI";
 
 const MAX_SOURCES = 20;
@@ -389,16 +390,17 @@ export default function ArticleEditor() {
         <Field
           label="Article"
           id="body"
-          hint="Basic HTML is allowed. Anything unsafe is stripped when you save."
+          hint="Anything unsafe is stripped when you save, whatever you paste."
           error={fieldError.body}
         >
           {(props) => (
-            <textarea
+            <RichText
               {...props}
-              className="textarea textarea-body"
-              rows={18}
               value={form.body}
-              onChange={set("body")}
+              onChange={(html) => {
+                setForm((f) => ({ ...f, body: html }));
+                setFieldError((f) => ({ ...f, body: undefined }));
+              }}
               disabled={!editable}
             />
           )}

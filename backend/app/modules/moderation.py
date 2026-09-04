@@ -9,10 +9,16 @@ from flask import Blueprint, g, jsonify, request
 from sqlalchemy import func
 
 from ..credibility import DEFAULTS
-from ..enums import REVIEW_ROLES, ArticleStatus, CorrectionType, ReportStatus, Role
+from ..enums import (
+    AUTHORING_ROLES, REVIEW_ROLES, ArticleStatus, CorrectionType, DisputeStatus,
+    ReportStatus, Role,
+)
 from ..errors import ApiError
 from ..extensions import db
-from ..models import Article, AuditLog, Comment, Correction, Notification, Report, utcnow
+from ..models import (
+    Article, AuditLog, Comment, Correction, CorrectionDispute, Notification, Report,
+    utcnow,
+)
 from ..sanitize import clean_plain_text
 from ..scoring_service import load_settings, rescore_contributor_articles
 from ..security import editor_owns_category, roles_required
@@ -257,3 +263,155 @@ def duplicate_titles(title: str, exclude_article_id: int | None = None) -> list[
     if exclude_article_id:
         query = query.filter(Article.id != exclude_article_id)
     return [a.id for a in query]
+
+
+# --------------------------------------------------------------------------- #
+#  Credibility disputes  (PDD Figure 5.94)
+# --------------------------------------------------------------------------- #
+
+@bp.post("/corrections/<int:correction_id>/dispute")
+@roles_required(*AUTHORING_ROLES)
+def file_dispute(correction_id: int):
+    """A writer's challenge to a correction against their own article.
+
+    Until now the only route to reversing a correction was an administrator
+    noticing one was wrong. A correction lowers both the article's score and the
+    writer's accuracy rate across everything they have published, so the person
+    it lands on needs a way to put their case.
+    """
+    correction = Correction.query.get(correction_id)
+    if correction is None:
+        raise ApiError("Correction not found.", status=404)
+
+    article = Article.query.get(correction.article_id)
+    if article.contributor_id != g.current_user.id:
+        raise ApiError("You can only dispute a correction against your own work.", status=403)
+    if correction.overturned_at is not None:
+        raise ApiError("This correction has already been overturned.", status=409)
+
+    argument = clean_plain_text(json_body().get("case") or "")
+    if not argument:
+        raise ApiError("Set out why the correction is wrong.", status=422, field="case")
+
+    if CorrectionDispute.query.filter_by(
+        correction_id=correction.id, contributor_id=g.current_user.id
+    ).first():
+        raise ApiError("You have already disputed this correction.", status=409)
+
+    db.session.add(
+        CorrectionDispute(
+            correction_id=correction.id, contributor_id=g.current_user.id, argument=argument
+        )
+    )
+    db.session.commit()
+    return jsonify({"message": "Dispute filed. An administrator will review it."}), 201
+
+
+@bp.get("/moderation/disputes")
+@roles_required(Role.SYSTEM_ADMIN)
+def list_disputes():
+    """The administrator's queue, with everything needed to decide in one place.
+
+    The original correction, its effect on the score, and the writer's case
+    travel together: an administrator should not have to open three screens to
+    answer one question.
+    """
+    rows = (
+        CorrectionDispute.query.filter_by(status=DisputeStatus.OPEN)
+        .order_by(CorrectionDispute.created_at.asc())
+        .all()
+    )
+
+    payload = []
+    for dispute in rows:
+        correction = Correction.query.get(dispute.correction_id)
+        article = Article.query.get(correction.article_id)
+        payload.append(
+            {
+                "id": dispute.id,
+                "case": dispute.argument,
+                "filedAt": dispute.created_at.isoformat(),
+                "contributor": {
+                    "id": dispute.contributor_id,
+                    "name": article.contributor.byline,
+                    "accuracyRate": article.contributor.accuracy_rate,
+                },
+                "correction": {
+                    "id": correction.id,
+                    "type": correction.correction_type.value,
+                    "reason": correction.reason,
+                    "issuedAt": correction.created_at.isoformat(),
+                },
+                "article": {
+                    "id": article.id,
+                    "slug": article.slug,
+                    "title": article.title,
+                    "credibilityScore": article.credibility_score,
+                },
+            }
+        )
+
+    return jsonify({"disputes": payload})
+
+
+@bp.post("/moderation/disputes/<int:dispute_id>/resolve")
+@roles_required(Role.SYSTEM_ADMIN)
+def resolve_dispute(dispute_id: int):
+    """Binary, per the PDD: the correction is reversed or it stands.
+
+    Reversing overturns the correction and rescores the writer's whole
+    catalogue, because accuracy feeds every article they have published.
+    """
+    dispute = CorrectionDispute.query.get(dispute_id)
+    if dispute is None:
+        raise ApiError("Dispute not found.", status=404)
+    if dispute.status != DisputeStatus.OPEN:
+        raise ApiError("This dispute has already been decided.", status=409)
+
+    data = json_body()
+    outcome = data.get("outcome")
+    if outcome not in {"reverse", "uphold"}:
+        raise ApiError("Outcome must be 'reverse' or 'uphold'.", status=422, field="outcome")
+
+    correction = Correction.query.get(dispute.correction_id)
+    article = Article.query.get(correction.article_id)
+
+    dispute.status = DisputeStatus.REVERSED if outcome == "reverse" else DisputeStatus.UPHELD
+    dispute.resolved_by_id = g.current_user.id
+    dispute.resolution_note = clean_plain_text(data.get("note") or "") or None
+
+    if outcome == "reverse" and correction.overturned_at is None:
+        correction.overturned_at = utcnow()
+        correction.overturned_by_id = g.current_user.id
+        if correction.correction_type == CorrectionType.RETRACTION:
+            article.status = ArticleStatus.PUBLISHED
+        db.session.flush()
+        rescore_contributor_articles(article.contributor)
+
+    db.session.add(
+        Notification(
+            user_id=dispute.contributor_id,
+            event_type="dispute.resolved",
+            title=(
+                "Your dispute was upheld"
+                if outcome == "reverse"
+                else "Your dispute was not upheld"
+            ),
+            body=dispute.resolution_note or "",
+            link=f"/articles/{article.slug}",
+        )
+    )
+    db.session.add(
+        AuditLog(
+            actor_id=g.current_user.id,
+            action=f"dispute.{outcome}",
+            entity_type="dispute",
+            entity_id=dispute.id,
+            detail=dispute.resolution_note,
+        )
+    )
+    db.session.commit()
+
+    return jsonify(
+        {"status": dispute.status.value, "articleScore": article.credibility_score}
+    )

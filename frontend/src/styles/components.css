@@ -1256,3 +1256,11 @@
   padding-top: var(--s-4);
   border-top: 1px solid var(--hair);
 }
+
+/* Corrections sit between the body and the engagement bar: after the article
+   they qualify, before anything a reader might do about it. */
+.corrections {
+  margin-top: var(--s-7);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+}

@@ -38,6 +38,12 @@ class ArticleStatus(str, Enum):
     RETRACTED = "retracted"
 
 
+class DisputeStatus(str, Enum):
+    OPEN = "open"
+    UPHELD = "upheld"       # the correction stands
+    REVERSED = "reversed"   # the correction is overturned and scores restored
+
+
 class CorrectionType(str, Enum):
     CORRECTION = "correction"
     RETRACTION = "retraction"

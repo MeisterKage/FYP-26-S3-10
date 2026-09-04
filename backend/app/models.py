@@ -26,8 +26,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .enums import (
-    ApplicationStatus, ArticleStatus, CorrectionType, ReportStatus, Role,
-    SubscriptionStatus,
+    ApplicationStatus, ArticleStatus, CorrectionType, DisputeStatus, ReportStatus,
+    Role, SubscriptionStatus,
 )
 from .extensions import db
 
@@ -281,6 +281,36 @@ class Correction(TimestampMixin, db.Model):
     overturned_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
 
     article: Mapped[Article] = relationship(back_populates="corrections")
+
+
+class CorrectionDispute(TimestampMixin, db.Model):
+    """A contributor's challenge to a correction against their work.
+
+    PDD Figure 5.94. A correction lowers both the article's score and the
+    writer's accuracy rate, and until now the only route to reversing one was an
+    administrator noticing. This gives the writer a way to put their case, and
+    an administrator a queue to answer it, with the original correction and its
+    effect on the score attached.
+
+    One open dispute per correction: a second filing is the same argument again,
+    not new information.
+    """
+
+    __tablename__ = "correction_disputes"
+    __table_args__ = (UniqueConstraint("correction_id", "contributor_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    correction_id: Mapped[int] = mapped_column(
+        ForeignKey("corrections.id", ondelete="CASCADE"), index=True
+    )
+    contributor_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    argument: Mapped[str] = mapped_column(Text)
+    status: Mapped[DisputeStatus] = mapped_column(
+        SAEnum(DisputeStatus, name="dispute_status"),
+        default=DisputeStatus.OPEN, index=True,
+    )
+    resolved_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    resolution_note: Mapped[str | None] = mapped_column(Text)
 
 
 class Report(TimestampMixin, db.Model):
