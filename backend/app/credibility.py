@@ -44,7 +44,11 @@ from dataclasses import dataclass
 DEFAULTS: dict[str, float] = {
     # Accuracy rate
     "min_articles_for_accuracy": 5,     # below this, show "New Contributor"
-    "provisional_accuracy": 70.0,       # stand-in accuracy for new contributors
+    "provisional_accuracy": 70.0,
+    #: How many articles' worth of the baseline is blended into an accuracy
+    #: rate. Higher means a record moves more slowly and small samples are
+    #: treated more cautiously.
+    "smoothing_articles": 5.0,       # stand-in accuracy for new contributors
     # Credibility score
     "accuracy_weight": 0.75,            # accuracy 0-100 contributes 0-75
     "source_points": 5.0,               # points per verifiable source link
@@ -104,6 +108,25 @@ def band_for(score: float) -> str:
     return BANDS[-1][1]
 
 
+def smoothed_accuracy(
+    published_count: int,
+    corrected_or_retracted_count: int,
+    settings: dict | None = None,
+) -> float:
+    """The accuracy figure the scoring engine uses, at any article count.
+
+    Always a number. `accuracy_rate` below is the same curve, withheld from
+    display until the contributor has published enough to show it.
+    """
+    cfg = {**DEFAULTS, **(settings or {})}
+
+    clean = max(0, published_count - corrected_or_retracted_count)
+    k = float(cfg["smoothing_articles"])
+    prior = float(cfg["provisional_accuracy"]) / 100.0
+
+    return round(100.0 * (clean + k * prior) / (max(0, published_count) + k), 2)
+
+
 def accuracy_rate(
     published_count: int,
     corrected_or_retracted_count: int,
@@ -118,11 +141,19 @@ def accuracy_rate(
 
     if published_count < int(cfg["min_articles_for_accuracy"]):
         return None
-    if published_count <= 0:
-        return None
 
-    clean = max(0, published_count - corrected_or_retracted_count)
-    return round(100.0 * clean / published_count, 2)
+    # Smoothed toward the platform baseline rather than a raw clean/total ratio.
+    #
+    # A raw ratio punishes small records unfairly hard. With five articles, one
+    # correction took a writer from 100% to 80%, removing 15 points from every
+    # article they had ever published; the same correction against a writer with
+    # forty articles cost under two. Same mistake, eight times the penalty,
+    # purely for being new.
+    #
+    # It is the same adjustment used for rating averages everywhere: an average
+    # over few observations is pulled toward the population mean until there is
+    # enough evidence to trust it.
+    return smoothed_accuracy(published_count, corrected_or_retracted_count, cfg)
 
 
 def credibility_score(
@@ -133,16 +164,25 @@ def credibility_score(
     is_retracted: bool,
     upheld_report_count: int,
     settings: dict | None = None,
+    accuracy_withheld: bool = False,
 ) -> ScoreBreakdown:
     """Score one article. Pure: no database access, no clock, no randomness.
 
-    `contributor_accuracy` of None means the contributor has not yet reached the
-    minimum article count, so the provisional rate stands in for it.
+    `contributor_accuracy` is the smoothed figure from `smoothed_accuracy`, which
+    exists at every article count. Passing None falls back to the bare baseline,
+    which is only useful for a contributor with no record at all.
+
+    `accuracy_withheld` says the contributor has not yet published enough for
+    their rate to be shown publicly. It changes nothing about the arithmetic; it
+    marks the ledger so a reader is told the writer is new rather than being
+    shown a figure the profile page refuses to display.
     """
     cfg = {**DEFAULTS, **(settings or {})}
 
-    used_provisional = contributor_accuracy is None
-    accuracy = cfg["provisional_accuracy"] if used_provisional else contributor_accuracy
+    accuracy = (
+        cfg["provisional_accuracy"] if contributor_accuracy is None else contributor_accuracy
+    )
+    used_provisional = accuracy_withheld or contributor_accuracy is None
 
     accuracy_component = cfg["accuracy_weight"] * accuracy
     source_component = min(max(0, source_count) * cfg["source_points"], cfg["source_cap"])

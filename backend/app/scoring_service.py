@@ -73,7 +73,13 @@ def rescore_article(article: Article, settings: dict | None = None):
     """
     cfg = settings if settings is not None else load_settings()
 
-    accuracy = recalculate_accuracy(article.contributor, cfg)
+    # Two different figures on purpose. `recalculate_accuracy` persists the
+    # public rate, which is withheld below the minimum article count. The score
+    # uses the same curve without that cutoff, so a contributor crossing the
+    # minimum does not shift their whole back catalogue in one step.
+    published_rate = recalculate_accuracy(article.contributor, cfg)
+    published, blemished = _published_counts(article.contributor_id)
+    accuracy = credibility.smoothed_accuracy(published, blemished, cfg)
 
     valid_sources = sum(1 for s in article.sources if s.is_valid)
     corrections = sum(1 for c in article.corrections if c.overturned_at is None)
@@ -91,6 +97,7 @@ def rescore_article(article: Article, settings: dict | None = None):
         is_retracted=article.is_retracted,
         upheld_report_count=upheld_reports,
         settings=cfg,
+        accuracy_withheld=published_rate is None,
     )
 
     article.credibility_score = result.score
@@ -109,7 +116,7 @@ def explain_article(article: Article, settings: dict | None = None):
     cfg = settings if settings is not None else load_settings()
 
     published, blemished = _published_counts(article.contributor_id)
-    accuracy = credibility.accuracy_rate(published, blemished, cfg)
+    accuracy = credibility.smoothed_accuracy(published, blemished, cfg)
 
     upheld = (
         db.session.query(func.count(Report.id))
@@ -125,6 +132,7 @@ def explain_article(article: Article, settings: dict | None = None):
         is_retracted=article.is_retracted,
         upheld_report_count=upheld,
         settings=cfg,
+        accuracy_withheld=credibility.accuracy_rate(published, blemished, cfg) is None,
     )
 
 

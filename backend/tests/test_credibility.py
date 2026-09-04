@@ -22,21 +22,61 @@ def test_accuracy_none_is_not_zero():
     assert accuracy_rate(0, 0) is None
 
 
-def test_accuracy_all_clean():
-    assert accuracy_rate(10, 0) == 100.0
+def test_accuracy_rises_with_a_clean_record_but_never_instantly():
+    """Smoothed, not a raw ratio: ten clean articles is strong evidence, not
+    proof of perfection, so the figure approaches 100 rather than reaching it."""
+    assert 88 < accuracy_rate(10, 0) < 100
+    assert accuracy_rate(40, 0) > accuracy_rate(10, 0)
 
 
-def test_accuracy_with_corrections():
-    assert accuracy_rate(10, 3) == 70.0
+def test_accuracy_falls_with_corrections():
+    assert accuracy_rate(10, 3) < accuracy_rate(10, 0)
 
 
-def test_accuracy_all_corrected():
-    assert accuracy_rate(5, 5) == 0.0
+def test_an_entirely_corrected_record_scores_low_but_not_zero():
+    """Even a wholly corrected record keeps the baseline's contribution, so the
+    figure floors near the baseline rather than at zero."""
+    rate = accuracy_rate(5, 5)
+    assert 0 < rate < 40
 
 
 def test_accuracy_respects_admin_threshold():
-    settings = {"min_articles_for_accuracy": 2}
-    assert accuracy_rate(3, 0, settings) == 100.0
+    """The threshold governs when the figure is shown, not how it is computed."""
+    assert accuracy_rate(3, 0) is None
+    assert accuracy_rate(3, 0, {"min_articles_for_accuracy": 2}) is not None
+
+
+def test_a_new_writer_is_not_punished_far_harder_for_the_same_mistake():
+    """The fairness property this smoothing exists for.
+
+    A raw clean/total ratio cost a five-article writer 20 accuracy points for
+    one correction and a forty-article writer 2.5: the same mistake, eight
+    times the penalty, purely for being new. Some difference is right, because
+    one correction genuinely is more of the evidence when there is less of it.
+    An eightfold difference is not.
+    """
+    new_writer = accuracy_rate(5, 0) - accuracy_rate(5, 1)
+    veteran = accuracy_rate(40, 0) - accuracy_rate(40, 1)
+
+    assert new_writer > veteran, "a correction should still matter more early on"
+    assert new_writer / veteran < 5, "but not by the margin a raw ratio produced"
+
+
+def test_crossing_the_minimum_does_not_jump_the_back_catalogue():
+    """Display is withheld below the minimum; scoring is not.
+
+    Both use one curve, so publishing the article that first reveals a rate
+    does not move the score of everything published before it.
+    """
+    from app.credibility import smoothed_accuracy
+
+    below = smoothed_accuracy(4, 0)
+    at = smoothed_accuracy(5, 0)
+
+    assert accuracy_rate(4, 0) is None
+    assert accuracy_rate(5, 0) == at
+    # A single further article moves the input by a couple of points, not twenty.
+    assert 0 < at - below < 3
 
 
 # --------------------------------------------------------------------------- #

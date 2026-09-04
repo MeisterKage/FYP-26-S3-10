@@ -212,8 +212,10 @@ def test_draft_to_published_journey(client, category):
     assert payload["article"]["credibility"]["score"] > 0
     # First article, so the contributor is still "New Contributor".
     assert payload["credibility"]["provisional"] is True
-    # 0.75 * 70 provisional + 2 sources * 5 = 62.5
-    assert payload["credibility"]["score"] == 62.5
+    # One clean article smooths to 75% rather than the bare 70% baseline, so a
+    # first piece counts slightly in the writer's favour instead of being
+    # ignored: 0.75 * 75 + 2 sources * 5 = 66.25.
+    assert payload["credibility"]["score"] == 66.25
 
     slug = payload["article"]["slug"]
     public = client.get(f"/api/articles/{slug}")
