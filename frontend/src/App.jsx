@@ -10,10 +10,14 @@ import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, ROLES, useAuth } from "./auth";
 import { ErrorBoundary, Footer, Masthead } from "./components/Layout";
 import { Button, Empty } from "./components/UI";
 import AboutPage from "./pages/AboutPage";
+import Account from "./pages/Account";
 import AdminConsole from "./pages/AdminConsole";
 import ArticleEditor from "./pages/ArticleEditor";
 import ArticlePage from "./pages/ArticlePage";
 import ContributorDashboard from "./pages/ContributorDashboard";
+import CategoryPage from "./pages/CategoryPage";
+import ContributorProfile from "./pages/ContributorProfile";
+import ResetPassword from "./pages/ResetPassword";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import Moderation from "./pages/Moderation";
@@ -78,6 +82,9 @@ export default function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/articles/:slug" element={<ArticlePage />} />
+            <Route path="/categories/:slug" element={<CategoryPage />} />
+            <Route path="/contributors/:id" element={<ContributorProfile />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
@@ -101,6 +108,14 @@ export default function App() {
               element={
                 <RequireRole roles={CAN_REVIEW}>
                   <ReviewQueue />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <RequireRole roles={Object.values(ROLES)}>
+                  <Account />
                 </RequireRole>
               }
             />

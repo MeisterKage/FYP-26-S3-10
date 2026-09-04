@@ -1229,3 +1229,30 @@
   padding: 0;
   margin: 0;
 }
+
+/* Section links wrap onto their own row in the footer; at 360px a single row
+   of eight would either clip or force the page to scroll sideways. */
+.footer-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  flex: 1 1 100%;
+  order: 3;
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+}
+
+.article-extras {
+  margin-top: var(--s-5);
+}
+
+.revision-list {
+  list-style: none;
+  padding: 0;
+}
+
+.revision-list > li + li {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+}

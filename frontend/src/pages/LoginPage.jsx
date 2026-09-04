@@ -84,6 +84,9 @@ export default function LoginPage() {
             <Link className="link-quiet" to="/register">
               Create an account
             </Link>
+            <Link className="link-quiet" to="/reset-password">
+              Forgot your password?
+            </Link>
           </div>
         </form>
       </div>

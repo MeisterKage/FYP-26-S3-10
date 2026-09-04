@@ -19,6 +19,7 @@ import {
   CredibilityLedger,
   CredibilityMeter,
 } from "../components/Credibility";
+import ArticleExtras from "../components/ArticleExtras";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
@@ -95,7 +96,13 @@ export default function ArticlePage() {
         {article.summary && <p className="lead mt-5">{article.summary}</p>}
 
         <div className="article-byline">
-          <span style={{ color: "var(--ink)" }}>{article.contributor.name}</span>
+          <Link
+            className="link-quiet"
+            style={{ color: "var(--ink)" }}
+            to={`/contributors/${article.contributor.id}`}
+          >
+            {article.contributor.name}
+          </Link>
           <AccuracyRate rate={article.contributor.accuracyRate} />
           {date && <span>{date}</span>}
         </div>
@@ -180,6 +187,7 @@ export default function ArticlePage() {
                 </Button>
               )
             )}
+            <ArticleExtras article={article} />
           </footer>
 
           {/* Only a published article has a discussion: the server rejects

@@ -2,9 +2,10 @@
  * Page furniture: masthead, footer, and the error boundary that keeps one bad
  * render from blanking the whole application.
  */
-import { Component } from "react";
+import { Component, useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
+import { api } from "../api";
 import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, useAuth } from "../auth";
 import Notifications from "./Notifications";
 import { Button, Notice } from "./UI";
@@ -55,14 +56,14 @@ export function Masthead() {
 
           {user ? (
             <>
-              <span className="nav-link nav-name" style={{ color: "var(--ink)" }}>
+              <NavLink className="nav-link nav-name" to="/account">
                 {user.displayName}
-              </span>
+              </NavLink>
               <Button
                 variant="quiet"
                 size="sm"
-                onClick={() => {
-                  signOut();
+                onClick={async () => {
+                  await signOut();
                   navigate("/");
                 }}
               >
@@ -86,12 +87,33 @@ export function Masthead() {
 }
 
 export function Footer() {
+  // Sections are fetched rather than hard-coded: an administrator can add or
+  // remove one at runtime, and a footer listing last month's sections would be
+  // worse than listing none.
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("/categories")
+      .then((d) => setCategories(d.categories || []))
+      .catch(() => setCategories([]));
+  }, []);
+
   return (
     <footer className="footer">
       <div className="shell footer-inner">
         <p>
           The Record. Every article scored by a published formula.
         </p>
+        {categories.length > 0 && (
+          <nav className="footer-sections" aria-label="Sections">
+            {categories.map((c) => (
+              <Link className="link-quiet" key={c.id} to={`/categories/${c.slug}`}>
+                {c.name}
+              </Link>
+            ))}
+          </nav>
+        )}
         <nav aria-label="Footer">
           <Link className="link-quiet" to="/about">
             How scoring works

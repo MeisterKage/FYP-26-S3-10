@@ -110,6 +110,7 @@ export default function ArticleEditor() {
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState({});
   const [notice, setNotice] = useState(null);
+  const [publishAt, setPublishAt] = useState("");
 
   useEffect(() => {
     api
@@ -236,6 +237,23 @@ export default function ArticleEditor() {
       });
     } catch (e) {
       handleError(e);
+      setBusy(null);
+    }
+  }
+
+  /** PDD Figure 5.44. The server accepts this only on an approved article. */
+  async function schedule() {
+    setBusy("schedule");
+    setError(null);
+    try {
+      // datetime-local has no timezone, and the server treats a naive value as
+      // UTC. Send an explicit offset so "9am" means 9am where the writer is.
+      const iso = new Date(publishAt).toISOString();
+      await api.post(`/articles/${articleId}/schedule`, { publishAt: iso });
+      setNotice(`Scheduled to publish on ${new Date(publishAt).toLocaleString()}.`);
+    } catch (e) {
+      handleError(e);
+    } finally {
       setBusy(null);
     }
   }
@@ -421,6 +439,34 @@ export default function ArticleEditor() {
             Readers without a subscription see the opening lines and nothing more.
           </p>
         </div>
+
+        {(status === "published" || status === "scheduled") && (
+          <section className="well mt-7">
+            <p className="label">Schedule publication</p>
+            <p className="field-hint mt-2">
+              Only an approved article can be scheduled, and only for a time in the
+              future.
+            </p>
+            <div className="row gap-4 mt-4">
+              <input
+                className="input"
+                type="datetime-local"
+                aria-label="Publication time"
+                value={publishAt}
+                onChange={(e) => setPublishAt(e.target.value)}
+              />
+              <Button
+                variant="outline"
+                type="button"
+                busy={busy === "schedule"}
+                disabled={!publishAt}
+                onClick={schedule}
+              >
+                Schedule
+              </Button>
+            </div>
+          </section>
+        )}
 
         <div className="row gap-4 mt-7">
           <Button

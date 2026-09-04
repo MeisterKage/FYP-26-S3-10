@@ -55,7 +55,24 @@ export function AuthProvider({ children }) {
         setUser(data.user);
         return data.user;
       },
-      signOut() {
+      /** Re-read the session after the account page changes the profile. */
+      async refresh() {
+        try {
+          const data = await api.get("/auth/me");
+          setUser(data.user);
+        } catch {
+          /* A failed refresh leaves the existing session in place. */
+        }
+      },
+      async signOut() {
+        // Tell the server first so the session is recorded as ended, but never
+        // let a failed call strand the user in a signed-in interface: the local
+        // token is cleared either way.
+        try {
+          await api.post("/auth/logout");
+        } catch {
+          /* ignored */
+        }
         setToken(null);
         setUser(null);
       },
