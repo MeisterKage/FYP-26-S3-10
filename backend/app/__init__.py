@@ -8,6 +8,7 @@ from flask import Flask, jsonify
 from config import Config
 from .errors import register_error_handlers
 from .extensions import cors, db, migrate
+from .headers import register_security_headers
 from .ratelimit import limiter, register_rate_limit_handler
 from .security import load_current_user
 
@@ -48,6 +49,8 @@ def create_app(config_object=Config) -> Flask:
         engagement_bp, moderation_bp, notifications_bp, subscriptions_bp, admin_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
+
+    register_security_headers(app)
 
     register_error_handlers(app)
     # Registered after the generic handlers so the 429 keeps the API's error

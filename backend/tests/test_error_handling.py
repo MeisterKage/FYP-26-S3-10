@@ -403,3 +403,44 @@ def test_bounded_reapply_window(client):
     )
     assert response.status_code == 422
     assert_error_shape(response)
+
+
+# --------------------------------------------------------------------------- #
+#  Security response headers
+# --------------------------------------------------------------------------- #
+
+def test_every_response_refuses_to_be_framed(client):
+    """Clickjacking: without this, any site can frame ours and overlay a
+    transparent control over a real one a signed-in administrator will click."""
+    response = client.get("/api/health")
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
+
+
+def test_every_response_forbids_mime_sniffing(client):
+    """A browser that guesses a content type can be talked into running a JSON
+    response as script."""
+    assert client.get("/api/health").headers["X-Content-Type-Options"] == "nosniff"
+
+
+def test_headers_are_present_on_errors_too(client):
+    """An error path is still a response a browser acts on, so it needs the same
+    headers. Handlers that build their own response can skip an after_request
+    if it is wired in the wrong order."""
+    response = client.get("/api/definitely-not-a-route")
+    assert response.status_code == 404
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+
+
+def test_authorised_replies_are_not_cached_by_shared_caches(client):
+    assert client.get("/api/health").headers["Cache-Control"] == "no-store"
+
+
+def test_referrer_is_trimmed_to_the_origin(client):
+    """Article slugs travel in the URL; they should not follow a reader to a
+    third-party site in the Referer header."""
+    assert (
+        client.get("/api/health").headers["Referrer-Policy"]
+        == "strict-origin-when-cross-origin"
+    )

@@ -48,6 +48,19 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    # Render already sends HSTS and nosniff. These close clickjacking, which
+    # matters here because an administrator signed into /admin is exactly the
+    # session an overlay attack wants to borrow.
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Content-Security-Policy
+        value: frame-ancestors 'none'
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
     envVars:
       # Full URL with scheme, e.g. https://fyp-26-s3-10-api.onrender.com
       - key: VITE_API_BASE
