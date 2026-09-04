@@ -23,11 +23,17 @@ export function Button({
     .filter(Boolean)
     .join(" ");
 
+  // Default to type="button". A <button> with no type inside a form is a
+  // submit button, so an action button next to a form silently submits it.
+  // Every real submit in this codebase passes type="submit" explicitly.
+  const typeProp = As === "button" && rest.type === undefined ? { type: "button" } : {};
+
   return (
     <As
       className={classes}
       data-busy={busy || undefined}
       aria-busy={busy || undefined}
+      {...typeProp}
       {...rest}
     >
       {children}

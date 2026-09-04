@@ -17,7 +17,7 @@ from ..enums import ArticleStatus
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
-    Article, Category, Follow, User, UserCategoryPreference,
+    Article, Category, Follow, Like, SavedArticle, User, UserCategoryPreference,
 )
 from ..credibility import DEFAULTS, credibility_score
 from ..scoring_service import explain_article, load_settings
@@ -195,6 +195,22 @@ def read_article(slug: str):
         payload["credibility"] = {
             **payload["credibility"],
             **explain_article(article).as_dict(),
+        }
+
+    # Whether this reader has already liked or saved it. Two small lookups on a
+    # single article, deliberately not in serialize(): a list of twenty would
+    # turn that into forty extra queries for something no list displays.
+    payload["viewer"] = {"liked": False, "saved": False}
+    if viewer is not None:
+        payload["viewer"] = {
+            "liked": db.session.query(
+                Like.query.filter_by(article_id=article.id, user_id=viewer.id).exists()
+            ).scalar(),
+            "saved": db.session.query(
+                SavedArticle.query.filter_by(
+                    article_id=article.id, user_id=viewer.id
+                ).exists()
+            ).scalar(),
         }
 
     return jsonify({"article": payload})

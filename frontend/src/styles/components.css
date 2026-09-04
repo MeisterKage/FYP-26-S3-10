@@ -997,3 +997,93 @@
 .push { margin-left: auto; }
 .read { max-width: var(--w-read); }
 .wide { max-width: var(--w-wide); }
+
+/* ---------------------------------------------------------------------------
+   Discussion (PDD Figures 5.29-5.31)
+
+   A comment thread is a list of rules, like every other listing in this system.
+   Replies indent once and no further, matching the server's refusal to nest
+   deeper than one level.
+--------------------------------------------------------------------------- */
+
+.discussion {
+  margin-top: var(--s-8);
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--hair);
+}
+
+.engagement {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: center;
+}
+
+.comment-list,
+.comment-replies {
+  list-style: none;
+  padding: 0;
+}
+
+.comment {
+  padding-block: var(--s-5);
+  border-top: 1px solid var(--hair);
+}
+
+.comment-list > .comment:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.comment-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+}
+
+.comment-author {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.comment-body {
+  font-family: var(--font-body);
+  color: var(--body);
+  line-height: var(--lh-body);
+  /* Comment text is reader-supplied, so a pasted URL must wrap rather than
+     push the column wider than the page. */
+  overflow-wrap: anywhere;
+}
+
+/* One level of indent, marked by a rule rather than by whitespace alone so the
+   nesting survives at 360px. */
+.comment-replies {
+  margin-top: var(--s-4);
+  margin-left: var(--s-4);
+  padding-left: var(--s-5);
+  border-left: 1px solid var(--hair);
+}
+
+.comment-replies .comment {
+  border-top: 0;
+  padding-bottom: 0;
+}
+
+.link-button {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--quiet);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

@@ -19,6 +19,7 @@ import {
   CredibilityLedger,
   CredibilityMeter,
 } from "../components/Credibility";
+import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
 
@@ -180,6 +181,11 @@ export default function ArticlePage() {
               )
             )}
           </footer>
+
+          {/* Only a published article has a discussion: the server rejects
+              comments on anything else, so an author previewing their own draft
+              should not be shown a form that cannot work. */}
+          {article.status === "published" && <Discussion article={article} />}
         </div>
 
         <aside className="article-margin">
