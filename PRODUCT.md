@@ -7,8 +7,13 @@ web
 ## Stack
 
 React (Vite) SPA, Flask REST API, PostgreSQL via Supabase. Committed in PDD 2.1
-and 2.2; the database is a team decision recorded in the project README. Flask is
-the single entry point, and no client ever queries the database directly.
+and 2.2, except the database: the PDD says MySQL and the team moved to Supabase.
+Flask is the single entry point, and no client ever queries the database
+directly.
+
+Deployed on Render as two services, the built frontend as a static site and
+Flask under gunicorn, both on the free tier. Supabase holds the database only.
+It cannot serve a website, so the two are not alternatives to each other.
 
 ## Users
 
@@ -38,13 +43,15 @@ trace exactly why a score is what it is.
 
 ## Positioning
 
-The disclosure is the differentiator. Competitors either hide their ranking
-(algorithmic feeds) or have none (open publishing). PRD 1.3.3 and PDD 1 commit to
-arithmetic a reader can follow: contributor accuracy, a fixed value per
-verifiable source link, a fixed penalty per correction or retraction, and a
-further penalty once reader reports pass an administrator-set threshold. Every
-input is published, so a competing product cannot copy the claim without also
-publishing its formula.
+Traceability is the differentiator. Competitors either hide their ranking
+(algorithmic feeds) or have none (open publishing). Here the inputs are named in
+public: contributor accuracy, verifiable source links, corrections and
+retractions, and upheld reader reports. Every article shows what each of those
+contributed to its own score, and every correction against it stays visible.
+
+The tuning weights themselves are internal, which is a team decision taken after
+the PDD was written. What a reader is promised is that they can see why one
+article scores differently from another, not the constants behind it.
 
 ## Operating context
 
@@ -66,6 +73,12 @@ publishing its formula.
 - Accuracy Rate is withheld until a contributor passes a minimum article count.
   Until then the profile reads "New Contributor". A withheld rate is not a zero
   and must never render as one.
+- The rate is smoothed toward a platform baseline rather than a raw ratio of
+  clean articles to published ones. A raw ratio punished a new writer roughly
+  eight times harder than a veteran for the same correction, and produced a
+  cliff where one article moved a whole back catalogue.
+- The scoring inputs are published; the weights are not. Every article still
+  carries its own ledger showing what each input contributed to that article.
 - Premium access is checked against a live subscription, never a role label.
 - Responsive from 360px up; latest two versions of Chrome, Edge, Firefox, Safari.
 - 95% of pages and searches under 3s; scores recalculated within 2s (PRD 5.1).
@@ -90,8 +103,8 @@ no shadows, and typographic rather than coloured links.
 
 ## Product principles
 
-1. Show the arithmetic. A score without its breakdown is the hidden model this
-   product exists to reject.
+1. Show the working. A score without its breakdown is the hidden model this
+   product exists to reject, even now the weights are internal.
 2. A missing score is a legitimate state. "New Contributor" means no track record
    yet, and it must never be styled as a warning.
 3. Scores prioritise editorial attention. They never auto-publish, auto-retract,

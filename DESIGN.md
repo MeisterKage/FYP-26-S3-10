@@ -24,6 +24,11 @@ them colour:
 `Disputed` also switches to a hatched fill, so the most consequential state
 survives grayscale printing and colour-blind vision.
 
+The same reasoning governs two later additions. The notification bell shows a
+count, not a dot, and repeats it in the button's accessible name. The revenue
+tier meter is a plain ruled track rather than the credibility meter, because
+that component means one thing and should keep meaning it.
+
 For the same reason there is no red error state anywhere. Errors are marked by a
 full-weight rule and an icon, and they carry `role="alert"` so the urgency
 reaches a screen reader, which a colour never did.
@@ -121,9 +126,32 @@ defect.
 
 ## Surface modes
 
-| Surface                        | Mode      |
-| ------------------------------ | --------- |
-| Front page, article, search    | Read      |
-| How scoring works              | Persuade  |
-| Sign in, register              | Operate   |
-| Your writing, review queue     | Operate   |
+| Surface                                     | Mode      |
+| ------------------------------------------- | --------- |
+| Front page, article, search, section         | Read      |
+| Writer profile                               | Read      |
+| How scoring works, subscriptions and pricing | Persuade  |
+| Sign in, register, reset password            | Operate   |
+| Your writing, the article editor             | Operate   |
+| Review queue, flagged content                | Operate   |
+| Your account, administration                 | Operate   |
+
+Sixteen screens in total. The Operate surfaces outnumber the rest because five
+of the six roles are here to do a job rather than to read.
+
+## Patterns that recur
+
+A few shapes carry most of the interface, and reusing them is deliberate: a
+reader who learns one screen has learned several.
+
+- **Tabs for a role's whole job.** Administration and Your account both hold six
+  or more unrelated tasks. Tabs rather than one long page, because someone
+  arrives with one task in mind and should not scroll past five others.
+- **A ruled list for anything reviewable.** The review queue, flagged content,
+  and the dispute queue are the same block: the item, the evidence, and the
+  decision, with the consequence stated before the button rather than after.
+- **Status as a word.** Draft, pending, published, unpublished, retracted. Never
+  a coloured dot, so the state survives grayscale and reaches a screen reader.
+- **The destructive action names what it destroys.** "Delete" on a draft,
+  "Unpublish" on a live article, because the same endpoint does both and only
+  one is irreversible.
