@@ -1,12 +1,15 @@
 /**
  * How scoring works (PDD Figure 5.2).
  *
- * PRD 1.3.3 promises "a disclosed formula rather than a hidden or predictive
- * model", and this is the page where that promise is kept.
+ * What a credibility score is built from.
  *
- * The constants are fetched rather than hard-coded. Administrators can change
- * every threshold at runtime (PRD 1.3.2), so a page printing last month's
- * numbers would be worse than printing none.
+ * Team decision: the inputs are published, the weights are not. A reader learns
+ * that sourcing raises a score and a correction lowers it, and can open any
+ * article's ledger to see what each input contributed to that article. The
+ * tuning constants stay internal.
+ *
+ * Everything here is fetched rather than hard-coded, so the page cannot drift
+ * from what the engine actually does.
  */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -35,25 +38,25 @@ export default function AboutPage() {
       .catch((e) => setError(e.message));
   }, []);
 
-  const v = formula?.constants;
+  const v = formula;
 
   return (
     <div className="about">
       <header className="read">
         <h1 className="display">Every score is arithmetic you can check.</h1>
         <p className="lead mt-6">
-          Most platforms rank what you read and never say how. This one publishes
-          the formula, the inputs, and the thresholds. The same inputs always
-          produce the same number, and nothing here is predicted, learned, or
-          weighted behind a curtain.
+          Most platforms rank what you read and never say what moves the ranking.
+          This one does. Every score comes from the same fixed rules applied the
+          same way to every article: nothing is predicted, learned, or personalised
+          to you.
         </p>
       </header>
 
       {error && (
         <div className="read mt-7">
           <Notice>
-            The live figures could not be loaded, so the numbers below are not
-            shown. The method itself is unchanged.
+            This explanation could not be loaded. The scores themselves are
+            unaffected.
           </Notice>
         </div>
       )}
@@ -66,9 +69,9 @@ export default function AboutPage() {
             A writer&rsquo;s published articles that were never corrected or
             retracted, as a share of everything they have published. It appears
             only once they have published{" "}
-            {v ? <strong>{v.min_articles_for_accuracy} articles</strong> : "a set minimum"};
-            before that their profile reads <em>new contributor</em>, which is not
-            a low score. It is no score at all.
+            a minimum number of articles; before that their profile reads{" "}
+            <em>new contributor</em>, which is not a low score. It is no score at
+            all.
           </Term>
 
           <Term name="Credibility Score">
@@ -82,91 +85,41 @@ export default function AboutPage() {
 
       {v && (
         <section className="section read mt-9">
-          <h2 className="title">The formula</h2>
+          <h2 className="title">What moves a score</h2>
           <p className="lead mt-5">
-            An article starts from its writer&rsquo;s accuracy, earns points for
-            sourcing, and loses them for corrections. The result is held between
-            0 and 100.
+            An article starts from its writer&rsquo;s track record, gains for
+            sourcing, and loses for anything an editor later has to correct. The
+            result is held between 0 and 100.
           </p>
 
-          <div className="formula mt-6">
-            <dl>
-              <div className="ledger-row">
-                <dt>Writer&rsquo;s accuracy rate, weighted</dt>
-                <dd>&times; {v.accuracy_weight}</dd>
-              </div>
-              <div className="ledger-row">
-                <dt>Each verifiable source cited</dt>
-                <dd>+{v.source_points}</dd>
-              </div>
-              <div className="ledger-row">
-                <dt>Most sourcing can contribute</dt>
-                <dd>+{v.source_cap}</dd>
-              </div>
-              <div className="ledger-row">
-                <dt>Each logged correction</dt>
-                <dd>&minus;{v.correction_penalty}</dd>
-              </div>
-              <div className="ledger-row">
-                <dt>A retraction</dt>
-                <dd>&minus;{v.retraction_penalty}</dd>
-              </div>
-              <div className="ledger-row">
-                <dt>
-                  Once {v.report_threshold} reader reports are upheld
+          <dl className="terms mt-7">
+            {v.inputs.map((input) => (
+              <div className="term" key={input.name}>
+                <dt className="sub">
+                  {input.name}{" "}
+                  {/* The direction is a word, never an arrow or a colour: this
+                      system encodes nothing by colour alone. */}
+                  <span className="tag">{input.effect} the score</span>
                 </dt>
-                <dd>&minus;{v.report_penalty}</dd>
+                <dd className="lead">{input.description}</dd>
               </div>
-            </dl>
-          </div>
+            ))}
+          </dl>
+
+          <p className="meta mt-6">
+            {v.newContributor}
+          </p>
 
           <p className="meta mt-5">
-            These figures are live. An administrator can change any of them, and
-            when they do, every published score is recalculated and this page
-            shows the new numbers immediately.
+            The exact weight given to each input is set by an administrator and is
+            not published. Every article carries its own ledger showing what each
+            of these contributed to that article&rsquo;s score, so you can always
+            see why a particular number is what it is.
           </p>
         </section>
       )}
 
-      {v && (
-        <section className="section read mt-9">
-          <h2 className="title">A worked example</h2>
-          <p className="lead mt-5">
-            A writer with a {v.example.accuracy}% accuracy rate publishes an
-            article citing {v.example.sources} verifiable sources, with no
-            corrections against it.
-          </p>
-
-          <div className="formula mt-6">
-            <dl>
-              <div className="ledger-row">
-                <dt>
-                  {v.example.accuracy}% accuracy &times; {v.accuracy_weight}
-                </dt>
-                <dd>{v.example.accuracy_component}</dd>
-              </div>
-              <div className="ledger-row">
-                <dt>
-                  {v.example.sources} sources &times; {v.source_points}
-                </dt>
-                <dd>+{v.example.source_component}</dd>
-              </div>
-              <div className="ledger-row ledger-total">
-                <dt>Credibility score</dt>
-                <dd>{v.example.score}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="mt-6" style={{ maxWidth: "20rem" }}>
-            <CredibilityMeter
-              credibility={{ score: v.example.score, band: v.example.band }}
-            />
-          </div>
-        </section>
-      )}
-
-      {formula?.bands && (
+      {formula && (
         <section className="section read mt-9">
           <h2 className="title">What the bands mean</h2>
           <p className="lead mt-5">

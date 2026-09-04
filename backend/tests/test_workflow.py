@@ -408,15 +408,39 @@ def test_review_queue_shows_the_prospective_score_not_zero(client, category):
     assert shown["breakdown"]["sources"] > 0
 
 
-def test_the_formula_is_public(client):
-    """A formula behind authentication is not disclosed."""
+def test_what_counts_is_public(client):
+    """The inputs are published for readers, most of whom are not signed in."""
     payload = client.get("/api/scoring/formula").get_json()
 
-    assert payload["constants"]["accuracy_weight"] > 0
     assert len(payload["bands"]) == 4
-    # The worked example must be produced by the real engine, never hand-written.
-    example = payload["constants"]["example"]
-    assert round(example["accuracy_component"] + example["source_component"], 2) == example["score"]
+    names = {i["name"] for i in payload["inputs"]}
+    assert "Contributor accuracy" in names
+    assert "Verifiable sources" in names
+    assert {i["effect"] for i in payload["inputs"]} == {"raises", "lowers"}
+    # "New contributor" is otherwise an unexplained state on a profile.
+    assert "New contributor" in payload["newContributor"]
+
+
+def test_the_tuning_constants_are_not_published(client):
+    """Team decision: the inputs are disclosed, the weights are not.
+
+    This asserts the absence rather than trusting the shape, because a weight
+    leaks the moment someone adds `**cfg` back into the payload for debugging.
+    """
+    body = client.get("/api/scoring/formula").get_data(as_text=True)
+
+    assert "constants" not in body
+    for key in (
+        "accuracy_weight",
+        "source_points",
+        "source_cap",
+        "correction_penalty",
+        "retraction_penalty",
+        "report_threshold",
+        "report_penalty",
+        "min_articles_for_accuracy",
+    ):
+        assert key not in body, f"{key} is exposed on the public formula endpoint"
 
 
 # --------------------------------------------------------------------------- #
@@ -590,3 +614,81 @@ def test_a_moderator_only_sees_flagged_articles_in_their_own_categories(client, 
     token = token_for(client, "moderator2@example.com")
     payload = client.get("/api/moderation/reports", headers=auth(token)).get_json()
     assert all(f["articleId"] != article.id for f in payload["flagged"])
+
+
+# --------------------------------------------------------------------------- #
+#  Separation of duties: an editor may not approve their own article
+# --------------------------------------------------------------------------- #
+
+def _own_pending_article(author, category, title):
+    article = Article(
+        contributor_id=author.id,
+        category_id=category.id,
+        title=title,
+        slug=title.lower().replace(" ", "-"),
+        body="<p>Body</p>",
+        status=ArticleStatus.PENDING,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+    return article
+
+
+def test_an_editor_cannot_approve_their_own_article(client, category):
+    """Editors may write, so without this guard an editor could write, submit,
+    and publish inside their own section with nobody else ever reading it."""
+    editor = make_user("selfeditor@example.com", Role.EDITOR)
+    _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
+    _db.session.commit()
+
+    article = _own_pending_article(editor, category, "My own piece")
+
+    token = token_for(client, "selfeditor@example.com")
+    response = client.post(f"/api/review/{article.id}/approve", headers=auth(token))
+
+    assert response.status_code == 403
+    assert "another editor" in response.get_json()["error"]["message"]
+    # And it must genuinely not have published.
+    assert Article.query.get(article.id).status == ArticleStatus.PENDING
+
+
+def test_an_editor_cannot_reject_their_own_article_either(client, category):
+    """Rejection is the same authority as approval, applied the other way."""
+    editor = make_user("selfeditor2@example.com", Role.EDITOR)
+    _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
+    _db.session.commit()
+
+    article = _own_pending_article(editor, category, "My other piece")
+
+    token = token_for(client, "selfeditor2@example.com")
+    response = client.post(
+        f"/api/review/{article.id}/reject", json={"reason": "no"}, headers=auth(token)
+    )
+    assert response.status_code == 403
+
+
+def test_another_editor_can_still_approve_it(client, category):
+    """The guard must block the author, not the article."""
+    author = make_user("selfeditor3@example.com", Role.EDITOR)
+    colleague = make_user("colleague@example.com", Role.EDITOR)
+    _db.session.add(EditorCategory(editor_id=author.id, category_id=category.id))
+    _db.session.add(EditorCategory(editor_id=colleague.id, category_id=category.id))
+    _db.session.commit()
+
+    article = _own_pending_article(author, category, "Reviewed by a colleague")
+
+    token = token_for(client, "colleague@example.com")
+    assert client.post(f"/api/review/{article.id}/approve", headers=auth(token)).status_code == 200
+
+
+def test_an_administrator_may_still_approve_their_own(client, category):
+    """PRD 1.3.2 gives administrators oversight of everything, and they can
+    already override any editorial decision, so the exemption changes nothing
+    they could not do in two steps anyway."""
+    admin = make_user("selfadmin@example.com", Role.SYSTEM_ADMIN)
+    _db.session.commit()
+
+    article = _own_pending_article(admin, category, "An administrator piece")
+
+    token = token_for(client, "selfadmin@example.com")
+    assert client.post(f"/api/review/{article.id}/approve", headers=auth(token)).status_code == 200

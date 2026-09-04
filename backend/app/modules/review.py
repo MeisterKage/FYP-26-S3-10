@@ -157,4 +157,24 @@ def _pending_article(article_id: int) -> Article:
         )
     if not editor_owns_category(article.category_id):
         raise ApiError("This article is outside your assigned categories.", status=403)
+
+    # Separation of duties. Editors may write (AUTHORING_ROLES includes them),
+    # and without this an editor could write, submit, and approve their own
+    # article inside their own section, skipping the only human check between a
+    # claim and a published credibility score. PRD 7.4.2 commits to review
+    # before publication, which a review by the author is not.
+    #
+    # Administrators are exempt: PRD 1.3.2 grants them oversight of everything,
+    # and an administrator publishing their own piece is a deliberate act by the
+    # one role that can already override any editorial decision.
+    if (
+        article.contributor_id == g.current_user.id
+        and g.current_user.role != Role.SYSTEM_ADMIN
+    ):
+        raise ApiError(
+            "You wrote this article, so another editor or an administrator has to "
+            "review it.",
+            status=403,
+        )
+
     return article

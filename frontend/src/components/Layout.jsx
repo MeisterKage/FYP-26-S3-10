@@ -103,7 +103,7 @@ export function Footer() {
     <footer className="footer">
       <div className="shell footer-inner">
         <p>
-          The Record. Every article scored by a published formula.
+          The Record. Every article scored by the same fixed rules.
         </p>
         {categories.length > 0 && (
           <nav className="footer-sections" aria-label="Sections">

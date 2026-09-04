@@ -218,40 +218,63 @@ def read_article(slug: str):
 
 @bp.get("/scoring/formula")
 def scoring_formula():
-    """The disclosed formula, in public.
+    """What the credibility score is built from, in public.
 
-    Administrators can change every constant at runtime (PRD 1.3.2), so the
-    About page reads them from here rather than hard-coding numbers that would
-    silently go stale the first time a threshold moved.
+    Team decision: the *inputs* are published, the *weights* are not. A reader
+    can see that sourcing raises a score and a correction lowers it, and can
+    read the per-article ledger showing what each input contributed to that
+    particular article. The tuning constants themselves stay internal.
 
-    Public by design: a formula behind authentication is not disclosed.
+    So this returns no numbers. `min_articles_for_accuracy` is the one value a
+    reader arguably needs, because "New contributor" is otherwise unexplained,
+    and it is described in words rather than published as a figure.
+
+    Public by design: the explanation is for readers, most of whom are not
+    signed in.
     """
-    cfg = {**DEFAULTS, **load_settings()}
-
-    # A worked example, computed by the real engine rather than written by hand,
-    # so the page can never print arithmetic the platform would not produce.
-    example = credibility_score(
-        contributor_accuracy=92.0,
-        source_count=3,
-        correction_count=0,
-        is_retracted=False,
-        upheld_report_count=0,
-        settings=cfg,
-    )
-
     return jsonify(
         {
-            "constants": {
-                **{k: cfg[k] for k in DEFAULTS},
-                "example": {
-                    "accuracy": 92,
-                    "sources": 3,
-                    "accuracy_component": example.accuracy_component,
-                    "source_component": example.source_component,
-                    "score": example.score,
-                    "band": example.band,
+            "inputs": [
+                {
+                    "name": "Contributor accuracy",
+                    "effect": "raises",
+                    "description": "The share of this writer's published articles "
+                                   "that were never corrected or retracted. It is "
+                                   "the largest single influence on a score.",
                 },
-            },
+                {
+                    "name": "Verifiable sources",
+                    "effect": "raises",
+                    "description": "Each source link an editor can check raises the "
+                                   "score, up to a fixed ceiling, so an article "
+                                   "cannot be padded with links.",
+                },
+                {
+                    "name": "Logged corrections",
+                    "effect": "lowers",
+                    "description": "Every correction an editor records lowers this "
+                                   "article's score and the writer's accuracy rate.",
+                },
+                {
+                    "name": "Retraction",
+                    "effect": "lowers",
+                    "description": "A withdrawn article carries the heaviest penalty "
+                                   "of any single event.",
+                },
+                {
+                    "name": "Upheld reader reports",
+                    "effect": "lowers",
+                    "description": "Once enough reader reports are upheld by an "
+                                   "editor, the article is penalised and pulled into "
+                                   "editorial review.",
+                },
+            ],
+            "newContributor": (
+                "A writer's accuracy rate is withheld until they have published a "
+                "minimum number of articles. Until then their profile reads "
+                "“New contributor”. That is a missing figure, not a low one, and "
+                "it is never counted as zero."
+            ),
             "bands": [
                 {
                     "label": label,

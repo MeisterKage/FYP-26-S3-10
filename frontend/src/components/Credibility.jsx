@@ -140,7 +140,7 @@ export function FormulaNote({ compact = false }) {
   if (compact) {
     return (
       <p className="meta">
-        Every score comes from a published formula: contributor accuracy,
+        Every score comes from the same fixed rules: contributor accuracy,
         verified sources, and logged corrections. Nothing is predicted.
       </p>
     );
