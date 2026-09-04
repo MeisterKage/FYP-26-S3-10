@@ -486,6 +486,27 @@ function Earnings() {
         </div>
       </div>
 
+      {data.nextTier && (
+        <div className="well mt-6">
+          <p className="label">Next revenue band</p>
+          <p className="meta mt-2">
+            {data.nextTier.remaining} more subscriber
+            {data.nextTier.remaining === 1 ? "" : "s"} and the platform&rsquo;s share
+            falls to {data.nextTier.platformSharePercent}%, so you keep{" "}
+            {data.nextTier.contributorSharePercent}%.
+          </p>
+          {/* A measure, not a progress bar toward a task: the meter component is
+              reserved for credibility, so this is a plain ruled track. */}
+          <div
+            className="tier-track mt-4"
+            role="img"
+            aria-label={`${data.nextTier.progressPercent}% of the way to the next band`}
+          >
+            <span style={{ width: `${data.nextTier.progressPercent}%` }} />
+          </div>
+        </div>
+      )}
+
       <SectionHead title="Payouts" />
       {data.payouts.length === 0 ? (
         <Empty title="No payouts yet">

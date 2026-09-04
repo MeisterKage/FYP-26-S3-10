@@ -213,10 +213,32 @@ def earnings_dashboard():
         .all()
     )
 
+    # The next band, and how far off it is. PDD Figure 5.62 asks for a progress
+    # indicator; a writer cannot plan against a share they cannot see coming.
+    next_tier = None
+    for threshold, name, share in REVENUE_TIERS:
+        if threshold > subscriber_count:
+            previous = max(
+                (t for t, _, _ in REVENUE_TIERS if t <= subscriber_count), default=0
+            )
+            span = threshold - previous
+            next_tier = {
+                "name": name,
+                "atSubscribers": threshold,
+                "remaining": threshold - subscriber_count,
+                "platformSharePercent": round(share * 100),
+                "contributorSharePercent": round((1 - share) * 100),
+                "progressPercent": round(
+                    100 * (subscriber_count - previous) / span
+                ) if span else 100,
+            }
+            break
+
     return jsonify(
         {
             "subscriberCount": subscriber_count,
             "revenueTier": tier_name,
+            "nextTier": next_tier,
             "platformSharePercent": round(platform_share * 100),
             "currentPeriod": {
                 "grossCents": gross_cents,

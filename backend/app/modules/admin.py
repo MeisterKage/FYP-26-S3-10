@@ -11,12 +11,14 @@ from flask import Blueprint, g, jsonify, request
 from sqlalchemy import func
 
 from ..credibility import DEFAULTS
-from ..enums import ApplicationStatus, ArticleStatus, ReportStatus, Role
+from ..enums import (
+    ApplicationStatus, ArticleStatus, DisputeStatus, ReportStatus, Role,
+)
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
-    Article, AuditLog, Category, ContributorApplication, EditorCategory, Notification,
-    PlatformSetting, Report, User, utcnow,
+    Article, AuditLog, Category, Comment, ContributorApplication, CorrectionDispute,
+    EditorCategory, Like, Notification, PlatformSetting, Report, User, utcnow,
 )
 from ..sanitize import clean_plain_text
 from ..scoring_service import rescore_contributor_articles
@@ -124,8 +126,6 @@ def delete_user(user_id: int):
     corrected is part of the record of those corrections, and removing the row
     would take the evidence with it.
     """
-    from ..models import Comment, Like
-
     user = _target_user(user_id)
     articles_action = json_body().get("articles", "keep")
     if articles_action not in {"keep", "remove"}:
@@ -204,6 +204,18 @@ def list_applications():
                     "writingSample": a.writing_sample,
                     "background": a.background,
                     "submittedAt": a.created_at.isoformat(),
+                    # PDD Figure 5.89 wants context beyond the application text,
+                    # so the administrator is not judging a writing sample in a
+                    # vacuum.
+                    "history": {
+                        "memberSince": a.user.created_at.isoformat(),
+                        "currentRole": a.user.role.value,
+                        "suspended": a.user.is_suspended,
+                        "comments": db.session.query(func.count(Comment.id))
+                        .filter(Comment.user_id == a.user_id)
+                        .scalar()
+                        or 0,
+                    },
                 }
                 for a in applications
             ]
@@ -379,6 +391,39 @@ def create_category():
     return jsonify({"id": category.id, "name": category.name, "slug": category.slug}), 201
 
 
+@bp.patch("/admin/categories/<int:category_id>")
+@admin_only
+def rename_category(category_id: int):
+    """PDD Figure 5.95. The slug is deliberately left alone.
+
+    Renaming "Tech" to "Technology" should not break every link anyone has
+    shared to /categories/tech. The display name changes; the address does not.
+    """
+    category = Category.query.filter_by(id=category_id, deleted_at=None).first()
+    if category is None:
+        raise ApiError("Category not found.", status=404)
+
+    data = json_body()
+    if "name" in data:
+        name = clean_plain_text(data.get("name") or "")
+        if not name:
+            raise ApiError("Give the category a name.", status=422, field="name")
+        clash = Category.query.filter(
+            func.lower(Category.name) == name.lower(), Category.id != category.id
+        ).first()
+        if clash is not None:
+            raise ApiError(
+                "A category with that name already exists.", status=409, field="name"
+            )
+        category.name = name
+    if "description" in data:
+        category.description = clean_plain_text(data.get("description") or "") or None
+
+    _audit("category.rename", "category", category.id, category.name)
+    db.session.commit()
+    return jsonify({"id": category.id, "name": category.name, "slug": category.slug})
+
+
 @bp.delete("/admin/categories/<int:category_id>")
 @admin_only
 def delete_category(category_id: int):
@@ -511,6 +556,52 @@ def dashboard():
                 or 0,
                 1,
             ),
+            # PDD Figure 5.97: the dashboard is read-only, and each item links
+            # out to the screen where the work is actually done. Only non-zero
+            # counts are returned, so a quiet platform shows a short list rather
+            # than a column of noughts.
+            "attention": [
+                item
+                for item in (
+                    {
+                        "label": "Contributor applications waiting",
+                        "count": db.session.query(func.count(ContributorApplication.id))
+                        .filter(ContributorApplication.status == ApplicationStatus.PENDING)
+                        .scalar()
+                        or 0,
+                        "tab": "applications",
+                    },
+                    {
+                        "label": "Articles awaiting review",
+                        "count": db.session.query(func.count(Article.id))
+                        .filter(Article.status == ArticleStatus.PENDING)
+                        .scalar()
+                        or 0,
+                        "tab": "articles",
+                    },
+                    {
+                        "label": "Open credibility disputes",
+                        "count": db.session.query(func.count(CorrectionDispute.id))
+                        .filter(CorrectionDispute.status == DisputeStatus.OPEN)
+                        .scalar()
+                        or 0,
+                        "tab": "disputes",
+                    },
+                    {
+                        "label": "Editors with no assigned sections",
+                        "count": db.session.query(func.count(User.id))
+                        .filter(
+                            User.role == Role.EDITOR,
+                            User.deleted_at.is_(None),
+                            ~User.id.in_(db.session.query(EditorCategory.editor_id)),
+                        )
+                        .scalar()
+                        or 0,
+                        "tab": "editors",
+                    },
+                )
+                if item["count"] > 0
+            ],
         }
     )
 

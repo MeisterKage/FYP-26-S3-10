@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 
 import { api } from "../api";
 import { ROLES, useAuth } from "../auth";
-import { Button, Empty, Notice, formatDate } from "../components/UI";
+import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
 
 const TABS = [
   ["overview", "Overview"],
@@ -69,7 +69,7 @@ function useResource(path) {
 /*  Overview (PDD Figure 5.51)                                         */
 /* ------------------------------------------------------------------ */
 
-function Overview() {
+function Overview({ onGo }) {
   const state = useResource("/admin/dashboard");
 
   const CARDS = [
@@ -83,14 +83,36 @@ function Overview() {
   return (
     <Panel state={state}>
       {(d) => (
-        <div className="stat-grid">
-          {CARDS.map(([key, label]) => (
-            <div className="stat" key={key}>
-              <p className="label">{label}</p>
-              <p className="stat-figure">{d[key] ?? 0}</p>
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="stat-grid">
+            {CARDS.map(([key, label]) => (
+              <div className="stat" key={key}>
+                <p className="label">{label}</p>
+                <p className="stat-figure">{d[key] ?? 0}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Read-only, per PDD Figure 5.97: each line goes to the tab where
+              the work is done rather than being actionable from here. */}
+          <div className="mt-7">
+            <SectionHead title="Needs attention" />
+            {(d.attention || []).length === 0 ? (
+              <p className="meta">Nothing is waiting.</p>
+            ) : (
+              <ul className="attention-list">
+                {d.attention.map((item) => (
+                  <li key={item.tab}>
+                    <button type="button" className="attention-row" onClick={() => onGo(item.tab)}>
+                      <span>{item.label}</span>
+                      <span className="tabular">{item.count}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
       )}
     </Panel>
   );
@@ -321,6 +343,23 @@ function Applications({ onNotice }) {
                   <h3 className="entry-title">{a.applicant}</h3>
                   <p className="entry-meta mt-3">
                     <span>Applied {formatDate(a.submittedAt)}</span>
+                    {a.history && (
+                      <>
+                        <span className="dot" aria-hidden="true" />
+                        <span>Member since {formatDate(a.history.memberSince)}</span>
+                        <span className="dot" aria-hidden="true" />
+                        <span>
+                          {a.history.comments} comment
+                          {a.history.comments === 1 ? "" : "s"}
+                        </span>
+                        {a.history.suspended && (
+                          <>
+                            <span className="dot" aria-hidden="true" />
+                            <span className="tag">Suspended</span>
+                          </>
+                        )}
+                      </>
+                    )}
                   </p>
                   {a.background && (
                     <>
@@ -483,6 +522,20 @@ function Categories({ onNotice }) {
     }
   }
 
+  async function rename(category, name) {
+    const next = name.trim();
+    if (!next || next === category.name) return;
+    try {
+      await api.patch(`/admin/categories/${category.id}`, { name: next });
+      // The address is deliberately unchanged, so existing links keep working.
+      onNotice(`Renamed to ${next}. Its web address is unchanged.`);
+      reload();
+    } catch (e) {
+      setError(e.message);
+      reload();
+    }
+  }
+
   async function remove(category) {
     if (
       !window.confirm(
@@ -550,7 +603,20 @@ function Categories({ onNotice }) {
             <tbody>
               {data.categories.map((c) => (
                 <tr key={c.id}>
-                  <td style={{ color: "var(--ink)", fontWeight: 500 }}>{c.name}</td>
+                  <td>
+                    {/* Renaming happens in the row. A separate edit screen for
+                        one text field is more navigation than the change is
+                        worth. */}
+                    <input
+                      className="input input-sm"
+                      aria-label={`Name for ${c.name}`}
+                      defaultValue={c.name}
+                      onBlur={(e) => rename(c, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.target.blur();
+                      }}
+                    />
+                  </td>
                   <td className="meta">{c.slug}</td>
                   <td>
                     <Button size="sm" variant="quiet" onClick={() => remove(c)}>
@@ -969,7 +1035,7 @@ export default function AdminConsole() {
   }
 
   const PANELS = {
-    overview: <Overview />,
+    overview: <Overview onGo={setTab} />,
     users: <Accounts onNotice={onNotice} />,
     applications: <Applications onNotice={onNotice} />,
     editors: <Editors onNotice={onNotice} />,

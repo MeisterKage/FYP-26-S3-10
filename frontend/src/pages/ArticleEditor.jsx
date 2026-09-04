@@ -112,6 +112,7 @@ export default function ArticleEditor() {
   const [fieldError, setFieldError] = useState({});
   const [notice, setNotice] = useState(null);
   const [publishAt, setPublishAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState(null);
 
   useEffect(() => {
     api
@@ -133,6 +134,7 @@ export default function ArticleEditor() {
         const found = d.article;
         setArticleId(found.id);
         setStatus(found.status);
+        setUpdatedAt(found.publishedAt || found.submittedAt || null);
         setRejection(found.rejectionReason || null);
         setForm({
           title: found.title || "",
@@ -298,10 +300,22 @@ export default function ArticleEditor() {
       <header className="dash-head">
         <div>
           <h1 className="title">{isNew ? "New article" : "Edit article"}</h1>
-          <p className="meta mt-3">
-            {isNew
-              ? "Saved as a draft until you send it for review."
-              : `This article is ${status}.`}
+          <p className="entry-meta mt-3">
+            {isNew ? (
+              <span>Saved as a draft until you send it for review.</span>
+            ) : (
+              <>
+                <span className="status" data-status={status}>
+                  {status}
+                </span>
+                {updatedAt && (
+                  <>
+                    <span className="dot" aria-hidden="true" />
+                    <span>Last edited {formatDate(updatedAt)}</span>
+                  </>
+                )}
+              </>
+            )}
           </p>
         </div>
       </header>

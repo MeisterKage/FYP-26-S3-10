@@ -217,3 +217,59 @@ def test_an_unknown_articles_choice_is_rejected(client, categories):
         headers=auth_for(client, "delbadadmin@example.com"),
     )
     assert response.status_code == 422
+
+
+# --------------------------------------------------------------------------- #
+#  Renaming a category (PDD Figure 5.95)
+# --------------------------------------------------------------------------- #
+
+def test_renaming_a_category_keeps_its_address(client, categories):
+    """Renaming "Tech" to "Technology" must not break every link anyone has
+    shared to /categories/tech."""
+    make_user("renameadmin@example.com", Role.SYSTEM_ADMIN)
+    target = categories[0]
+    original_slug = target.slug
+
+    response = client.patch(
+        f"/api/admin/categories/{target.id}",
+        json={"name": "Science and Technology"},
+        headers=auth_for(client, "renameadmin@example.com"),
+    )
+
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["name"] == "Science and Technology"
+    assert body["slug"] == original_slug
+
+
+def test_renaming_onto_an_existing_name_is_refused(client, categories):
+    make_user("renameadmin2@example.com", Role.SYSTEM_ADMIN)
+
+    response = client.patch(
+        f"/api/admin/categories/{categories[0].id}",
+        json={"name": categories[1].name},
+        headers=auth_for(client, "renameadmin2@example.com"),
+    )
+    assert response.status_code == 409
+
+
+def test_a_category_cannot_be_renamed_to_nothing(client, categories):
+    make_user("renameadmin3@example.com", Role.SYSTEM_ADMIN)
+
+    response = client.patch(
+        f"/api/admin/categories/{categories[0].id}",
+        json={"name": "   "},
+        headers=auth_for(client, "renameadmin3@example.com"),
+    )
+    assert response.status_code == 422
+
+
+def test_an_editor_cannot_rename_a_category(client, categories):
+    make_user("renameeditor@example.com", Role.EDITOR)
+
+    response = client.patch(
+        f"/api/admin/categories/{categories[0].id}",
+        json={"name": "Mine now"},
+        headers=auth_for(client, "renameeditor@example.com"),
+    )
+    assert response.status_code == 403

@@ -585,3 +585,44 @@
   content: "Write the article";
   color: var(--mute);
 }
+
+.attention-list {
+  list-style: none;
+  padding: 0;
+}
+
+.attention-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  width: 100%;
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  padding: var(--s-4) 0;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: color 160ms var(--ease);
+}
+
+.attention-row:hover {
+  color: var(--deep);
+}
+
+/* A measure of progress toward the next revenue band. Deliberately not the
+   credibility meter: that component means one thing and should keep meaning it. */
+.tier-track {
+  height: 4px;
+  background: var(--sunken);
+}
+
+.tier-track > span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+}
