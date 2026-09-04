@@ -105,3 +105,10 @@ export const ScaleIcon = (p) => (
     <path d="M15 6.25 12.75 11.5h4.5L15 6.25Z" />
   </Svg>
 );
+
+export const BellIcon = (p) => (
+  <Svg {...p}>
+    <path d="M6 8a4 4 0 0 1 8 0c0 3.2.8 4.6 1.5 5.4a.6.6 0 0 1-.45 1H4.95a.6.6 0 0 1-.45-1C5.2 12.6 6 11.2 6 8Z" />
+    <path d="M8.4 16.4a1.8 1.8 0 0 0 3.2 0" />
+  </Svg>
+);

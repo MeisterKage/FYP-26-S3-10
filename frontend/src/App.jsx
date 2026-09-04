@@ -16,6 +16,7 @@ import ArticlePage from "./pages/ArticlePage";
 import ContributorDashboard from "./pages/ContributorDashboard";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
+import Moderation from "./pages/Moderation";
 import RegisterPage from "./pages/RegisterPage";
 import ReviewQueue from "./pages/ReviewQueue";
 import SearchPage from "./pages/SearchPage";
@@ -100,6 +101,14 @@ export default function App() {
               element={
                 <RequireRole roles={CAN_REVIEW}>
                   <ReviewQueue />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/moderation"
+              element={
+                <RequireRole roles={CAN_REVIEW}>
+                  <Moderation />
                 </RequireRole>
               }
             />

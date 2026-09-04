@@ -514,3 +514,79 @@ def test_a_rejected_article_carries_its_reason_back_to_the_writer(client, catego
     mine = client.get("/api/articles/mine", headers=auth(author_token)).get_json()["articles"][0]
     assert mine["status"] == "rejected"
     assert mine["rejectionReason"] == "Second source needed for the funding figure."
+
+
+# --------------------------------------------------------------------------- #
+#  Moderation queue (PDD Figure 5.50)
+# --------------------------------------------------------------------------- #
+
+def test_the_flagged_list_carries_the_reports_behind_each_count(client, category):
+    """A count alone gives a moderator nothing to act on: resolving works one
+    report at a time, so the ids have to travel with the article."""
+    from app.models import PlatformSetting, Report
+
+    contributor = make_user("flagged@example.com", Role.VERIFIED_CONTRIBUTOR)
+    editor = make_user("moderator@example.com", Role.EDITOR)
+    _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
+    # Drop the escalation threshold so two reports are enough to surface it.
+    _db.session.add(PlatformSetting(key="report_threshold", value=2))
+
+    article = Article(
+        contributor_id=contributor.id,
+        category_id=category.id,
+        title="Disputed piece",
+        slug="disputed-piece",
+        body="<p>Body</p>",
+        status=ArticleStatus.PUBLISHED,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+
+    for i in range(2):
+        reader = make_user(f"flagger{i}@example.com", Role.FREE_REGISTERED)
+        _db.session.add(
+            Report(article_id=article.id, reporter_id=reader.id, reason=f"Reason {i}")
+        )
+    _db.session.commit()
+
+    token = token_for(client, "moderator@example.com")
+    payload = client.get("/api/moderation/reports", headers=auth(token)).get_json()
+
+    assert payload["threshold"] == 2
+    entry = next(f for f in payload["flagged"] if f["articleId"] == article.id)
+    assert entry["openReports"] == 2
+    assert len(entry["reports"]) == 2
+    assert {r["reason"] for r in entry["reports"]} == {"Reason 0", "Reason 1"}
+    assert all(isinstance(r["id"], int) for r in entry["reports"])
+
+
+def test_a_moderator_only_sees_flagged_articles_in_their_own_categories(client, category):
+    from app.models import PlatformSetting, Report
+
+    other = Category(name="Sport", slug="sport")
+    _db.session.add(other)
+    contributor = make_user("flagged2@example.com", Role.VERIFIED_CONTRIBUTOR)
+    editor = make_user("moderator2@example.com", Role.EDITOR)
+    _db.session.commit()
+    # Assigned to `category`, but the flagged article is in `other`.
+    _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
+    _db.session.add(PlatformSetting(key="report_threshold", value=1))
+
+    article = Article(
+        contributor_id=contributor.id,
+        category_id=other.id,
+        title="Elsewhere",
+        slug="elsewhere",
+        body="<p>Body</p>",
+        status=ArticleStatus.PUBLISHED,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+
+    reader = make_user("flagger9@example.com", Role.FREE_REGISTERED)
+    _db.session.add(Report(article_id=article.id, reporter_id=reader.id, reason="No"))
+    _db.session.commit()
+
+    token = token_for(client, "moderator2@example.com")
+    payload = client.get("/api/moderation/reports", headers=auth(token)).get_json()
+    assert all(f["articleId"] != article.id for f in payload["flagged"])

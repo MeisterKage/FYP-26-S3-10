@@ -1087,3 +1087,145 @@
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------------------------------------------------------------------------
+   Notification bell (PDD Figure 5.21) and the moderation queue (Figure 5.50)
+--------------------------------------------------------------------------- */
+
+.bell-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.bell {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: var(--s-2);
+  color: var(--quiet);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  transition: color 160ms var(--ease);
+}
+
+.bell:hover,
+.bell[aria-expanded="true"] {
+  color: var(--ink);
+}
+
+/* The count is a number, not a coloured dot: an unread state that exists only
+   as a colour is invisible in grayscale and to a screen reader. The button's
+   aria-label carries the same count. */
+.bell-count {
+  position: absolute;
+  top: 0;
+  left: 60%;
+  min-width: 1.05rem;
+  padding: 0 0.2rem;
+  background: var(--deep);
+  color: var(--paper);
+  border-radius: 9999px;
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05rem;
+  text-align: center;
+}
+
+.bell-panel {
+  position: absolute;
+  top: calc(100% + var(--s-3));
+  right: 0;
+  z-index: 40;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: 24rem;
+  overflow-y: auto;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+}
+
+.bell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--hair);
+}
+
+.bell-empty {
+  padding: var(--s-5);
+}
+
+.bell-list {
+  list-style: none;
+  padding: 0;
+}
+
+.bell-item {
+  display: grid;
+  gap: var(--s-1);
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  padding: var(--s-4) var(--s-5);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 160ms var(--ease);
+}
+
+.bell-item:hover {
+  background: var(--canvas);
+}
+
+.bell-item-title {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+}
+
+/* Unread is marked by weight and a rule, not by colour alone. */
+.bell-item[data-unread] .bell-item-title {
+  font-weight: 600;
+}
+
+.bell-item[data-unread] {
+  border-left: 2px solid var(--ink);
+}
+
+.bell-item-body {
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  overflow-wrap: anywhere;
+}
+
+.report-list {
+  list-style: none;
+  padding: 0;
+}
+
+.report {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: var(--s-4);
+  border-top: 1px solid var(--hair);
+}
+
+.report:first-child {
+  border-top: 0;
+}
+
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}

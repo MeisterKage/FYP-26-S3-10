@@ -40,15 +40,50 @@ def flagged_content():
         .all()
     )
 
+    flagged = [(a, c) for a, c in rows if editor_owns_category(a.category_id)]
+
+    # The individual reports behind each count. Resolving works on one report at
+    # a time, so a count alone gives a moderator nothing to act on. Fetched in
+    # one query for the whole page rather than one per article.
+    open_reports: dict[int, list] = {}
+    corrections: dict[int, list] = {}
+    if flagged:
+        ids = [a.id for a, _ in flagged]
+        for report in Report.query.filter(
+            Report.article_id.in_(ids), Report.status == ReportStatus.OPEN
+        ).order_by(Report.created_at.asc()):
+            open_reports.setdefault(report.article_id, []).append(
+                {
+                    "id": report.id,
+                    "reason": report.reason,
+                    "reportedAt": report.created_at.isoformat(),
+                }
+            )
+        for correction in Correction.query.filter(
+            Correction.article_id.in_(ids)
+        ).order_by(Correction.created_at.desc()):
+            corrections.setdefault(correction.article_id, []).append(
+                {
+                    "id": correction.id,
+                    "type": correction.correction_type.value,
+                    "reason": correction.reason,
+                    "issuedAt": correction.created_at.isoformat(),
+                    "overturned": correction.overturned_at is not None,
+                }
+            )
+
     visible = [
         {
             "articleId": article.id,
+            "slug": article.slug,
             "title": article.title,
+            "status": article.status.value,
             "openReports": count,
             "credibilityScore": article.credibility_score,
+            "reports": open_reports.get(article.id, []),
+            "corrections": corrections.get(article.id, []),
         }
-        for article, count in rows
-        if editor_owns_category(article.category_id)
+        for article, count in flagged
     ]
     return jsonify({"threshold": threshold, "flagged": visible})
 
