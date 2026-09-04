@@ -10,6 +10,7 @@ import { CAN_AUTHOR, CAN_REVIEW, ROLES, useAuth } from "./auth";
 import { ErrorBoundary, Footer, Masthead } from "./components/Layout";
 import { Button, Empty } from "./components/UI";
 import AboutPage from "./pages/AboutPage";
+import ArticleEditor from "./pages/ArticleEditor";
 import ArticlePage from "./pages/ArticlePage";
 import ContributorDashboard from "./pages/ContributorDashboard";
 import HomePage from "./pages/HomePage";
@@ -82,6 +83,14 @@ export default function App() {
               element={
                 <RequireRole roles={CAN_AUTHOR}>
                   <ContributorDashboard />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/dashboard/articles/:id"
+              element={
+                <RequireRole roles={CAN_AUTHOR}>
+                  <ArticleEditor />
                 </RequireRole>
               }
             />

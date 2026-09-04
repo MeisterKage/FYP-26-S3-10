@@ -9,7 +9,7 @@
  * every score below it.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { api } from "../api";
 import { useAuth } from "../auth";
@@ -20,10 +20,16 @@ const EDITABLE = new Set(["draft", "rejected"]);
 
 export default function ContributorDashboard() {
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [articles, setArticles] = useState(null);
-  const [notice, setNotice] = useState(null);
+  const [notice, setNotice] = useState(location.state?.notice || null);
   const [error, setError] = useState(null);
   const [pendingId, setPendingId] = useState(null);
+
+  useEffect(() => {
+    if (location.state?.notice) navigate(location.pathname, { replace: true });
+  }, [location.pathname, location.state, navigate]);
 
   const load = useCallback(() => {
     api
@@ -72,9 +78,14 @@ export default function ContributorDashboard() {
             )}
           </p>
         </div>
-        <Link className="link-quiet" to="/about">
-          How scoring works
-        </Link>
+        <div className="row gap-4">
+          <Link className="link-quiet" to="/about">
+            How scoring works
+          </Link>
+          <Link className="btn btn-primary" to="/dashboard/articles/new">
+            New article
+          </Link>
+        </div>
       </header>
 
       {notice && (
@@ -101,7 +112,14 @@ export default function ContributorDashboard() {
         {!articles && <div className="skeleton" style={{ height: "12rem" }} />}
 
         {articles?.length === 0 && (
-          <Empty title="You haven't written anything yet">
+          <Empty
+            title="You haven't written anything yet"
+            action={
+              <Link className="btn btn-primary" to="/dashboard/articles/new">
+                Write your first article
+              </Link>
+            }
+          >
             Drafts stay private until you submit them. An editor for the
             article&rsquo;s category reviews it before it goes live.
           </Empty>
@@ -154,16 +172,24 @@ export default function ContributorDashboard() {
                       {formatDate(article.publishedAt) || "—"}
                     </td>
                     <td>
-                      {EDITABLE.has(article.status) && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          busy={pendingId === article.id}
-                          onClick={() => submitForReview(article)}
+                      <div className="row gap-2">
+                        <Link
+                          className="btn btn-quiet btn-sm"
+                          to={`/dashboard/articles/${article.id}`}
                         >
-                          Submit for review
-                        </Button>
-                      )}
+                          {EDITABLE.has(article.status) ? "Edit" : "View"}
+                        </Link>
+                        {EDITABLE.has(article.status) && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            busy={pendingId === article.id}
+                            onClick={() => submitForReview(article)}
+                          >
+                            Submit for review
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

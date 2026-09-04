@@ -417,3 +417,100 @@ def test_the_formula_is_public(client):
     # The worked example must be produced by the real engine, never hand-written.
     example = payload["constants"]["example"]
     assert round(example["accuracy_component"] + example["source_component"], 2) == example["score"]
+
+
+# --------------------------------------------------------------------------- #
+#  Authoring: what the editing screen needs (PDD Figures 5.41-5.42)
+# --------------------------------------------------------------------------- #
+
+def test_the_writers_list_withholds_bodies(client, category):
+    """/articles/mine is a list, so it omits bodies on purpose.
+
+    The editing screen therefore cannot be built on it, which is why the
+    owner-scoped single read below exists.
+    """
+    make_user("listauthor@example.com", Role.VERIFIED_CONTRIBUTOR)
+    token = token_for(client, "listauthor@example.com")
+
+    client.post(
+        "/api/articles",
+        json={"title": "Listed", "body": "<p>Full body</p>", "categoryId": category.id},
+        headers=auth(token),
+    )
+
+    listed = client.get("/api/articles/mine", headers=auth(token)).get_json()["articles"][0]
+    assert "body" not in listed
+
+
+def test_an_author_can_load_their_own_article_body_for_editing(client, category):
+    make_user("owner@example.com", Role.VERIFIED_CONTRIBUTOR)
+    token = token_for(client, "owner@example.com")
+
+    created = client.post(
+        "/api/articles",
+        json={
+            "title": "Editable",
+            "body": "<p>The body</p>",
+            "categoryId": category.id,
+            "sources": [{"url": "https://example.com/a", "label": "A"}],
+        },
+        headers=auth(token),
+    ).get_json()
+    article_id = created["id"]
+
+    response = client.get(f"/api/articles/{article_id}", headers=auth(token))
+    assert response.status_code == 200
+
+    article = response.get_json()["article"]
+    assert article["body"] == "<p>The body</p>"
+    assert article["sources"][0]["url"] == "https://example.com/a"
+
+
+def test_one_author_cannot_load_another_authors_draft(client, category):
+    owner = make_user("owner2@example.com", Role.VERIFIED_CONTRIBUTOR)
+    make_user("stranger@example.com", Role.VERIFIED_CONTRIBUTOR)
+
+    article = Article(
+        contributor_id=owner.id,
+        category_id=category.id,
+        title="Not yours",
+        slug="not-yours",
+        body="<p>Private</p>",
+        status=ArticleStatus.DRAFT,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+
+    token = token_for(client, "stranger@example.com")
+    response = client.get(f"/api/articles/{article.id}", headers=auth(token))
+    assert response.status_code == 403
+
+
+def test_a_rejected_article_carries_its_reason_back_to_the_writer(client, category):
+    """A writer cannot act on a rejection they cannot read."""
+    contributor = make_user("returned@example.com", Role.VERIFIED_CONTRIBUTOR)
+    editor = make_user("editor4@example.com", Role.EDITOR)
+    _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
+
+    article = Article(
+        contributor_id=contributor.id,
+        category_id=category.id,
+        title="Needs work",
+        slug="needs-work",
+        body="<p>Body</p>",
+        status=ArticleStatus.PENDING,
+    )
+    _db.session.add(article)
+    _db.session.commit()
+
+    editor_token = token_for(client, "editor4@example.com")
+    client.post(
+        f"/api/review/{article.id}/reject",
+        json={"reason": "Second source needed for the funding figure."},
+        headers=auth(editor_token),
+    )
+
+    author_token = token_for(client, "returned@example.com")
+    mine = client.get("/api/articles/mine", headers=auth(author_token)).get_json()["articles"][0]
+    assert mine["status"] == "rejected"
+    assert mine["rejectionReason"] == "Second source needed for the funding figure."

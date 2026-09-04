@@ -85,6 +85,8 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         "tags": [t for t in (article.tags or "").split(",") if t],
         "publishedAt": article.published_at.isoformat() if article.published_at else None,
         "submittedAt": article.submitted_at.isoformat() if article.submitted_at else None,
+        # The writer has to be able to read why an editor sent it back.
+        "rejectionReason": article.rejection_reason,
         "viewCount": article.view_count,
         "likeCount": article.like_count,
         "credibility": {
@@ -298,6 +300,19 @@ def unpublish_or_delete(article_id: int):
     db.session.commit()
     return jsonify({"message": "Article unpublished.", "article": serialize(article,
                                                                            viewer=g.current_user)})
+
+
+@bp.get("/articles/<int:article_id>")
+@roles_required(*AUTHORING_ROLES)
+def read_own_article(article_id: int):
+    """The article behind the editing screen (PDD Figure 5.42).
+
+    The public route is keyed on slug and withholds a premium body. This one is
+    keyed on id, is owner-scoped, and always includes the body, because a writer
+    editing their own draft is the one reader who must always see all of it.
+    """
+    article = _owned_article(article_id)
+    return jsonify({"article": serialize(article, viewer=g.current_user)})
 
 
 @bp.get("/articles/mine")
