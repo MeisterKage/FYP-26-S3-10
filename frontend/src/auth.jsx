@@ -21,6 +21,7 @@ export const ROLES = {
 
 export const CAN_AUTHOR = [ROLES.CONTRIBUTOR, ROLES.EDITOR, ROLES.ADMIN];
 export const CAN_REVIEW = [ROLES.EDITOR, ROLES.ADMIN];
+export const CAN_ADMIN = [ROLES.ADMIN];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);

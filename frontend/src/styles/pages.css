@@ -433,3 +433,87 @@
 .editor .form {
   max-width: none;
 }
+
+/* ---------------------------------------------------------------------------
+   Administration (PDD Figures 5.51-5.62)
+
+   Seven jobs on one screen, so the tab strip is the primary structure. It is a
+   ruled strip rather than boxed tabs: this system separates surfaces with a
+   value shift and a hairline, never with a border-radius and a fill.
+--------------------------------------------------------------------------- */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-5);
+  border-bottom: 1px solid var(--hair);
+}
+
+.tab {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0 0 var(--s-3);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  cursor: pointer;
+  transition: color 160ms var(--ease), border-color 160ms var(--ease);
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+/* The current tab is marked by weight and a rule, not by colour alone. */
+.tab[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 500;
+  border-bottom-color: var(--ink);
+}
+
+.stat-grid {
+  display: grid;
+  gap: var(--s-5);
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+
+.stat {
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  padding: var(--s-5);
+}
+
+.stat-figure {
+  margin-top: var(--s-2);
+  font-family: var(--font-display);
+  font-size: var(--t-heading);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: center;
+}
+
+.filter-bar .input {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.input-sm {
+  padding-block: var(--s-2);
+  font-size: var(--t-small);
+}
+
+.checkbox-grid {
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}

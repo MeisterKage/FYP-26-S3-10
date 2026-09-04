@@ -5,7 +5,7 @@
 import { Component } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
-import { CAN_AUTHOR, CAN_REVIEW, useAuth } from "../auth";
+import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, useAuth } from "../auth";
 import { Button, Notice } from "./UI";
 
 export function Masthead() {
@@ -35,6 +35,11 @@ export function Masthead() {
           {has(...CAN_REVIEW) && (
             <NavLink className="nav-link" to="/review">
               Review queue
+            </NavLink>
+          )}
+          {has(...CAN_ADMIN) && (
+            <NavLink className="nav-link" to="/admin">
+              Administration
             </NavLink>
           )}
 

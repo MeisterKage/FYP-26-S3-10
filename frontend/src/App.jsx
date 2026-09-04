@@ -6,10 +6,11 @@
  */
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
-import { CAN_AUTHOR, CAN_REVIEW, ROLES, useAuth } from "./auth";
+import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, ROLES, useAuth } from "./auth";
 import { ErrorBoundary, Footer, Masthead } from "./components/Layout";
 import { Button, Empty } from "./components/UI";
 import AboutPage from "./pages/AboutPage";
+import AdminConsole from "./pages/AdminConsole";
 import ArticleEditor from "./pages/ArticleEditor";
 import ArticlePage from "./pages/ArticlePage";
 import ContributorDashboard from "./pages/ContributorDashboard";
@@ -99,6 +100,14 @@ export default function App() {
               element={
                 <RequireRole roles={CAN_REVIEW}>
                   <ReviewQueue />
+                </RequireRole>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <RequireRole roles={CAN_ADMIN}>
+                  <AdminConsole />
                 </RequireRole>
               }
             />
