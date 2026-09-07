@@ -1,6 +1,6 @@
 # Design
 
-The visual world for The Record.
+The visual world for Wollongong News.
 
 The client pinned this to the **Medium design system** (styles.refero.design),
 rebased on **#133955** as the sole hue. The structure is Medium's; the colour is

@@ -18,7 +18,7 @@ export function Masthead() {
     <header className="masthead">
       <div className="shell masthead-inner">
         <Link className="wordmark" to="/">
-          The Record
+          Wollongong News
         </Link>
 
         <nav className="nav" aria-label="Main">
@@ -103,7 +103,7 @@ export function Footer() {
     <footer className="footer">
       <div className="shell footer-inner">
         <p>
-          The Record. Every article scored by the same fixed rules.
+          Wollongong News. Every article scored by the same fixed rules.
         </p>
         {categories.length > 0 && (
           <nav className="footer-sections" aria-label="Sections">

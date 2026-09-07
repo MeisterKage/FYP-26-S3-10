@@ -36,3 +36,14 @@ frontend/shots/
 
 # Demo credentials for the live site. Local only.
 DEMO-ACCOUNTS.md
+
+# Document build outputs; regenerate with `node frontend/build-docs.mjs`
+docs/pdf/
+docs/pptx/
+
+# Screenshot payload for the user manual; regenerate with `node frontend/encode-shots.mjs`
+frontend/shots-encoded.json
+
+# Working copies kept while editing the deck
+*.backup-*.pptx
+~$*

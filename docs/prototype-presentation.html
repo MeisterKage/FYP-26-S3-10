@@ -1,0 +1,1072 @@
+<title>Wollongong News Prototype Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Spectral:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+/* ==========================================================================
+   FYP-26-S3-10 — Prototype Presentation
+   Palette inherited from the product's own DESIGN.md: one hue (205deg) at ten
+   lightnesses, no chromatic colour, no shadows, hairline rules only.
+   ========================================================================== */
+
+:root {
+  --paper:#fcfdfd; --canvas:#f2f5f8; --sunken:#e5ecf0;
+  --hair:#ccd8e0;  --rule:#9ab1c1;
+  --mute:#587184;  --quiet:#446074; --body:#294c65; --ink:#133955; --deep:#0a2233;
+
+  --font-display:"Playfair Display","Libre Caslon Text",Georgia,serif;
+  --font-read:"Spectral",Charter,Georgia,"Times New Roman",serif;
+  --font-ui:"IBM Plex Sans",-apple-system,"Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+
+  --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem;
+  --s-5:1.5rem; --s-6:2rem; --s-7:3rem; --s-8:4rem;
+  --track-label:.09em;
+  --ease:cubic-bezier(.2,.6,.2,1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#0f232f; --canvas:#0a1922; --sunken:#081620;
+    --hair:#24404f;  --rule:#3d6076;
+    --mute:#8ba6b8;  --quiet:#a6bece; --body:#c4d6e2; --ink:#e8f1f6; --deep:#f2f8fb;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#0f232f; --canvas:#0a1922; --sunken:#081620;
+  --hair:#24404f;  --rule:#3d6076;
+  --mute:#8ba6b8;  --quiet:#a6bece; --body:#c4d6e2; --ink:#e8f1f6; --deep:#f2f8fb;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:var(--canvas);
+  color:var(--body);
+  font-family:var(--font-read);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* --- shell ---------------------------------------------------------------- */
+
+.deck {
+  max-width:1180px;
+  margin:0 auto;
+  padding:var(--s-6) var(--s-5) var(--s-8);
+  display:flex;
+  flex-direction:column;
+  gap:var(--s-6);
+}
+
+/* A slide is a 16:9-ish panel. It is a panel and not a card: one hairline,
+   no radius beyond 2px, no shadow, per the product's own rules. */
+.slide {
+  background:var(--paper);
+  border:1px solid var(--hair);
+  padding:var(--s-7);
+  min-height:min(74vh, 640px);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  scroll-margin-top:var(--s-4);
+}
+
+.slide-num {
+  position:absolute;
+  top:var(--s-5); right:var(--s-6);
+  font-family:var(--font-mono);
+  font-size:.75rem;
+  color:var(--rule);
+  font-variant-numeric:tabular-nums;
+}
+
+.eyebrow {
+  font-family:var(--font-ui);
+  font-size:.6875rem;
+  font-weight:600;
+  letter-spacing:var(--track-label);
+  text-transform:uppercase;
+  color:var(--mute);
+  margin:0 0 var(--s-3);
+}
+
+h1, h2, h3 { color:var(--ink); text-wrap:balance; margin:0; }
+
+h1 {
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:clamp(2.5rem,1.4rem+4vw,4.25rem);
+  line-height:1.02;
+  letter-spacing:-.025em;
+}
+
+h2 {
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:clamp(1.75rem,1.2rem+1.8vw,2.5rem);
+  line-height:1.15;
+  letter-spacing:-.02em;
+  margin-bottom:var(--s-5);
+}
+
+h3 {
+  font-family:var(--font-ui);
+  font-weight:600;
+  font-size:1rem;
+  line-height:1.3;
+  letter-spacing:-.005em;
+}
+
+p { margin:0 0 var(--s-4); max-width:66ch; }
+p:last-child { margin-bottom:0; }
+
+.lead { font-size:1.1875rem; color:var(--body); }
+
+strong { color:var(--ink); font-weight:600; }
+em { font-style:italic; }
+
+a { color:var(--ink); text-decoration:underline; text-underline-offset:.15em;
+    text-decoration-color:var(--rule); text-decoration-thickness:1px; }
+a:hover { text-decoration-color:var(--ink); }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+
+code, .mono { font-family:var(--font-mono); font-size:.85em; }
+
+/* --- title slide ---------------------------------------------------------- */
+
+.title-slide { justify-content:space-between; }
+
+.masthead-rule {
+  border:0; border-top:2px solid var(--ink);
+  margin:0 0 var(--s-5);
+}
+
+.title-meta {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:var(--s-5);
+  border-top:1px solid var(--hair);
+  padding-top:var(--s-5);
+  margin-top:var(--s-6);
+}
+.title-meta dt {
+  font-family:var(--font-ui); font-size:.6875rem; font-weight:600;
+  letter-spacing:var(--track-label); text-transform:uppercase;
+  color:var(--mute); margin-bottom:var(--s-2);
+}
+.title-meta dd { margin:0; color:var(--ink); font-size:.9375rem; }
+
+/* --- contents ------------------------------------------------------------- */
+
+.contents { list-style:none; padding:0; margin:0; counter-reset:c; }
+.contents li { counter-increment:c; border-bottom:1px solid var(--hair); }
+.contents li:first-child { border-top:1px solid var(--hair); }
+.contents a {
+  display:flex; align-items:baseline; gap:var(--s-4);
+  padding:var(--s-4) 0;
+  text-decoration:none;
+  font-family:var(--font-ui); font-size:1.0625rem; color:var(--ink);
+  transition:padding-left 180ms var(--ease);
+}
+.contents a::before {
+  content:counter(c,decimal-leading-zero);
+  font-family:var(--font-mono); font-size:.8125rem; color:var(--rule);
+  font-variant-numeric:tabular-nums;
+}
+.contents a:hover { padding-left:var(--s-3); }
+.contents .ct-note { margin-left:auto; color:var(--mute); font-size:.8125rem; }
+
+/* --- generic bits --------------------------------------------------------- */
+
+.rows { display:flex; flex-direction:column; gap:var(--s-5); }
+.cols { display:grid; gap:var(--s-5); grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+.cols-2 { display:grid; gap:var(--s-6); grid-template-columns:1fr; }
+@media (min-width:820px) { .cols-2 { grid-template-columns:1fr 1fr; } }
+
+.bullets { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:var(--s-4); }
+.bullets > li { padding-left:var(--s-5); position:relative; max-width:64ch; }
+.bullets > li::before {
+  content:""; position:absolute; left:0; top:.62em;
+  width:11px; height:1px; background:var(--rule);
+}
+.bullets ul { margin:var(--s-2) 0 0; padding-left:var(--s-4); list-style:none;
+              display:flex; flex-direction:column; gap:var(--s-2); }
+.bullets ul li { color:var(--quiet); font-size:.9375rem; position:relative; padding-left:var(--s-4); }
+.bullets ul li::before { content:"·"; position:absolute; left:0; color:var(--rule); }
+
+.block {
+  border-top:1px solid var(--hair);
+  padding-top:var(--s-4);
+}
+.block h3 { margin-bottom:var(--s-2); }
+.block p { font-size:.9375rem; color:var(--quiet); }
+
+.note {
+  border-left:2px solid var(--rule);
+  padding:var(--s-1) 0 var(--s-1) var(--s-4);
+  font-size:.9375rem;
+  color:var(--quiet);
+  max-width:62ch;
+}
+
+/* --- tables --------------------------------------------------------------- */
+
+.t-wrap { overflow-x:auto; border:1px solid var(--hair); }
+table { border-collapse:collapse; width:100%; font-family:var(--font-ui); font-size:.875rem; }
+th, td { text-align:left; padding:var(--s-3) var(--s-4); border-bottom:1px solid var(--hair); vertical-align:top; }
+thead th {
+  background:var(--sunken); color:var(--ink);
+  font-size:.6875rem; font-weight:600; letter-spacing:var(--track-label);
+  text-transform:uppercase; white-space:nowrap;
+}
+tbody tr:last-child td { border-bottom:0; }
+td.num, th.num { text-align:center; font-variant-numeric:tabular-nums; }
+.yes { color:var(--ink); font-weight:600; }
+.no  { color:var(--rule); }
+.rowhead { color:var(--ink); font-weight:500; }
+
+/* --- pick chart ----------------------------------------------------------- */
+
+.pick {
+  position:relative;
+  border:1px solid var(--hair);
+  aspect-ratio:16/10;
+  min-height:380px;
+  background:
+    linear-gradient(var(--hair),var(--hair)) center/1px 100% no-repeat,
+    linear-gradient(var(--hair),var(--hair)) center/100% 1px no-repeat,
+    var(--sunken);
+}
+.quad-label {
+  position:absolute;
+  font-family:var(--font-ui); font-size:.6875rem; font-weight:600;
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--mute);
+}
+.bub {
+  position:absolute;
+  transform:translate(-50%,-50%);
+  background:var(--paper);
+  border:1px solid var(--rule);
+  border-radius:999px;
+  padding:.3rem .6rem;
+  font-family:var(--font-ui); font-size:.6875rem; line-height:1.25;
+  color:var(--ink);
+  text-align:center;
+  max-width:140px;
+}
+.bub.built { border-color:var(--ink); border-width:1.5px; font-weight:500; }
+.bub.killed { border-style:dashed; color:var(--mute); }
+.axis {
+  font-family:var(--font-ui); font-size:.6875rem; font-weight:600;
+  letter-spacing:var(--track-label); text-transform:uppercase; color:var(--mute);
+}
+.axis-row { display:flex; justify-content:space-between; margin-top:var(--s-2); }
+.axis-y { display:flex; flex-direction:column; justify-content:space-between; }
+.pick-frame { display:grid; grid-template-columns:auto 1fr; gap:var(--s-3); }
+
+.key { display:flex; flex-wrap:wrap; gap:var(--s-5); margin-top:var(--s-4);
+       font-family:var(--font-ui); font-size:.8125rem; color:var(--quiet); }
+.key span { display:flex; align-items:center; gap:var(--s-2); }
+.key i { width:22px; height:0; border-top:1.5px solid var(--ink); display:inline-block; }
+.key i.thin { border-top:1px solid var(--rule); }
+.key i.dash { border-top:1px dashed var(--rule); }
+
+/* --- figure / diagram ----------------------------------------------------- */
+
+figure { margin:0; }
+figcaption {
+  font-family:var(--font-ui); font-size:.8125rem; color:var(--mute);
+  margin-top:var(--s-3); padding-top:var(--s-3); border-top:1px solid var(--hair);
+}
+.mermaid { background:transparent; text-align:center; overflow-x:auto; }
+
+/* --- stat strip ----------------------------------------------------------- */
+
+.stats { display:grid; gap:0; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+         border-top:1px solid var(--hair); border-left:1px solid var(--hair); }
+.stat { border-right:1px solid var(--hair); border-bottom:1px solid var(--hair);
+        padding:var(--s-4) var(--s-4) var(--s-5); }
+.stat .n {
+  font-family:var(--font-display); font-size:2.5rem; line-height:1;
+  color:var(--ink); font-variant-numeric:tabular-nums; display:block;
+  margin-bottom:var(--s-2);
+}
+.stat .l { font-family:var(--font-ui); font-size:.75rem; color:var(--mute);
+           letter-spacing:.02em; }
+
+/* --- score ledger --------------------------------------------------------- */
+
+.ledger { font-family:var(--font-ui); font-size:.9375rem; border-top:1px solid var(--hair); }
+.ledger div {
+  display:flex; justify-content:space-between; gap:var(--s-4);
+  padding:var(--s-3) 0; border-bottom:1px solid var(--hair);
+}
+.ledger .v { font-variant-numeric:tabular-nums; color:var(--ink); }
+.ledger .total { border-bottom:0; border-top:2px solid var(--ink); font-weight:600; }
+.ledger .total span { color:var(--ink); }
+
+.meter { height:6px; background:var(--sunken); margin:var(--s-4) 0 var(--s-2); }
+.meter span { display:block; height:100%; background:var(--ink); }
+
+/* --- nav ------------------------------------------------------------------ */
+
+.topbar {
+  position:sticky; top:0; z-index:20;
+  background:var(--canvas);
+  border-bottom:1px solid var(--hair);
+  padding:var(--s-3) var(--s-5);
+  display:flex; align-items:center; gap:var(--s-4);
+  font-family:var(--font-ui); font-size:.8125rem;
+}
+.topbar strong { font-weight:600; }
+.topbar .sp { margin-left:auto; color:var(--mute); }
+.topbar a { text-decoration:none; color:var(--quiet); }
+.topbar a:hover { color:var(--ink); }
+
+/* --- print ---------------------------------------------------------------- */
+
+@media print {
+  body { background:#fff; font-size:11pt; }
+  .topbar { display:none; }
+  .deck { padding:0; gap:0; max-width:none; }
+  .slide {
+    border:0; padding:14mm 12mm; min-height:0;
+    page-break-after:always; break-after:page;
+  }
+  .slide:last-child { page-break-after:auto; }
+  a { text-decoration:none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition:none !important; animation:none !important; }
+}
+</style>
+
+<nav class="topbar">
+  <strong>Wollongong News</strong>
+  <span>Prototype Presentation</span>
+  <span class="sp">FYP-26-S3-10 &nbsp;·&nbsp; CSIT321</span>
+</nav>
+
+<div class="deck">
+
+  <!-- 01 ================================================================== -->
+  <section class="slide title-slide" id="s1">
+    <span class="slide-num">01</span>
+    <div>
+      <p class="eyebrow">University of Wollongong · SIM Global Education</p>
+      <hr class="masthead-rule">
+      <h1>Who decides<br>what you can trust?</h1>
+      <p class="lead" style="margin-top:var(--s-5);max-width:52ch;">
+        <strong>Wollongong News</strong> — a news publishing platform where every article
+        carries a Credibility Score you can trace, and every contributor an
+        Accuracy Rate they earn.
+      </p>
+    </div>
+
+    <dl class="title-meta">
+      <div>
+        <dt>Project team</dt>
+        <dd>FYP-26-S3-10</dd>
+      </div>
+      <div>
+        <dt>Subject</dt>
+        <dd>CSIT321 Final Year Project</dd>
+      </div>
+      <div>
+        <dt>Supervisor</dt>
+        <dd>[ to be filled in ]</dd>
+      </div>
+      <div>
+        <dt>Assessor</dt>
+        <dd>[ to be filled in ]</dd>
+      </div>
+      <div>
+        <dt>Team members</dt>
+        <dd>[ list names and UOW IDs ]</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- 02 ================================================================== -->
+  <section class="slide" id="s2">
+    <span class="slide-num">02</span>
+    <h2>Contents</h2>
+    <ol class="contents">
+      <li><a href="#s3">The project scope<span class="ct-note">What we set out to build</span></a></li>
+      <li><a href="#s4">Learning objectives<span class="ct-note">What we set out to learn</span></a></li>
+      <li><a href="#s5">Findings and research<span class="ct-note">Six comparable products</span></a></li>
+      <li><a href="#s6">Comparison matrix<span class="ct-note">Where we differ</span></a></li>
+      <li><a href="#s7">Pick chart<span class="ct-note">What we chose to build, and to kill</span></a></li>
+      <li><a href="#s8">The six user roles<span class="ct-note">Work breakdown</span></a></li>
+      <li><a href="#s9">Development tools<span class="ct-note">Stack and why</span></a></li>
+      <li><a href="#s10">Scheduling<span class="ct-note">Waterfall and Scrum</span></a></li>
+      <li><a href="#s11">Our prototype: architecture<span class="ct-note">How it fits together</span></a></li>
+      <li><a href="#s12">Our prototype: the scoring engine<span class="ct-note">A worked example</span></a></li>
+      <li><a href="#s13">Our prototype: what is running<span class="ct-note">Screens and figures</span></a></li>
+      <li><a href="#s14">Future development<span class="ct-note">What comes after v1</span></a></li>
+      <li><a href="#s15">Questions</a></li>
+    </ol>
+  </section>
+
+  <!-- 03 ================================================================== -->
+  <section class="slide" id="s3">
+    <span class="slide-num">03</span>
+    <h2>The project scope</h2>
+
+    <ul class="bullets">
+      <li>
+        <strong>The goal</strong> is to build a news publishing platform on which every
+        published article carries a <strong>Credibility Score</strong>, and every
+        contributor a <strong>Accuracy Rate</strong>, both produced by a fixed formula
+        whose inputs are disclosed to the reader rather than by a hidden or
+        predictive model.
+      </li>
+      <li>
+        <strong>The system covers</strong> the full editorial lifecycle:
+        <ul>
+          <li>Drafting, submission, scheduling and publication of articles</li>
+          <li>Editorial review scoped to an assigned content category</li>
+          <li>Reader reporting of inaccuracies, and moderation of what is reported</li>
+          <li>Corrections and retractions, logged permanently against the article</li>
+          <li>Contributor appeals against a correction, resolved by an administrator</li>
+          <li>Premium subscriptions and a tiered contributor revenue share</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Six user tiers</strong> hold different permissions, from an unregistered
+        visitor who can only read to a system administrator who governs the scoring
+        thresholds themselves.
+      </li>
+      <li>
+        <strong>Deliberately out of scope for v1:</strong> machine-learned credibility
+        prediction, semantic search, image and video analysis, multi-language
+        publishing, and native mobile applications.
+      </li>
+    </ul>
+
+    <p class="note" style="margin-top:auto;">
+      The scope is bounded by a single design rule: if a reader cannot be shown why
+      a score is what it is, the feature that produced it does not belong in v1.
+    </p>
+  </section>
+
+  <!-- 04 ================================================================== -->
+  <section class="slide" id="s4">
+    <span class="slide-num">04</span>
+    <h2>Learning objectives</h2>
+
+    <div class="cols" style="margin-top:var(--s-2);">
+      <div class="block">
+        <h3>Explore industry tooling</h3>
+        <p>
+          Work with the stack a graduate would actually meet: a single-page React
+          front end against a REST API, a relational database under versioned
+          migrations, automated tests in continuous use, and a real cloud
+          deployment rather than a localhost demonstration.
+        </p>
+      </div>
+      <div class="block">
+        <h3>Improve technical skills</h3>
+        <p>
+          REST API design, six-tier role-based access control, password hashing and
+          token sessions, schema migration, input sanitisation, rate limiting, and
+          writing tests that fail for the right reason.
+        </p>
+      </div>
+      <div class="block">
+        <h3>Practise team engineering</h3>
+        <p>
+          Shared version control with reviewed commits, a documented design system
+          so that two people produce one interface, and formal SDLC documentation
+          that stays in step with the code rather than describing an older version
+          of it.
+        </p>
+      </div>
+    </div>
+
+    <div class="block" style="margin-top:var(--s-6);">
+      <h3>The objective that shaped the project most</h3>
+      <p style="max-width:70ch;">
+        Learning to say no. A credibility platform invites feature after feature —
+        sentiment analysis, bias detection, automated fact-checking — each of which
+        would have made the score unexplainable. Holding the line on a disclosed,
+        arithmetic formula was the hardest engineering decision of the project, and
+        the one the rest of the design depends on.
+      </p>
+    </div>
+  </section>
+
+  <!-- 05 ================================================================== -->
+  <section class="slide" id="s5">
+    <span class="slide-num">05</span>
+    <h2>Findings and research</h2>
+
+    <p class="lead">
+      We examined six products that assess or publish news, to establish what
+      already exists and where a gap remains.
+    </p>
+
+    <div class="cols" style="margin-top:var(--s-5);">
+      <div class="block">
+        <h3>NewsGuard</h3>
+        <p>Journalist-assigned trust ratings for whole publications, nine weighted criteria. Rates the outlet, never the individual article.</p>
+      </div>
+      <div class="block">
+        <h3>Ground News</h3>
+        <p>Aggregates one story across outlets and shows the political spread of coverage. Measures bias, not accuracy.</p>
+      </div>
+      <div class="block">
+        <h3>Media Bias / Fact Check</h3>
+        <p>Manually maintained directory of outlet bias and factual reporting. No publishing function, and updates lag.</p>
+      </div>
+      <div class="block">
+        <h3>Full Fact</h3>
+        <p>Charity fact-checking of individual claims, with automated claim detection. Checks claims after publication elsewhere.</p>
+      </div>
+      <div class="block">
+        <h3>Substack</h3>
+        <p>Independent publishing with paid subscriptions and a revenue share. No accuracy signal of any kind.</p>
+      </div>
+      <div class="block">
+        <h3>Medium</h3>
+        <p>Open publishing with editorial curation and a partner programme. Curation is discretionary and undisclosed.</p>
+      </div>
+    </div>
+
+    <div class="block" style="margin-top:var(--s-6);">
+      <h3>The gap</h3>
+      <p style="max-width:72ch;">
+        Every product we examined does one of two things: it <em>rates outlets</em>
+        without publishing them, or it <em>publishes writers</em> without rating them.
+        None scores the individual article, ties that score to the writer's own
+        track record, and shows the reader the arithmetic. That intersection is the
+        product.
+      </p>
+    </div>
+  </section>
+
+  <!-- 06 ================================================================== -->
+  <section class="slide" id="s6">
+    <span class="slide-num">06</span>
+    <h2>Product comparison matrix</h2>
+
+    <div class="t-wrap">
+      <table>
+        <caption class="sr-only">Functions available in existing products and planned for Wollongong News</caption>
+        <thead>
+          <tr>
+            <th scope="col">Function</th>
+            <th scope="col" class="num">NewsGuard</th>
+            <th scope="col" class="num">Ground News</th>
+            <th scope="col" class="num">MBFC</th>
+            <th scope="col" class="num">Full Fact</th>
+            <th scope="col" class="num">Substack</th>
+            <th scope="col" class="num">Medium</th>
+            <th scope="col" class="num">Wollongong News</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="rowhead">Publish original articles</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Credibility rating of an outlet</td>
+              <td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td></tr>
+          <tr><td class="rowhead">Credibility score per <em>article</em></td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Per-author accuracy record</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Published scoring inputs</td>
+              <td class="num yes">✓</td><td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Per-article score breakdown shown to reader</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Verifiable source links counted</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Reader reporting of inaccuracy</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Permanent public correction log</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Author appeal against a correction</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Editorial review before publication</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Paid subscriptions</td>
+              <td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Contributor revenue share</td>
+              <td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+          <tr><td class="rowhead">Bias / political spread analysis</td>
+              <td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td><td class="num no">—</td></tr>
+          <tr><td class="rowhead">Machine-learned prediction</td>
+              <td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td><td class="num yes">✓</td><td class="num no">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note" style="margin-top:var(--s-5);">
+      The last row is a deliberate absence, not a shortfall. A predicted score
+      cannot be shown its own arithmetic, which is the one thing this product
+      promises.
+    </p>
+  </section>
+
+  <!-- 07 ================================================================== -->
+  <section class="slide" id="s7">
+    <span class="slide-num">07</span>
+    <h2>Pick chart</h2>
+    <p style="margin-bottom:var(--s-5);">
+      Candidate features plotted by payoff against difficulty. Everything in the
+      upper-left quadrant is built and running in the prototype.
+    </p>
+
+    <div class="pick-frame">
+      <div class="axis axis-y"><span>High</span><span style="writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;">Payoff</span><span>Low</span></div>
+      <div>
+        <div class="pick">
+          <span class="quad-label" style="left:50%;top:6%;transform:translateX(-50%);">Implement</span>
+          <span class="quad-label" style="left:75%;top:6%;transform:translateX(-50%);">Challenging</span>
+          <span class="quad-label" style="left:25%;bottom:6%;transform:translateX(-50%);">Possible</span>
+          <span class="quad-label" style="left:75%;bottom:6%;transform:translateX(-50%);">Kill</span>
+
+          <!-- Implement -->
+          <span class="bub built" style="left:12%;top:16%;">Credibility score</span>
+          <span class="bub built" style="left:33%;top:14%;">Accuracy rate</span>
+          <span class="bub built" style="left:13%;top:34%;">Editorial review queue</span>
+          <span class="bub built" style="left:35%;top:33%;">Reader reporting</span>
+          <span class="bub built" style="left:22%;top:26%;">Corrections log</span>
+          <span class="bub built" style="left:9%;top:45%;">Registration</span>
+          <span class="bub built" style="left:38%;top:44%;">Category-scoped editors</span>
+
+          <!-- Challenging -->
+          <span class="bub built" style="left:63%;top:19%;">Dispute resolution</span>
+          <span class="bub built" style="left:84%;top:30%;">Tiered revenue share</span>
+          <span class="bub" style="left:64%;top:41%;">Real payment gateway</span>
+
+          <!-- Possible -->
+          <span class="bub built" style="left:14%;top:62%;">Reading lists</span>
+          <span class="bub built" style="left:33%;top:60%;">Follows</span>
+          <span class="bub built" style="left:20%;top:78%;">Notification settings</span>
+          <span class="bub built" style="left:40%;top:76%;">Share links</span>
+
+          <!-- Kill -->
+          <span class="bub killed" style="left:62%;top:60%;">Semantic search</span>
+          <span class="bub killed" style="left:84%;top:58%;">ML score prediction</span>
+          <span class="bub killed" style="left:63%;top:80%;">Image &amp; video analysis</span>
+          <span class="bub killed" style="left:85%;top:80%;">Automated fact-checking</span>
+        </div>
+        <div class="axis-row"><span>Easy</span><span>Difficulty</span><span>Hard</span></div>
+      </div>
+    </div>
+
+    <div class="key">
+      <span><i></i> Built in the prototype</span>
+      <span><i class="thin"></i> Planned, not yet built</span>
+      <span><i class="dash"></i> Rejected for v1</span>
+    </div>
+  </section>
+
+  <!-- 08 ================================================================== -->
+  <section class="slide" id="s8">
+    <span class="slide-num">08</span>
+    <h2>The six user roles</h2>
+    <p style="margin-bottom:var(--s-5);">
+      Work breakdown by role. Each tier inherits everything below it and adds its
+      own responsibilities.
+    </p>
+
+    <figure>
+      <pre class="mermaid">
+graph TD
+  R["Wollongong News"]
+  R --- V["Unregistered<br/>visitor"]
+  R --- F["Free registered<br/>reader"]
+  R --- P["Premium<br/>reader"]
+  R --- C["Verified<br/>contributor"]
+  R --- E["Editor"]
+  R --- A["System<br/>administrator"]
+
+  V --- v1["Read published articles"]
+  V --- v2["Browse categories"]
+  V --- v3["See credibility scores"]
+  V --- v4["Search"]
+
+  F --- f1["Register and sign in"]
+  F --- f2["Comment, like, follow"]
+  F --- f3["Save a reading list"]
+  F --- f4["Report an inaccuracy"]
+  F --- f5["Apply to contribute"]
+
+  P --- p1["Subscriber-only articles"]
+  P --- p2["Manage subscription"]
+
+  C --- c1["Draft and edit articles"]
+  C --- c2["Tag verifiable sources"]
+  C --- c3["Submit for review"]
+  C --- c4["Schedule publication"]
+  C --- c5["Track accuracy rate"]
+  C --- c6["View earnings"]
+  C --- c7["Dispute a correction"]
+
+  E --- e1["Review assigned sections"]
+  E --- e2["Approve or reject"]
+  E --- e3["Moderate flagged content"]
+  E --- e4["Log corrections"]
+
+  A --- a1["Govern accounts"]
+  A --- a2["Decide applications"]
+  A --- a3["Assign editor sections"]
+  A --- a4["Manage categories"]
+  A --- a5["Set scoring thresholds"]
+  A --- a6["Resolve disputes"]
+  A --- a7["Read the audit log"]
+      </pre>
+      <figcaption>Figure 1 — Work breakdown structure by user role.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 09 ================================================================== -->
+  <section class="slide" id="s9">
+    <span class="slide-num">09</span>
+    <h2>Development tools</h2>
+
+    <div class="cols-2">
+      <div class="rows">
+        <div class="block">
+          <h3>Back end — Python 3.12 and Flask</h3>
+          <p>
+            Flask is the single entry point to the system; no client ever queries
+            the database directly. SQLAlchemy for the ORM, Alembic for versioned
+            migrations, Argon2 for password hashing, PyJWT for sessions, bleach for
+            HTML sanitisation on write, Flask-Limiter for rate limiting.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Database — PostgreSQL via Supabase</h3>
+          <p>
+            The PDD specifies MySQL. The team moved to Supabase-hosted PostgreSQL
+            for a managed instance the whole team can share without each running a
+            local server. Row Level Security is enabled on all 23 tables and default
+            privileges are revoked, so a leaked key alone reads nothing.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Front end — React 18 with Vite</h3>
+          <p>
+            A single-page application in plain JSX with hand-written CSS against a
+            documented token file. No component framework, so that every rule in the
+            design system is one we can account for.
+          </p>
+        </div>
+      </div>
+
+      <div class="rows">
+        <div class="block">
+          <h3>Hosting — Render</h3>
+          <p>
+            Two services from one blueprint: the built front end as a static site,
+            and Flask under gunicorn as a web service. Supabase holds the database
+            only — it cannot serve a website, so the two are complements rather than
+            alternatives.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Testing — pytest and Playwright</h3>
+          <p>
+            139 automated test cases covering the scoring engine, the permission
+            middleware, the editorial workflow, error handling and rate limiting. A
+            batched Playwright pass captures every screen at desktop and mobile
+            width and fails on console errors or horizontal overflow.
+          </p>
+        </div>
+        <div class="block">
+          <h3>Version control and environment</h3>
+          <p>
+            GitHub for source control, with the environment file held out of the
+            repository. Visual Studio Code as the editor across the team.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <p class="note" style="margin-top:var(--s-5);">
+      One deployment constraint worth recording: the API runs a single gunicorn
+      worker, because the rate limiter holds its counters in process memory. Two
+      workers meant two independent counters and a limit that was twice as loose as
+      configured.
+    </p>
+  </section>
+
+  <!-- 10 ================================================================== -->
+  <section class="slide" id="s10">
+    <span class="slide-num">10</span>
+    <h2>Scheduling</h2>
+
+    <div class="cols-2" style="margin-bottom:var(--s-6);">
+      <div class="block">
+        <h3>Waterfall — for the deliverables</h3>
+        <p>
+          The subject's milestones are fixed and sequential: requirements, design,
+          prototype, final product. The waterfall model matches those dates and is
+          how we plan against the assessment calendar.
+        </p>
+      </div>
+      <div class="block">
+        <h3>Scrum — for the development itself</h3>
+        <p>
+          Inside each phase the work runs as short sprints against a backlog of user
+          stories, because requirements did change: the database moved from MySQL to
+          Supabase, and the accuracy formula was rewritten after testing showed it
+          punished new writers eight times harder than veterans.
+        </p>
+      </div>
+    </div>
+
+    <figure>
+      <pre class="mermaid">
+gantt
+  title Project schedule
+  dateFormat YYYY-MM-DD
+  axisFormat %b
+  section Planning
+  Form team and topic          :done, a1, 2026-07-01, 14d
+  Project website              :done, a2, 2026-07-08, 10d
+  section Research
+  Existing products            :done, b1, 2026-07-10, 21d
+  Comparison and pick chart    :done, b2, 2026-07-24, 10d
+  Requirements (PRD)           :milestone, done, m1, 2026-08-01, 0d
+  section Design
+  Use cases and DB design      :done, c1, 2026-08-01, 7d
+  Design document (PDD)        :milestone, done, m2, 2026-08-07, 0d
+  section Implementation
+  Scoring engine and API       :done, d1, 2026-08-08, 18d
+  Front end and design system  :done, d2, 2026-08-15, 20d
+  Deployment and hardening     :done, d3, 2026-08-28, 8d
+  Prototype demonstration      :milestone, active, m3, 2026-09-05, 0d
+  section Remaining
+  Final documentation          :e1, 2026-09-06, 21d
+  User acceptance testing      :e2, 2026-09-15, 14d
+  Final presentation           :milestone, m4, 2026-10-01, 0d
+      </pre>
+      <figcaption>Figure 2 — Milestones to date and work remaining. Dates are indicative and to be confirmed against the subject calendar.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 11 ================================================================== -->
+  <section class="slide" id="s11">
+    <span class="slide-num">11</span>
+    <h2>Our prototype — architecture</h2>
+
+    <figure>
+      <pre class="mermaid">
+flowchart LR
+  subgraph client["Browser"]
+    SPA["React SPA<br/>16 screens<br/>static site on Render"]
+  end
+  subgraph api["Application"]
+    F["Flask REST API<br/>77 endpoints<br/>gunicorn on Render"]
+    SEC["Permission middleware<br/>six roles"]
+    SCORE["Scoring engine<br/>pure functions"]
+  end
+  subgraph data["Data"]
+    DB[("PostgreSQL<br/>Supabase<br/>23 tables, RLS on")]
+  end
+
+  SPA -- "HTTPS + JWT" --> F
+  F --> SEC
+  SEC --> SCORE
+  SEC --> DB
+  SCORE --> DB
+  DB -- "rows" --> F
+  F -- "JSON incl. score ledger" --> SPA
+      </pre>
+      <figcaption>
+        Figure 3 — No client reaches the database directly. Every request passes the
+        permission middleware first, and the scoring engine is a set of pure
+        functions with no database access, no clock and no randomness, so a score
+        can be recomputed and verified from its inputs alone.
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- 12 ================================================================== -->
+  <section class="slide" id="s12">
+    <span class="slide-num">12</span>
+    <h2>Our prototype — the scoring engine</h2>
+
+    <div class="cols-2">
+      <div>
+        <p>
+          A reader is never shown a bare number. Every article carries the ledger
+          that produced it: what the writer's record contributed, what the sources
+          added, and what each correction took away.
+        </p>
+        <p>
+          The score is a fixed arithmetic expression. The <em>inputs</em> are named
+          in public; the tuning weights are internal and administrator-configurable,
+          so no constant may be hard-coded into the interface.
+        </p>
+
+        <h3 style="margin-top:var(--s-5);">Accuracy is smoothed, not a raw ratio</h3>
+        <p style="font-size:.9375rem;color:var(--quiet);">
+          A plain ratio of clean articles to published ones cost a five-article
+          writer <strong>15.0 points</strong> for one correction, against
+          <strong>1.9</strong> for a forty-article writer — a 7.9× penalty for the
+          same mistake. Blending the rate toward a platform baseline reduces that
+          gap to 4.4× and removes the cliff where a single article moved a whole
+          back catalogue.
+        </p>
+      </div>
+
+      <div>
+        <p class="eyebrow">Worked example — a published article</p>
+        <div class="ledger">
+          <div><span>Contributor accuracy record</span><span class="v">+ 63.75</span></div>
+          <div><span>Verifiable sources (5 × 5, capped at 25)</span><span class="v">+ 25.00</span></div>
+          <div><span>Logged corrections (1)</span><span class="v">− 15.00</span></div>
+          <div><span>Retraction</span><span class="v">− 0.00</span></div>
+          <div><span>Upheld reader reports (below threshold)</span><span class="v">− 0.00</span></div>
+          <div class="total"><span>Credibility score</span><span class="v">73.75</span></div>
+        </div>
+        <div class="meter"><span style="width:73.75%"></span></div>
+        <p style="font-family:var(--font-ui);font-size:.8125rem;color:var(--mute);margin:0;">
+          Band: <strong style="color:var(--ink)">Moderate</strong> — 60 and above
+        </p>
+
+        <p class="note" style="margin-top:var(--s-5);">
+          Bands are High, Moderate, Low and Disputed. None is signalled by colour:
+          the band word is always rendered and is always the authority, so the
+          reading survives greyscale printing and colour-blind vision.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 ================================================================== -->
+  <section class="slide" id="s13">
+    <span class="slide-num">13</span>
+    <h2>Our prototype — what is running</h2>
+
+    <p>
+      The prototype is deployed and reachable, not a local demonstration. Every
+      figure below is counted from the running system.
+    </p>
+
+    <div class="stats" style="margin:var(--s-5) 0;">
+      <div class="stat"><span class="n">77</span><span class="l">API endpoints</span></div>
+      <div class="stat"><span class="n">16</span><span class="l">Screens</span></div>
+      <div class="stat"><span class="n">23</span><span class="l">Database tables</span></div>
+      <div class="stat"><span class="n">6</span><span class="l">User roles</span></div>
+      <div class="stat"><span class="n">139</span><span class="l">Automated tests</span></div>
+      <div class="stat"><span class="n">50</span><span class="l">Seeded articles</span></div>
+    </div>
+
+    <div class="cols-2">
+      <div class="rows">
+        <div class="block">
+          <h3>Reading</h3>
+          <p>Front page, article with its score ledger and correction history, section pages, writer profiles, keyword search, and a page that explains the scoring in words.</p>
+        </div>
+        <div class="block">
+          <h3>Writing</h3>
+          <p>Rich-text editor with source tagging, draft and submission workflow, scheduling, per-article status, and an accuracy rate that updates as the record changes.</p>
+        </div>
+      </div>
+      <div class="rows">
+        <div class="block">
+          <h3>Editing and moderation</h3>
+          <p>Review queue scoped to assigned sections, flagged-content queue with every reader report shown in full, correction logging, and a dispute queue for appeals.</p>
+        </div>
+        <div class="block">
+          <h3>Administration</h3>
+          <p>Nine tabs: accounts, applications, editor assignments, platform-wide article moderation, disputes, categories, scoring thresholds and the audit log.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="note" style="margin-top:var(--s-5);">
+      Security testing against the deployed system: injected scripts stripped on
+      write, every privileged route refused to a free reader, tampered session
+      tokens rejected, and sign-in and password-reset responses byte-identical
+      whether or not the account exists, so neither can be used to enumerate users.
+    </p>
+  </section>
+
+  <!-- 14 ================================================================== -->
+  <section class="slide" id="s14">
+    <span class="slide-num">14</span>
+    <h2>Future development</h2>
+
+    <div class="cols-2">
+      <div class="rows">
+        <div class="block">
+          <h3>Security</h3>
+          <p>Two-factor authentication for editor and administrator accounts; email verification at registration; moving rate-limit counters to shared storage so the API can run more than one worker.</p>
+        </div>
+        <div class="block">
+          <h3>Account management</h3>
+          <p>Real transactional email for password resets and notifications, which the prototype currently logs rather than sends.</p>
+        </div>
+        <div class="block">
+          <h3>Payments</h3>
+          <p>A real payment gateway in place of the stubbed integration, and scheduled payout runs against the tiered revenue share.</p>
+        </div>
+      </div>
+
+      <div class="rows">
+        <div class="block">
+          <h3>Scoring</h3>
+          <p>Per-category weights, since a science article and a sports report do not carry the same sourcing expectation; and a public history of threshold changes, so a score movement can be attributed to a policy change rather than to the writer.</p>
+        </div>
+        <div class="block">
+          <h3>Editorial</h3>
+          <p>Cover images, comment moderation, and a duplicate-content check surfaced to editors during review.</p>
+        </div>
+        <div class="block">
+          <h3>Expansion</h3>
+          <p>A native mobile client, and multi-language publishing with per-language editorial assignment.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="note" style="margin-top:auto;">
+      Three documentation amendments are also outstanding: the PDD still specifies
+      MySQL, Figure 5.96 states that threshold changes do not affect existing
+      scores when in fact they recalculate, and Figure 5.87's "remove articles" is
+      implemented as unpublish rather than delete, because a corrected article is
+      the record of that correction.
+    </p>
+  </section>
+
+  <!-- 15 ================================================================== -->
+  <section class="slide" id="s15" style="justify-content:center;align-items:center;text-align:center;">
+    <span class="slide-num">15</span>
+    <div>
+      <p class="eyebrow">FYP-26-S3-10</p>
+      <h1 style="font-size:clamp(3rem,2rem+5vw,5rem);">Questions</h1>
+      <p class="lead" style="margin:var(--s-5) auto 0;max-width:44ch;">
+        Live prototype, demonstration accounts and the full test suite are
+        available to run during the session.
+      </p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Arrow-key paging between slides, for presenting from the browser.
+  const slides = [...document.querySelectorAll(".slide")];
+  addEventListener("keydown", (e) => {
+    if (e.target.closest("input, textarea")) return;
+    const dir = e.key === "ArrowRight" || e.key === "PageDown" ? 1
+              : e.key === "ArrowLeft"  || e.key === "PageUp"   ? -1 : 0;
+    if (!dir) return;
+    e.preventDefault();
+    const mid = innerHeight / 2;
+    let current = 0;
+    slides.forEach((s, i) => { if (s.getBoundingClientRect().top < mid) current = i; });
+    const next = slides[Math.min(slides.length - 1, Math.max(0, current + dir))];
+    next.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  });
+</script>

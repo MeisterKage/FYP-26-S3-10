@@ -1,0 +1,2154 @@
+<title>News Release System Technical Report</title>
+<style>
+/* ==========================================================================
+   PDD-matched document style
+   --------------------------------------------------------------------------
+   Extracted from FYP-26-S3-10_PDD.docx so the technical report and user manual
+   sit alongside the design document as one set:
+
+     font          Arial only
+     body          11pt, line spacing 1.15, #000000
+     page          US Letter, 1in margins
+     Heading 1     18pt bold black
+     Heading 2     13pt bold black
+     Heading 3     12pt bold #434343      (the PDD's own 14pt is a Google Docs
+     Heading 4     11pt bold #666666       default that renders larger than
+     Title         26pt                    Heading 2; not reproduced)
+     Subtitle      15pt #666666
+     tables        ruled, no cell shading
+
+   Everything is set in points, so what is measured in Word is what prints.
+   ========================================================================== */
+
+:root {
+  --ink: #000000;
+  --h3: #434343;
+  --h4: #666666;
+  --line: #000000;
+  --hair: #b7b7b7;
+  --sunken: #f3f3f3;
+  --link: #0563c1;
+
+  --font: Arial, Helvetica, "Liberation Sans", sans-serif;
+  --measure: 100%;
+}
+
+@page {
+  size: Letter;
+  margin: 1in;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 11pt;
+  line-height: 1.15;
+  -webkit-font-smoothing: antialiased;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* --- shell ---------------------------------------------------------------
+   On screen a navigation rail helps in a 58-page document. It is not part of
+   the PDD's design, so it is removed entirely for print.                    */
+
+.shell { display: grid; grid-template-columns: 1fr; max-width: none; margin: 0; }
+@media (min-width: 1100px) { .shell { grid-template-columns: 250px 1fr; } }
+
+.toc {
+  border-bottom: 1px solid var(--hair);
+  padding: 18pt 14pt;
+  font-family: var(--font);
+  background: #fafafa;
+}
+@media (min-width: 1100px) {
+  .toc {
+    border-bottom: 0; border-right: 1px solid var(--hair);
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+}
+.toc-title { font-size: 12pt; font-weight: bold; color: var(--ink); margin: 0 0 2pt; }
+.toc-sub {
+  font-size: 8.5pt; color: var(--h4); margin: 0 0 12pt;
+  padding-bottom: 8pt; border-bottom: 1px solid var(--hair);
+}
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc > ol > li { margin-bottom: 6pt; }
+.toc a { display: block; padding: 1.5pt 0; font-size: 9pt; color: #222; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.toc a.top { font-weight: bold; color: var(--ink); }
+.toc a .n { color: var(--h4); margin-right: .5em; }
+.toc ol ol { margin: 2pt 0 6pt 12pt; }
+.toc ol ol a { font-size: 8.5pt; }
+.toc ol ol ol { margin-left: 10pt; }
+.toc a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+main { padding: 24pt 20pt 40pt; min-width: 0; }
+@media (min-width: 760px) { main { padding: 36pt 40pt 48pt; } }
+.doc { max-width: 6.5in; margin: 0 auto; }
+
+/* --- headings ------------------------------------------------------------- */
+
+h1, h2, h3, h4, h5 { color: var(--ink); font-family: var(--font); margin: 0; }
+
+.cover-title {
+  font-size: 26pt; font-weight: normal; line-height: 1.15;
+}
+
+h2 {                       /* PDD Heading 1 */
+  font-size: 18pt; font-weight: bold; line-height: 1.15;
+  margin: 24pt 0 8pt; scroll-margin-top: 12pt;
+}
+/* The PDD numbers its headings in the text — "1. Introduction", "2.1 Physical
+   Architecture Diagram". Top level takes the full stop; deeper levels do not. */
+h2 .n { display: inline; margin-right: .35em; }
+h2 .n::after { content: "."; }
+
+h3 {                       /* PDD Heading 2 */
+  font-size: 13pt; font-weight: bold; line-height: 1.15;
+  margin: 16pt 0 6pt; scroll-margin-top: 12pt;
+}
+h3 .n { margin-right: .5em; }
+
+h4 {                       /* PDD Heading 3 */
+  font-size: 12pt; font-weight: bold; color: var(--h3);
+  margin: 12pt 0 4pt;
+}
+h4 .n { margin-right: .5em; }
+
+h5 {                       /* PDD Heading 4 */
+  font-size: 11pt; font-weight: bold; color: var(--h4);
+  margin: 10pt 0 4pt;
+}
+
+/* --- body ----------------------------------------------------------------- */
+
+p { margin: 0 0 8pt; max-width: none; }
+.lead { font-size: 11pt; }
+.wide { max-width: none; }
+strong { font-weight: bold; color: var(--ink); }
+em { font-style: italic; }
+
+.eyebrow {
+  font-size: 9pt; font-weight: bold; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--h4); margin: 0 0 6pt;
+}
+
+a { color: var(--link); text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+code, .mono, td.mono {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 10pt;
+}
+code { background: var(--sunken); padding: 0 2pt; }
+
+ul.plain { list-style: disc; margin: 0 0 8pt; padding-left: 22pt; }
+ul.plain > li { position: static; padding-left: 0; margin-bottom: 4pt; max-width: none; }
+ul.plain > li::before { content: none; }
+
+ol.num { margin: 0 0 8pt 22pt; padding: 0; max-width: none; }
+ol.num li { margin-bottom: 4pt; padding-left: 2pt; }
+
+ol.steps { counter-reset: st; list-style: decimal; margin: 0 0 8pt 22pt; padding: 0; }
+ol.steps > li {
+  counter-increment: none; position: static;
+  padding: 0 0 4pt 2pt; max-width: none;
+}
+ol.steps > li::before { content: none; }
+
+/* --- cover ---------------------------------------------------------------- */
+
+.cover { padding-bottom: 18pt; border-bottom: 1.5pt solid var(--line); }
+.cover-meta {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10pt 16pt; margin-top: 18pt;
+}
+.cover-meta dt {
+  font-size: 8.5pt; font-weight: bold; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--h4); margin-bottom: 2pt;
+}
+.cover-meta dd { margin: 0; color: var(--ink); font-size: 10.5pt; }
+.cover + h2 { border-top: 0; padding-top: 0; margin-top: 20pt; }
+
+/* --- printed contents page ------------------------------------------------ */
+
+.contents-page { margin: 0 0 12pt; }
+.contents-page h2 { margin-top: 0; }
+.contents-list { list-style: none; margin: 0; padding: 0; font-size: 11pt; }
+.contents-list li { margin: 0; }
+.contents-list a {
+  display: flex; align-items: baseline; gap: 4pt;
+  color: var(--ink); text-decoration: none; padding: 2.5pt 0;
+}
+.contents-list .lbl { flex: 0 1 auto; }
+.contents-list .dots {
+  flex: 1 1 auto; border-bottom: 1px dotted var(--hair);
+  transform: translateY(-3px); min-width: 12pt;
+}
+.contents-list .pg { flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.contents-list .lvl2 { padding-left: 18pt; font-size: 10.5pt; }
+.contents-list .lvl3 { padding-left: 36pt; font-size: 10pt; color: #333; }
+.contents-list .lvl1 > a { font-weight: bold; }
+
+/* --- tables --------------------------------------------------------------- */
+
+.t-wrap { overflow-x: auto; border: 0; margin: 8pt 0 4pt; }
+table {
+  border-collapse: collapse; width: 100%;
+  font-family: var(--font); font-size: 10pt;
+}
+th, td {
+  text-align: left; padding: 4pt 6pt;
+  border: 1px solid var(--line); vertical-align: top;
+}
+thead th {
+  background: transparent; color: var(--ink);
+  font-size: 10pt; font-weight: bold; text-transform: none; letter-spacing: 0;
+}
+tbody tr:last-child td { border-bottom: 1px solid var(--line); }
+td.num, th.num { text-align: center; }
+.rowhead { font-weight: bold; color: var(--ink); }
+.yes { font-weight: bold; color: var(--ink); }
+.no { color: #767676; }
+.cap { font-size: 10pt; color: #333; margin: 0 0 14pt; font-style: italic; }
+.cap b { font-style: normal; font-weight: bold; color: var(--ink); }
+
+/* Use-case description table */
+.uc { margin: 8pt 0 14pt; border: 1px solid var(--line); font-size: 10pt; }
+.uc > div { display: grid; grid-template-columns: 1fr; border-bottom: 1px solid var(--line); }
+@media (min-width: 640px) { .uc > div { grid-template-columns: 150px 1fr; } }
+.uc > div:last-child { border-bottom: 0; }
+.uc dt {
+  padding: 4pt 6pt; color: var(--ink); font-weight: bold;
+  background: transparent; font-size: 10pt; text-transform: none; letter-spacing: 0;
+  border-right: 1px solid var(--line);
+}
+.uc dd { padding: 4pt 6pt; margin: 0; }
+.uc dd ol { margin: 0 0 0 16pt; padding: 0; }
+.uc dd ol li { margin-bottom: 2pt; }
+.uc .name dt, .uc .name dd { background: transparent; font-weight: bold; }
+.uc .name dd { font-family: var(--font); font-size: 10pt; color: var(--ink); }
+
+/* --- figures -------------------------------------------------------------- */
+
+figure { margin: 10pt 0 14pt; }
+figure img {
+  display: block; width: 100%; height: auto;
+  border: 1px solid var(--hair); background: #fff;
+}
+figcaption {
+  font-size: 10pt; color: #333; font-style: italic;
+  margin-top: 5pt; padding-top: 0; border-top: 0;
+}
+figcaption b { font-style: normal; font-weight: bold; color: var(--ink); }
+.mermaid {
+  background: #fff; text-align: center; overflow-x: auto;
+  border: 1px solid var(--hair); padding: 8pt;
+}
+
+.pair { display: grid; gap: 10pt; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .pair { grid-template-columns: 1fr 1fr; align-items: start; } }
+.pair figure { margin: 0 0 8pt; }
+.phone img { max-width: 2.6in; margin: 0 auto; }
+
+/* --- callouts ------------------------------------------------------------- */
+
+.note, .warn {
+  border: 1px solid var(--line); border-left-width: 3pt;
+  padding: 6pt 8pt; margin: 8pt 0 12pt;
+  font-size: 10.5pt; color: var(--ink); max-width: none;
+}
+.note p:last-child, .warn p:last-child { margin-bottom: 0; }
+.note .tag, .warn .tag {
+  display: block; font-size: 9pt; font-weight: bold; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ink); margin-bottom: 3pt;
+}
+
+/* --- ledger, meter, bands ------------------------------------------------- */
+
+.ledger { font-size: 10.5pt; border-top: 1px solid var(--line); max-width: 4.6in; margin-bottom: 10pt; }
+.ledger div {
+  display: flex; justify-content: space-between; gap: 12pt;
+  padding: 4pt 0; border-bottom: 1px solid var(--hair);
+}
+.ledger .v { font-variant-numeric: tabular-nums; }
+.ledger .total { border-bottom: 0; border-top: 1.5pt solid var(--line); font-weight: bold; }
+
+.role-band { display: flex; flex-wrap: wrap; gap: 4pt; font-size: 9pt; margin: 0 0 10pt; }
+.role-band span { border: 1px solid var(--hair); padding: 1pt 5pt; color: #555; }
+.role-band span.on { border-color: var(--line); color: var(--ink); font-weight: bold; }
+
+.risk td.lvl { font-weight: bold; text-align: center; }
+.risk td.h, .risk td.m, .risk td.l { color: var(--ink); }
+
+/* --- print ---------------------------------------------------------------- */
+
+@media print {
+  body { background: #fff; font-size: 11pt; }
+  .shell { display: block; }
+  .toc { display: none; }
+  main { padding: 0; }
+  .doc { max-width: none; }
+
+  /* Cover, then contents, then one page per numbered section. The contents
+     page owns its own page: letting section 1 share it both looks wrong and
+     makes the heading indistinguishable from its own contents entry. */
+  h2 { page-break-before: always; break-before: page; }
+  .contents-page { page-break-before: always; break-before: page; }
+  .contents-page > h2 { page-break-before: auto; break-before: auto; }
+  .cover + h2 { page-break-before: auto; break-before: auto; }
+
+  h2, h3, h4, h5 { page-break-after: avoid; break-after: avoid; }
+  figure, .t-wrap, .uc, .note, .warn, .ledger,
+  ol.steps > li, .contents-list li { page-break-inside: avoid; break-inside: avoid; }
+  p { orphans: 2; widows: 2; }
+  a { color: var(--ink); text-decoration: none; }
+}
+
+</style>
+
+<div class="shell">
+
+<nav class="toc" aria-label="Contents">
+  <p class="toc-title">Technical Report</p>
+  <p class="toc-sub">Wollongong News · FYP-26-S3-10</p>
+  <ol>
+    <li><a class="top" href="#s1"><span class="n">1</span>Executive summary</a></li>
+    <li><a class="top" href="#s2"><span class="n">2</span>Introduction</a>
+      <ol>
+        <li><a href="#s2-1">2.1 The problem</a></li>
+        <li><a href="#s2-2">2.2 How readers judge credibility today</a></li>
+        <li><a href="#s2-3">2.3 The data a scoring system handles</a></li>
+        <li><a href="#s2-4">2.4 Target stakeholders</a></li>
+        <li><a href="#s2-5">2.5 Project scope</a></li>
+      </ol>
+    </li>
+    <li><a class="top" href="#s3"><span class="n">3</span>Research analysis</a>
+      <ol>
+        <li><a href="#s3-1">3.1 Existing products</a></li>
+        <li><a href="#s3-2">3.2 Comparison matrix</a></li>
+        <li><a href="#s3-3">3.3 Approaches to scoring</a></li>
+        <li><a href="#s3-4">3.4 Necessary functionality</a></li>
+        <li><a href="#s3-5">3.5 How such systems are built</a></li>
+        <li><a href="#s3-6">3.6 Recent developments</a></li>
+      </ol>
+    </li>
+    <li><a class="top" href="#s4"><span class="n">4</span>Implementation</a>
+      <ol>
+        <li><a href="#s4-1">4.1 Functionality built</a></li>
+        <li><a href="#s4-2">4.2 Why arithmetic, not machine learning</a></li>
+        <li><a href="#s4-3">4.3 Development platforms</a></li>
+      </ol>
+    </li>
+    <li><a class="top" href="#s5"><span class="n">5</span>Proposed plan</a>
+      <ol>
+        <li><a href="#s5-1">5.1 System development method</a></li>
+        <li><a href="#s5-2">5.2 Software methodology</a></li>
+        <li><a href="#s5-3">5.3 Functional requirements</a>
+          <ol>
+            <li><a href="#s5-3-1">5.3.1 User stories</a></li>
+            <li><a href="#s5-3-2">5.3.2 Use case diagram</a></li>
+            <li><a href="#s5-3-3">5.3.3 Use case descriptions</a></li>
+            <li><a href="#s5-3-4">5.3.4 Proposed workflow</a></li>
+            <li><a href="#s5-3-5">5.3.5 Architecture design</a></li>
+            <li><a href="#s5-3-6">5.3.6 Database design</a></li>
+            <li><a href="#s5-3-7">5.3.7 Data flow diagram</a></li>
+            <li><a href="#s5-3-8">5.3.8 Sequence diagrams</a></li>
+            <li><a href="#s5-3-9">5.3.9 The scoring engine</a></li>
+            <li><a href="#s5-3-10">5.3.10 API surface</a></li>
+          </ol>
+        </li>
+        <li><a href="#s5-4">5.4 Non-functional requirements</a></li>
+        <li><a href="#s5-5">5.5 Project schedule</a></li>
+        <li><a href="#s5-6">5.6 Team organisation</a></li>
+        <li><a href="#s5-7">5.7 Project risk</a></li>
+      </ol>
+    </li>
+    <li><a class="top" href="#s6"><span class="n">6</span>Testing</a></li>
+    <li><a class="top" href="#s7"><span class="n">7</span>Deviations from the PRD and PDD</a></li>
+    <li><a class="top" href="#s8"><span class="n">8</span>Case study</a></li>
+    <li><a class="top" href="#s9"><span class="n">9</span>Project website</a></li>
+    <li><a class="top" href="#s10"><span class="n">10</span>References</a></li>
+  </ol>
+</nav>
+
+<main>
+<div class="doc">
+
+  <!-- COVER ============================================================== -->
+  <header class="cover">
+    <p class="eyebrow">University of Wollongong · SIM Global Education</p>
+    <h1 class="cover-title">CSIT321: News Release System<br>Preliminary Technical Report</h1>
+    <p class="lead" style="margin-top:var(--s-5);">
+      A news publishing platform on which every article carries a Credibility
+      Score and every contributor an Accuracy Rate, produced by a disclosed
+      formula rather than a hidden model.
+    </p>
+    <dl class="cover-meta">
+      <div><dt>Project team</dt><dd>FYP-26-S3-10</dd></div>
+      <div><dt>Product</dt><dd>Wollongong News</dd></div>
+      <div><dt>Document</dt><dd>Technical Report v1.0</dd></div>
+      <div><dt>Supervisor</dt><dd>[ to be filled in ]</dd></div>
+      <div><dt>Assessor</dt><dd>[ to be filled in ]</dd></div>
+      <div><dt>Website</dt><dd>[ project website URL ]</dd></div>
+      <div><dt>Team members</dt><dd>[ names and UOW IDs ]</dd></div>
+    </dl>
+  </header>
+  <section class="contents-page">
+    <h2>Contents</h2>
+    <ol class="contents-list">
+      <li class="lvl1"><a href="#s1"><span class="lbl">1. Executive summary</span><span class="dots"></span><span class="pg" data-pg-for="s1">4</span></a></li>
+      <li class="lvl1"><a href="#s2"><span class="lbl">2. Introduction</span><span class="dots"></span><span class="pg" data-pg-for="s2">5</span></a></li>
+      <li class="lvl2"><a href="#s2-1"><span class="lbl">2.1 The problem</span><span class="dots"></span><span class="pg" data-pg-for="s2-1">5</span></a></li>
+      <li class="lvl2"><a href="#s2-2"><span class="lbl">2.2 How readers judge credibility today</span><span class="dots"></span><span class="pg" data-pg-for="s2-2">5</span></a></li>
+      <li class="lvl2"><a href="#s2-3"><span class="lbl">2.3 The data a scoring system handles</span><span class="dots"></span><span class="pg" data-pg-for="s2-3">5</span></a></li>
+      <li class="lvl2"><a href="#s2-4"><span class="lbl">2.4 Target stakeholders</span><span class="dots"></span><span class="pg" data-pg-for="s2-4">6</span></a></li>
+      <li class="lvl2"><a href="#s2-5"><span class="lbl">2.5 Project scope</span><span class="dots"></span><span class="pg" data-pg-for="s2-5">6</span></a></li>
+      <li class="lvl1"><a href="#s3"><span class="lbl">3. Research analysis</span><span class="dots"></span><span class="pg" data-pg-for="s3">8</span></a></li>
+      <li class="lvl2"><a href="#s3-1"><span class="lbl">3.1 Existing products</span><span class="dots"></span><span class="pg" data-pg-for="s3-1">8</span></a></li>
+      <li class="lvl2"><a href="#s3-2"><span class="lbl">3.2 Comparison matrix</span><span class="dots"></span><span class="pg" data-pg-for="s3-2">9</span></a></li>
+      <li class="lvl2"><a href="#s3-3"><span class="lbl">3.3 Approaches to scoring</span><span class="dots"></span><span class="pg" data-pg-for="s3-3">11</span></a></li>
+      <li class="lvl2"><a href="#s3-4"><span class="lbl">3.4 Necessary functionality</span><span class="dots"></span><span class="pg" data-pg-for="s3-4">12</span></a></li>
+      <li class="lvl2"><a href="#s3-5"><span class="lbl">3.5 How such systems are built</span><span class="dots"></span><span class="pg" data-pg-for="s3-5">12</span></a></li>
+      <li class="lvl2"><a href="#s3-6"><span class="lbl">3.6 Recent developments</span><span class="dots"></span><span class="pg" data-pg-for="s3-6">12</span></a></li>
+      <li class="lvl1"><a href="#s4"><span class="lbl">4. Implementation</span><span class="dots"></span><span class="pg" data-pg-for="s4">13</span></a></li>
+      <li class="lvl2"><a href="#s4-1"><span class="lbl">4.1 Functionality built</span><span class="dots"></span><span class="pg" data-pg-for="s4-1">13</span></a></li>
+      <li class="lvl2"><a href="#s4-2"><span class="lbl">4.2 Why arithmetic, not machine learning</span><span class="dots"></span><span class="pg" data-pg-for="s4-2">14</span></a></li>
+      <li class="lvl2"><a href="#s4-3"><span class="lbl">4.3 Development platforms</span><span class="dots"></span><span class="pg" data-pg-for="s4-3">15</span></a></li>
+      <li class="lvl1"><a href="#s5"><span class="lbl">5. Proposed plan</span><span class="dots"></span><span class="pg" data-pg-for="s5">17</span></a></li>
+      <li class="lvl2"><a href="#s5-1"><span class="lbl">5.1 System development method</span><span class="dots"></span><span class="pg" data-pg-for="s5-1">17</span></a></li>
+      <li class="lvl2"><a href="#s5-2"><span class="lbl">5.2 Software methodology</span><span class="dots"></span><span class="pg" data-pg-for="s5-2">17</span></a></li>
+      <li class="lvl2"><a href="#s5-3"><span class="lbl">5.3 Functional requirements</span><span class="dots"></span><span class="pg" data-pg-for="s5-3">18</span></a></li>
+      <li class="lvl3"><a href="#s5-3-1"><span class="lbl">5.3.1 User stories</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-1">18</span></a></li>
+      <li class="lvl3"><a href="#s5-3-2"><span class="lbl">5.3.2 Use case diagram</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-2">20</span></a></li>
+      <li class="lvl3"><a href="#s5-3-3"><span class="lbl">5.3.3 Use case descriptions</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-3">25</span></a></li>
+      <li class="lvl3"><a href="#s5-3-4"><span class="lbl">5.3.4 Proposed workflow</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-4">31</span></a></li>
+      <li class="lvl3"><a href="#s5-3-5"><span class="lbl">5.3.5 Architecture design</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-5">35</span></a></li>
+      <li class="lvl3"><a href="#s5-3-6"><span class="lbl">5.3.6 Database design</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-6">35</span></a></li>
+      <li class="lvl3"><a href="#s5-3-7"><span class="lbl">5.3.7 Data flow diagram</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-7">36</span></a></li>
+      <li class="lvl3"><a href="#s5-3-8"><span class="lbl">5.3.8 Sequence diagrams</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-8">37</span></a></li>
+      <li class="lvl3"><a href="#s5-3-9"><span class="lbl">5.3.9 The scoring engine</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-9">39</span></a></li>
+      <li class="lvl3"><a href="#s5-3-10"><span class="lbl">5.3.10 API surface</span><span class="dots"></span><span class="pg" data-pg-for="s5-3-10">41</span></a></li>
+      <li class="lvl2"><a href="#s5-4"><span class="lbl">5.4 Non-functional requirements</span><span class="dots"></span><span class="pg" data-pg-for="s5-4">42</span></a></li>
+      <li class="lvl2"><a href="#s5-5"><span class="lbl">5.5 Project schedule</span><span class="dots"></span><span class="pg" data-pg-for="s5-5">43</span></a></li>
+      <li class="lvl2"><a href="#s5-6"><span class="lbl">5.6 Team organisation</span><span class="dots"></span><span class="pg" data-pg-for="s5-6">43</span></a></li>
+      <li class="lvl2"><a href="#s5-7"><span class="lbl">5.7 Project risk</span><span class="dots"></span><span class="pg" data-pg-for="s5-7">45</span></a></li>
+      <li class="lvl1"><a href="#s6"><span class="lbl">6. Testing</span><span class="dots"></span><span class="pg" data-pg-for="s6">46</span></a></li>
+      <li class="lvl1"><a href="#s7"><span class="lbl">7. Deviations from the PRD and PDD</span><span class="dots"></span><span class="pg" data-pg-for="s7">48</span></a></li>
+      <li class="lvl1"><a href="#s8"><span class="lbl">8. Case study</span><span class="dots"></span><span class="pg" data-pg-for="s8">49</span></a></li>
+      <li class="lvl1"><a href="#s9"><span class="lbl">9. Project website</span><span class="dots"></span><span class="pg" data-pg-for="s9">50</span></a></li>
+      <li class="lvl1"><a href="#s10"><span class="lbl">10. References</span><span class="dots"></span><span class="pg" data-pg-for="s10">51</span></a></li>
+    </ol>
+  </section>
+
+
+  <!-- 1 ================================================================== -->
+  <h2 id="s1"><span class="n">1</span>Executive summary</h2>
+
+  <p class="lead">
+    This report consolidates the project's requirements and design documentation
+    into one current record, and describes the working prototype built against it.
+  </p>
+
+  <p>
+    The project builds <strong>Wollongong News</strong>, a news publishing platform that
+    attaches a <strong>Credibility Score</strong> to every article and an
+    <strong>Accuracy Rate</strong> to every contributor. Both are computed by a
+    fixed arithmetic formula whose inputs are published, so that a reader can trace
+    why one article scores differently from another instead of being asked to trust
+    a ranking they cannot inspect.
+  </p>
+
+  <p>
+    Market analysis of six comparable products established the gap the project
+    occupies. Existing services either rate whole publications without publishing
+    them, or publish independent writers without assessing them. None scores the
+    individual article, ties that score to the writer's own record, and shows the
+    reader the arithmetic.
+  </p>
+
+  <p>
+    The prototype is deployed and operational. It comprises a React single-page
+    application against a Flask REST API of <strong>77 endpoints</strong>, backed by
+    a PostgreSQL database of <strong>23 tables</strong> hosted on Supabase, serving
+    <strong>six user roles</strong> across <strong>16 screens</strong>. The scoring
+    engine is implemented as pure functions with no database access, no clock and no
+    randomness, so any score can be recomputed and verified from its inputs alone.
+    <strong>139 automated test cases</strong> cover the engine, the permission
+    middleware, the editorial workflow, error handling and rate limiting.
+  </p>
+
+  <p>
+    Section 7 records where the built system deviates from the PRD and PDD, and why.
+    Three of those deviations require amendments to the design documentation rather
+    than changes to the code.
+  </p>
+
+  <!-- 2 ================================================================== -->
+  <h2 id="s2"><span class="n">2</span>Introduction</h2>
+
+  <h3 id="s2-1"><span class="n">2.1</span>The problem</h3>
+  <p>
+    Publishing is now effectively free, and the volume of material presented as news
+    exceeds any reader's capacity to verify it. The traditional signal of
+    reliability, the masthead, has weakened as independent writers publish
+    directly to audiences without an institution behind them.
+  </p>
+  <p>
+    This leaves a reader with a specific difficulty: <em>deciding, in seconds,
+    whether to trust an article written by someone they have never heard of.</em>
+    That situation is the one this project addresses. The reader is not asking
+    whether the claim is true, which no software can settle for them. They are
+    asking whether the writer has a record worth trusting and whether this
+    particular article was carefully made.
+  </p>
+  <p>
+    Two responses dominate. Algorithmic feeds rank material by engagement and do
+    not explain the ranking. Open publishing platforms apply no assessment at all.
+    Both leave the reader without a usable signal, and the first actively conceals
+    the one it has.
+  </p>
+
+  <h3 id="s2-2"><span class="n">2.2</span>How readers judge credibility today</h3>
+  <p>
+    Research into media literacy identifies the heuristics readers actually apply,
+    each of which is unreliable on its own:
+  </p>
+  <ul class="plain">
+    <li><strong>Brand recognition.</strong> Trusting a familiar masthead. Fails for independent writers and is exploited by imitation domains.</li>
+    <li><strong>Presentation quality.</strong> Inferring rigour from typography and layout. Trivially imitated.</li>
+    <li><strong>Corroboration.</strong> Checking whether other outlets report the same thing. Effective but slow, and defeated by syndication of a single wire story.</li>
+    <li><strong>Sourcing.</strong> Checking whether claims are attributed and linked. Reliable, but readers rarely follow links.</li>
+    <li><strong>Track record.</strong> Knowing whether the writer has been wrong before. The strongest signal available, and the one no platform currently surfaces.</li>
+  </ul>
+  <p>
+    The last two are the only heuristics a system can support without judging the
+    truth of a claim itself. They are the inputs this project measures.
+  </p>
+
+  <h3 id="s2-3"><span class="n">2.3</span>The data a scoring system handles</h3>
+  <p>Three kinds of data are held, and they behave differently.</p>
+
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Data</th><th scope="col">Contents</th><th scope="col">Behaviour</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowhead">Master data</td>
+          <td>Accounts and roles, content categories, editor assignments, and the platform scoring thresholds.</td>
+          <td>Changes rarely, but a change to the thresholds rewrites every published score, so it is audited.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Editorial data</td>
+          <td>Articles and their revisions, tagged sources, corrections, retractions, disputes and review decisions.</td>
+          <td>Append-mostly. A correction is never deleted, because a corrected article <em>is</em> the record of that correction.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Engagement data</td>
+          <td>Comments, likes, follows, saved articles, reader reports, subscriptions and payouts.</td>
+          <td>High volume and mutable. Only upheld reports affect a score; the rest never touch it.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 2.1</b>: Data classes and their handling characteristics.</p>
+
+  <p>
+    The distinction matters to the design. Engagement data is the largest by volume
+    and the least trustworthy as a signal, so it is deliberately excluded from the
+    score except through the single, editorially mediated path of an upheld report.
+    Popularity does not raise a credibility score on this platform.
+  </p>
+
+  <h3 id="s2-4"><span class="n">2.4</span>Target stakeholders</h3>
+  <ul class="plain">
+    <li><strong>Readers</strong> who want a defensible reason to trust or discount an article before committing time to it.</li>
+    <li><strong>Independent writers</strong> who have a record of accuracy but no masthead to vouch for them, and who currently cannot convert that record into readership.</li>
+    <li><strong>Editors</strong> who need reader reports triaged so that attention goes where it is most needed.</li>
+    <li><strong>Platform operators</strong> who must be able to defend a score to a writer who disputes it, which requires that the score be explainable.</li>
+  </ul>
+
+  <h3 id="s2-5"><span class="n">2.5</span>Project scope</h3>
+  <p>
+    The system covers the editorial lifecycle end to end: drafting, source tagging,
+    submission, category-scoped editorial review, scheduling, publication,
+    correction, retraction and appeal, together with reader engagement, reader
+    reporting, premium subscriptions and a tiered contributor revenue share.
+  </p>
+  <p>Six user tiers hold distinct permissions, described in §5.3.1.</p>
+
+  <h4>Explicitly out of scope for version 1</h4>
+  <ul class="plain">
+    <li>Machine-learned credibility prediction, for the reason given in §4.2.</li>
+    <li>Semantic or predictive search. Ranking must stay inspectable.</li>
+    <li>Image and video analysis.</li>
+    <li>Automated fact-checking of claims.</li>
+    <li>Multi-language publishing and native mobile applications.</li>
+  </ul>
+  <div class="note">
+    <span class="tag">The bounding rule</span>
+    <p>
+      If a reader cannot be shown why a score is what it is, the feature that
+      produced it does not belong in version 1. Every exclusion above follows from
+      that single rule rather than from schedule pressure.
+    </p>
+  </div>
+
+  <!-- 3 ================================================================== -->
+  <h2 id="s3"><span class="n">3</span>Research analysis</h2>
+
+  <h3 id="s3-1"><span class="n">3.1</span>Existing products</h3>
+
+  <h4><span class="n">3.1.1</span>NewsGuard</h4>
+  <p>
+    Assigns trust ratings to news websites against nine weighted journalistic
+    criteria, assessed by trained journalists rather than by algorithm. Ratings are
+    delivered through a browser extension that annotates search results and social
+    feeds.
+  </p>
+  <p>
+    <strong>Strengths.</strong> The criteria are published, and human assessment
+    catches nuance an algorithm misses. <strong>Limitations.</strong> The unit of
+    assessment is the whole publication, so a weak article in a strong outlet
+    inherits the outlet's rating and vice versa. Manual assessment does not scale to
+    independent writers, and the extension is a paid product outside the reading
+    experience.
+  </p>
+
+  <h4><span class="n">3.1.2</span>Ground News</h4>
+  <p>
+    Aggregates coverage of a single story across many outlets and displays the
+    political distribution of that coverage, together with a blindspot feature
+    showing which stories one side is not covering.
+  </p>
+  <p>
+    <strong>Strengths.</strong> Makes selection bias visible, which no other product
+    does as well. <strong>Limitations.</strong> Measures political lean, not
+    accuracy; a story can be balanced across the spectrum and wrong throughout.
+    Depends on outlet-level bias ratings sourced from third parties.
+  </p>
+
+  <h4><span class="n">3.1.3</span>Media Bias / Fact Check</h4>
+  <p>
+    A manually maintained directory rating thousands of sources for political bias
+    and factual reporting, with a written justification for each entry.
+  </p>
+  <p>
+    <strong>Strengths.</strong> Broad coverage, and each rating carries an
+    explanation. <strong>Limitations.</strong> A reference directory with no
+    publishing function; updates lag; and the methodology, while described, is
+    applied by a small team whose judgement is not itself auditable.
+  </p>
+
+  <h4><span class="n">3.1.4</span>Full Fact</h4>
+  <p>
+    A UK charity that fact-checks individual claims made in public life, with
+    automated claim-detection tooling that flags repeated claims for human checking.
+  </p>
+  <p>
+    <strong>Strengths.</strong> Operates at claim level, the finest useful grain, and
+    publishes its workings. <strong>Limitations.</strong> Checks claims after they
+    have been published elsewhere; it is a corrective rather than a publishing
+    platform, and cannot scale to every article.
+  </p>
+
+  <h4><span class="n">3.1.5</span>Substack</h4>
+  <p>
+    Independent publishing with paid subscriptions and a straightforward revenue
+    share, giving writers a direct relationship with readers.
+  </p>
+  <p>
+    <strong>Strengths.</strong> Proven economics for independent writers; the
+    subscription model this project adopts. <strong>Limitations.</strong> No accuracy
+    or credibility signal of any kind. A reader's only evidence is subscriber count,
+    which measures popularity.
+  </p>
+
+  <h4><span class="n">3.1.6</span>Medium</h4>
+  <p>
+    Open publishing with editorial curation, publications, and a partner programme
+    paying writers from member subscriptions.
+  </p>
+  <p>
+    <strong>Strengths.</strong> Low barrier to publishing and a mature reading
+    experience: the design reference this project's interface is based on.
+    <strong>Limitations.</strong> Curation is discretionary and its criteria are not
+    disclosed, so a reader cannot tell why one article was distributed and another
+    was not.
+  </p>
+
+  <h3 id="s3-2"><span class="n">3.2</span>Comparison matrix</h3>
+  <p>
+    Most competitors implement the basic functions. The differences concentrate in
+    the middle rows of the table, which are the ones this project exists to address.
+  </p>
+
+  <div class="t-wrap">
+    <table>
+      <caption class="sr-only">Functions available in existing products and planned for Wollongong News</caption>
+      <thead>
+        <tr>
+          <th scope="col">Function</th>
+          <th scope="col" class="num">NewsGuard</th>
+          <th scope="col" class="num">Ground News</th>
+          <th scope="col" class="num">MBFC</th>
+          <th scope="col" class="num">Full Fact</th>
+          <th scope="col" class="num">Substack</th>
+          <th scope="col" class="num">Medium</th>
+          <th scope="col" class="num">Wollongong News</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="rowhead">Account registration and roles</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Publish original articles</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Editorial review before publication</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Credibility rating of an outlet</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td></tr>
+        <tr><td class="rowhead">Credibility score per article</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Per-author accuracy record</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Scoring inputs published</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Per-item score breakdown shown to reader</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Verifiable source links counted in score</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Reader reporting of inaccuracy</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Permanent public correction log</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Author appeal against a correction</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Category-scoped editorial permissions</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Runtime-configurable scoring thresholds</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Paid subscriptions</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Contributor revenue share</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td></tr>
+        <tr><td class="rowhead">Political bias analysis</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td></tr>
+        <tr><td class="rowhead">Image and video analysis</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td><td class="num no">✗</td></tr>
+        <tr><td class="rowhead">Machine-learned prediction</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num no">✗</td><td class="num yes">✓</td><td class="num no">✗</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 3.1</b>: Overview of functions available in existing products and built for Wollongong News.</p>
+
+  <p>
+    Two absences in the final column are deliberate. Bias analysis is a different
+    product concern and would require classifying political position, which the
+    project has no defensible basis to do. Machine-learned prediction is excluded
+    for the reason in §4.2.
+  </p>
+
+  <h3 id="s3-3"><span class="n">3.3</span>Approaches to scoring</h3>
+  <p>Four approaches were considered before selecting one.</p>
+
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Approach</th><th scope="col">Strengths</th><th scope="col">Weaknesses</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowhead">Expert editorial rating<br><span style="color:var(--mute);font-weight:400">NewsGuard, MBFC</span></td>
+          <td>Catches nuance; defensible in a dispute; criteria can be published.</td>
+          <td>Does not scale; costly; the assessor's judgement is itself unauditable.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Crowd-sourced rating<br><span style="color:var(--mute);font-weight:400">Community Notes</span></td>
+          <td>Scales at no marginal cost; incorporates distributed knowledge.</td>
+          <td>Vulnerable to brigading; measures agreement rather than accuracy.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Machine-learned prediction</td>
+          <td>Scales; can incorporate signals a human would miss.</td>
+          <td>Cannot explain a specific score; inherits training-set bias; reproduces the opaque ranking the project exists to reject.</td>
+        </tr>
+        <tr>
+          <td class="rowhead"><strong>Disclosed formula</strong><br><span style="color:var(--mute);font-weight:400">selected</span></td>
+          <td>Every score decomposes into named contributions; reproducible from inputs; a writer can be told exactly why their score fell.</td>
+          <td>Only measures what is countable; can be gamed at the margin, e.g. by padding source links.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 3.2</b>: Scoring approaches evaluated.</p>
+
+  <p>
+    The disclosed formula was selected. Its weaknesses are mitigated rather than
+    eliminated: editorial review checks that tagged sources genuinely support the
+    article, so padding is caught before publication, and an upheld report after
+    publication costs considerably more than the sources gained.
+  </p>
+
+  <h3 id="s3-4"><span class="n">3.4</span>Necessary functionality</h3>
+  <p>Research established a minimum set of functions such a platform requires:</p>
+  <ol class="num">
+    <li>A publishing workflow with a review step, since a score assigned after unrestricted publication cannot prevent harm.</li>
+    <li>A structured way to attach sources to claims, so that sourcing can be counted rather than inferred.</li>
+    <li>A permanent, public correction record: a platform that silently
+        edits errors has no track record to measure.</li>
+    <li>A reader reporting channel, triaged editorially rather than acted on by count alone.</li>
+    <li>An appeal route, because a score that cannot be challenged is not accountable.</li>
+    <li>Role separation, so that no individual writes, approves and scores their own work.</li>
+    <li>Runtime-configurable thresholds, so the platform can be tuned without redeployment.</li>
+    <li>A complete audit trail of privileged actions.</li>
+  </ol>
+
+  <h3 id="s3-5"><span class="n">3.5</span>How such systems are built</h3>
+  <p>
+    Contemporary publishing platforms are built as a client application against a
+    REST or GraphQL API, with a relational database for editorial data. The pattern
+    the project follows places the API as the sole authority: no client reaches the
+    database directly, so permission logic cannot be bypassed by a modified client.
+  </p>
+  <p>
+    Managed database services (Supabase, Neon, PlanetScale) have displaced
+    self-hosted instances for projects of this size, providing connection pooling,
+    automated backup and row-level security without operational overhead. Platform
+    services such as Render and Railway deploy directly from a repository, which
+    suits a student team without dedicated infrastructure.
+  </p>
+
+  <h3 id="s3-6"><span class="n">3.6</span>Recent developments</h3>
+  <ul class="plain">
+    <li><strong>Provenance standards.</strong> The C2PA specification attaches cryptographically signed provenance to media files. It addresses whether an image was altered, which is complementary to, not a substitute for, whether an article is accurate.</li>
+    <li><strong>Crowd-sourced annotation at scale.</strong> Community Notes demonstrated that bridging algorithms, which surface notes rated
+      helpful across normally disagreeing groups, can moderate brigading, though the mechanism itself is not simple to explain to the reader.</li>
+    <li><strong>Regulatory pressure.</strong> The EU Digital Services Act requires large platforms to explain recommender systems, which pushes the industry toward the explainability this project adopts by choice.</li>
+    <li><strong>Generated content.</strong> The falling cost of producing plausible text raises the value of a per-author track record, since fluency is no longer evidence of care.</li>
+  </ul>
+
+  <!-- 4 ================================================================== -->
+  <h2 id="s4"><span class="n">4</span>Implementation</h2>
+
+  <h3 id="s4-1"><span class="n">4.1</span>Functionality built</h3>
+
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Feature</th><th scope="col" class="num">Built</th><th scope="col">Reasoning</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Registration, sign-in, sign-out</td><td class="num yes">Yes</td><td>Only valid users act on the system; sessions terminate on the server, not only in the browser.</td></tr>
+        <tr><td class="rowhead">Password reset</td><td class="num yes">Yes</td><td>Single-use hashed token. Responses are identical whether or not the account exists, so the endpoint cannot enumerate users.</td></tr>
+        <tr><td class="rowhead">Six-tier role model</td><td class="num yes">Yes</td><td>PRD 1.3.2. Enforced in one middleware so permission logic cannot drift between endpoints.</td></tr>
+        <tr><td class="rowhead">Draft, submit, schedule, publish</td><td class="num yes">Yes</td><td>The editorial lifecycle. Submission locks the article so it cannot change under review.</td></tr>
+        <tr><td class="rowhead">Rich-text article editor</td><td class="num yes">Yes</td><td>Contributors need structure (headings, quotes, links) without writing HTML. Sanitised on write.</td></tr>
+        <tr><td class="rowhead">Source tagging</td><td class="num yes">Yes</td><td>The only score input entirely within the writer's control, and the one editors verify at review.</td></tr>
+        <tr><td class="rowhead">Credibility score with ledger</td><td class="num yes">Yes</td><td>The product's centrepiece. The breakdown is returned with the article, not computed in the client.</td></tr>
+        <tr><td class="rowhead">Accuracy rate, smoothed</td><td class="num yes">Yes</td><td>Withheld below a minimum article count. See §5.3.9 for why smoothing was necessary.</td></tr>
+        <tr><td class="rowhead">Category-scoped editorial review</td><td class="num yes">Yes</td><td>PDD. An editor reviews only assigned sections; the server enforces it, the interface reflects it.</td></tr>
+        <tr><td class="rowhead">Self-approval block</td><td class="num yes">Yes</td><td>A contributor who is also an editor cannot approve their own article.</td></tr>
+        <tr><td class="rowhead">Reader reporting</td><td class="num yes">Yes</td><td>Fixed category plus free text. One report per reader per article.</td></tr>
+        <tr><td class="rowhead">Corrections and retractions</td><td class="num yes">Yes</td><td>Permanent and public. Recalculates every affected score on write.</td></tr>
+        <tr><td class="rowhead">Correction disputes</td><td class="num yes">Yes</td><td>A score that cannot be challenged is not accountable. Reversal restores the affected scores.</td></tr>
+        <tr><td class="rowhead">Comments, likes, follows, reading lists</td><td class="num yes">Yes</td><td>PRD 1.3.2 engagement requirements. None of these affects a credibility score.</td></tr>
+        <tr><td class="rowhead">Premium subscriptions</td><td class="num yes">Yes</td><td>Checked against a live subscription record on every request, never against a role label.</td></tr>
+        <tr><td class="rowhead">Tiered revenue share</td><td class="num yes">Yes</td><td>Platform share falls as a contributor's subscriber count rises.</td></tr>
+        <tr><td class="rowhead">Administrator console</td><td class="num yes">Yes</td><td>Nine tabs: accounts, applications, editors, articles, disputes, categories, scoring, logs, overview.</td></tr>
+        <tr><td class="rowhead">Runtime scoring thresholds</td><td class="num yes">Yes</td><td>PRD 1.3.2. No score constant is hard-coded in the interface.</td></tr>
+        <tr><td class="rowhead">Audit log</td><td class="num yes">Yes</td><td>Append-only record of every privileged action.</td></tr>
+        <tr><td class="rowhead">Keyword search</td><td class="num yes">Yes</td><td>Rule-based against title, tags and category, per PDD Figure 5.7.</td></tr>
+        <tr><td class="rowhead">Real email delivery</td><td class="num no">No</td><td>Reset links and notifications are written to the server log. Deferred; requires a transactional mail provider.</td></tr>
+        <tr><td class="rowhead">Real payment gateway</td><td class="num no">No</td><td>Stubbed integration records the subscription and returns success. Deferred; out of scope for a student deployment.</td></tr>
+        <tr><td class="rowhead">Cover images</td><td class="num no">No</td><td>Deferred by client decision; requires object storage and a moderation path for uploads.</td></tr>
+        <tr><td class="rowhead">Comment moderation queue</td><td class="num no">No</td><td>The endpoint exists; no interface was built. Deferred by client decision.</td></tr>
+        <tr><td class="rowhead">Semantic search, ML scoring</td><td class="num no">No</td><td>Excluded by the bounding rule in §2.5.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 4.1</b>: Functionality intended, built, and deferred, with reasoning.</p>
+
+  <h3 id="s4-2"><span class="n">4.2</span>Why arithmetic, not machine learning</h3>
+  <p>
+    A classifier trained on labelled examples would score more inputs than the
+    formula does and would likely correlate better with expert judgement. It was
+    rejected for three reasons.
+  </p>
+  <ol class="num">
+    <li>
+      <strong>It cannot answer the question the product exists to answer.</strong>
+      A reader asking why an article scores 62 needs a decomposition. Post-hoc
+      attribution methods approximate this but are neither exact nor stable, and an
+      approximate explanation of a score is precisely the hidden model the project
+      rejects.
+    </li>
+    <li>
+      <strong>It cannot be defended in a dispute.</strong> When a contributor appeals
+      a score, an administrator must be able to state what changed and why.
+      "The model weighted your article lower" is not a defensible position.
+    </li>
+    <li>
+      <strong>There is no training data.</strong> Supervised credibility scoring
+      requires a labelled corpus that does not exist for this platform, and
+      borrowing one would import another organisation's editorial judgement
+      unexamined.
+    </li>
+  </ol>
+  <p>
+    The cost of the decision is accepted: the formula measures only what is
+    countable, and ignores signals a human reviewer would notice. Editorial review
+    is where those signals are caught, which is why review was made mandatory rather
+    than optional.
+  </p>
+
+  <h3 id="s4-3"><span class="n">4.3</span>Development platforms</h3>
+
+  <h4><span class="n">4.3.1</span>Database</h4>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Option</th><th scope="col">Assessment</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">MySQL, self-hosted<br><span style="color:var(--mute);font-weight:400">PDD 2.2</span></td><td>Specified in the design document. Requires each team member to run a local server, with no shared state during development and manual backup.</td></tr>
+        <tr><td class="rowhead">Google Firebase</td><td>Real-time synchronisation and generous free tier, but document-oriented. The editorial model is heavily relational (an article joins to sources, revisions, corrections,
+            reports and disputes), and enforcing that in a document store means enforcing it in application code.</td></tr>
+        <tr><td class="rowhead"><strong>PostgreSQL via Supabase</strong><br><span style="color:var(--mute);font-weight:400">selected</span></td><td>Managed instance the whole team shares. Full relational integrity with foreign keys and unique constraints. Row Level Security and revocable privileges. Automated backup. Connection pooling suited to a small deployment.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 4.2</b>: Database platform evaluation. The move from MySQL is recorded as a deviation in §7.</p>
+
+  <h4><span class="n">4.3.2</span>Application platform</h4>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Layer</th><th scope="col">Selected</th><th scope="col">Reasoning</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Language</td><td>Python 3.12</td><td>Team familiarity; a mature ecosystem for web APIs and testing.</td></tr>
+        <tr><td class="rowhead">Framework</td><td>Flask</td><td>Explicit rather than convention-driven, so permission and scoring behaviour is visible in the code rather than implied by a framework default.</td></tr>
+        <tr><td class="rowhead">ORM and migrations</td><td>SQLAlchemy, Alembic</td><td>Schema changes are versioned and reversible. Automatic table creation is forbidden in this project: every schema change is a reviewed migration.</td></tr>
+        <tr><td class="rowhead">Front end</td><td>React 18, Vite</td><td>PDD 2.1. Vite for fast rebuilds and a small production bundle.</td></tr>
+        <tr><td class="rowhead">Styling</td><td>Hand-written CSS on a token file</td><td>No component framework, so every rule in the design system is one the team can account for and defend.</td></tr>
+        <tr><td class="rowhead">Hosting</td><td>Render</td><td>Two services from one blueprint file: the built front end as a static site, Flask under gunicorn as a web service.</td></tr>
+        <tr><td class="rowhead">Version control</td><td>Git and GitHub</td><td>Reviewed commits; environment secrets held outside the repository.</td></tr>
+        <tr><td class="rowhead">Testing</td><td>pytest, Playwright</td><td>Unit and integration tests for the API; batched browser passes for the interface.</td></tr>
+        <tr><td class="rowhead">Editor</td><td>Visual Studio Code</td><td>Consistent tooling across the team.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 4.3</b>: Application platform selections.</p>
+
+  <h4><span class="n">4.3.3</span>Security measures implemented</h4>
+  <ul class="plain">
+    <li><strong>Argon2id password hashing</strong> with per-password salts, and enforced password strength rules stated before the field rather than after rejection.</li>
+    <li><strong>Signed JWT sessions</strong> with expiry. A tampered token is rejected.</li>
+    <li><strong>Row Level Security</strong> enabled on all 23 tables with default privileges revoked, so a leaked database key alone reads nothing.</li>
+    <li><strong>HTML sanitisation on write</strong> using bleach, against a fixed tag allow-list. Injected scripts are stripped before storage, not escaped at render.</li>
+    <li><strong>Rate limiting</strong> on authentication and write endpoints.</li>
+    <li><strong>Security headers:</strong> <code>X-Content-Type-Options</code>, <code>X-Frame-Options: DENY</code>, a strict Content Security Policy, and <code>Cache-Control: no-store</code> on API responses.</li>
+    <li><strong>Uniform responses</strong> on sign-in and password reset, so neither can enumerate accounts.</li>
+    <li><strong>Parameterised queries throughout</strong> via the ORM; no string-built SQL.</li>
+  </ul>
+
+  <!-- 5 ================================================================== -->
+  <h2 id="s5"><span class="n">5</span>Proposed plan</h2>
+
+  <h3 id="s5-1"><span class="n">5.1</span>System development method</h3>
+  <p>
+    A single web application serves all six roles. There is no separate mobile
+    build: the interface is responsive from 360 pixels upward, so a phone runs the
+    same code as a desktop and no function is hidden at small widths.
+  </p>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Component</th><th scope="col">Platform</th><th scope="col">Advantages</th><th scope="col">Disadvantages</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowhead">Client</td><td>React 18 + Vite</td>
+          <td>Component reuse across 16 screens; large community; fast rebuild during development.</td>
+          <td>Client-side routing requires deliberate handling of deep links and browser history.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Server</td><td>Flask + SQLAlchemy</td>
+          <td>Explicit routing and permissions; pure-function scoring engine is trivially testable.</td>
+          <td>Synchronous by default; a long request blocks a worker.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Database</td><td>PostgreSQL (Supabase)</td>
+          <td>Relational integrity; RLS; managed backup; shared by the whole team.</td>
+          <td>Network latency against a hosted instance; free tier pauses when idle.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Hosting</td><td>Render</td>
+          <td>Deploys from the repository; one blueprint describes both services.</td>
+          <td>Free tier sleeps after 15 minutes, giving roughly a 50-second first load.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.1</b>: Development platform trade-offs.</p>
+
+  <h3 id="s5-2"><span class="n">5.2</span>Software methodology</h3>
+  <p>
+    Both models are used, at different scales, because they answer different
+    questions.
+  </p>
+  <p>
+    <strong>Waterfall governs the deliverables.</strong> The subject's milestones (requirements, design, prototype, final product) are fixed, sequential and
+    externally dated. Planning against them is a waterfall exercise.
+  </p>
+  <p>
+    <strong>Scrum governs the development.</strong> Within each phase the work runs
+    as short sprints against a backlog of user stories. This was not a stylistic
+    choice: requirements did change during implementation, twice materially.
+  </p>
+  <ul class="plain">
+    <li>The database moved from MySQL to Supabase after the design document was signed off, which changed the deployment model.</li>
+    <li>The accuracy formula was rewritten after testing showed it penalised new contributors roughly eight times more heavily than established ones for the same error.</li>
+  </ul>
+  <p>
+    A strict waterfall would have carried both defects into the final product,
+    because neither was visible until working code existed.
+  </p>
+
+  <h3 id="s5-3"><span class="n">5.3</span>Functional requirements</h3>
+
+  <h4 id="s5-3-1"><span class="n">5.3.1</span>User stories</h4>
+
+  <h5>Unregistered visitor</h5>
+  <ol class="num">
+    <li>As a visitor, I want to read published articles, so that I can evaluate the platform before registering.</li>
+    <li>As a visitor, I want to see each article's credibility score and band, so that I can judge what to read.</li>
+    <li>As a visitor, I want to see the breakdown behind a score, so that I can decide whether to trust the score itself.</li>
+    <li>As a visitor, I want to browse by section and search by keyword, so that I can find relevant articles.</li>
+    <li>As a visitor, I want to read how scoring works, so that I understand what the number means.</li>
+  </ol>
+
+  <h5>Free registered reader</h5>
+  <ol class="num">
+    <li>As a reader, I want to register and sign in, so that my activity persists across devices.</li>
+    <li>As a reader, I want to comment and reply, so that I can discuss an article.</li>
+    <li>As a reader, I want to like articles and follow writers, so that my front page reflects my interests.</li>
+    <li>As a reader, I want to save articles to a reading list, so that I can return to them.</li>
+    <li>As a reader, I want to report an inaccuracy with a category and an explanation, so that an editor can assess it.</li>
+    <li>As a reader, I want to control which events email me, so that I am not over-notified.</li>
+    <li>As a reader, I want to apply to become a contributor, so that I can write for the platform.</li>
+  </ol>
+
+  <h5>Premium reader</h5>
+  <ol class="num">
+    <li>As a premium reader, I want to open subscriber-only articles, so that I receive what I pay for.</li>
+    <li>As a premium reader, I want to see what a subscription funds and how it is shared with writers, so that I can decide whether it is worth it.</li>
+    <li>As a premium reader, I want to cancel and keep access until the period ends, so that cancelling is not punitive.</li>
+  </ol>
+
+  <h5>Verified contributor</h5>
+  <ol class="num">
+    <li>As a contributor, I want to draft an article privately, so that unfinished work is not visible.</li>
+    <li>As a contributor, I want to format the body with headings, quotes and links, so that a long article is readable.</li>
+    <li>As a contributor, I want to tag verifiable sources, so that my sourcing counts toward the article's credibility.</li>
+    <li>As a contributor, I want to submit for review and be told the outcome with a reason, so that I can act on a rejection.</li>
+    <li>As a contributor, I want to schedule publication, so that an article appears at the right moment.</li>
+    <li>As a contributor, I want to see my accuracy rate and what moves it, so that I understand my own record.</li>
+    <li>As a contributor, I want to see my subscriber count, revenue band and distance to the next band, so that I can plan.</li>
+    <li>As a contributor, I want to dispute a correction I believe is wrong, so that my record can be defended.</li>
+  </ol>
+
+  <h5>Editor</h5>
+  <ol class="num">
+    <li>As an editor, I want a queue of submissions in my assigned sections, so that I review what is mine to review.</li>
+    <li>As an editor, I want to read an article with its tagged sources listed, so that I can verify the sourcing.</li>
+    <li>As an editor, I want to approve or reject with a reason, so that the writer can act on the decision.</li>
+    <li>As an editor, I want to see flagged articles with every reader report in full, so that I decide on evidence and not on a count.</li>
+    <li>As an editor, I want to uphold or dismiss each report individually, so that a single valid report is not lost among invalid ones.</li>
+    <li>As an editor, I want to log a correction or retraction, so that the public record is accurate.</li>
+  </ol>
+
+  <h5>System administrator</h5>
+  <ol class="num">
+    <li>As an administrator, I want to see what is waiting on a decision, so that I know where to start.</li>
+    <li>As an administrator, I want to search accounts and change roles, so that I can govern access.</li>
+    <li>As an administrator, I want to suspend or delete an account, choosing whether its articles remain, so that removing a person does not silently remove the record.</li>
+    <li>As an administrator, I want to decide contributor applications with the applicant's history in view, so that I judge on more than a writing sample.</li>
+    <li>As an administrator, I want to assign editors to sections, so that review coverage is complete.</li>
+    <li>As an administrator, I want to manage categories, so that the section structure can evolve.</li>
+    <li>As an administrator, I want to adjust scoring thresholds and be told that doing so rewrites published scores, so that I am not surprised by the consequence.</li>
+    <li>As an administrator, I want to resolve disputes with the correction, its score effect and the writer's case on one screen, so that I can judge fairly.</li>
+    <li>As an administrator, I want an audit log of privileged actions, so that decisions are accountable.</li>
+  </ol>
+
+  <h4 id="s5-3-2"><span class="n">5.3.2</span>Use case diagram</h4>
+  <figure>
+    <pre class="mermaid">
+graph LR
+  V(("Unregistered<br/>visitor"))
+  F(("Free<br/>reader"))
+  P(("Premium<br/>reader"))
+  C(("Verified<br/>contributor"))
+  E(("Editor"))
+  A(("System<br/>administrator"))
+
+  subgraph SYS["News Release System"]
+    U1["Read article"]
+    U2["View score breakdown"]
+    U3["Search and browse"]
+    U4["Register / sign in"]
+    U5["Comment"]
+    U6["Like, follow, save"]
+    U7["Report inaccuracy"]
+    U8["Apply to contribute"]
+    U9["Read premium article"]
+    U10["Manage subscription"]
+    U11["Draft article"]
+    U12["Tag sources"]
+    U13["Submit for review"]
+    U14["Schedule publication"]
+    U15["View earnings"]
+    U16["Dispute correction"]
+    U17["Review submission"]
+    U18["Approve / reject"]
+    U19["Moderate flagged content"]
+    U20["Log correction"]
+    U21["Govern accounts"]
+    U22["Decide applications"]
+    U23["Assign editor sections"]
+    U24["Set scoring thresholds"]
+    U25["Resolve disputes"]
+    U26["Read audit log"]
+  end
+
+  V --- U1
+  V --- U2
+  V --- U3
+  V --- U4
+
+  F --- U5
+  F --- U6
+  F --- U7
+  F --- U8
+
+  P --- U9
+  P --- U10
+
+  C --- U11
+  C --- U12
+  C --- U13
+  C --- U14
+  C --- U15
+  C --- U16
+
+  E --- U17
+  E --- U18
+  E --- U19
+  E --- U20
+
+  A --- U21
+  A --- U22
+  A --- U23
+  A --- U24
+  A --- U25
+  A --- U26
+
+  U13 -.->|extends| U12
+  U18 -.->|extends| U17
+  U19 -.->|extends| U20
+  U16 -.->|extends| U25
+    </pre>
+    <figcaption>
+      <b>Figure 5.1</b>: Use case diagram. Each role inherits the use cases of the
+      roles above it; only the additional cases are drawn.
+    </figcaption>
+  </figure>
+
+  <h4 id="s5-3-3"><span class="n">5.3.3</span>Use case descriptions</h4>
+
+  <dl class="uc">
+    <div class="name"><dt>Sign in</dt><dd>ID: 1</dd></div>
+    <div><dt>Stakeholders</dt><dd>All registered users gain access to functions appropriate to their role.</dd></div>
+    <div><dt>Description</dt><dd>A registered user authenticates with an email address and password.</dd></div>
+    <div><dt>Actors</dt><dd>Free reader, Premium reader, Contributor, Editor, Administrator</dd></div>
+    <div><dt>Trigger</dt><dd>User selects Sign in.</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>System presents the email and password fields.</li>
+      <li>User enters credentials and submits.</li>
+      <li>System verifies the password against the stored Argon2 hash.</li>
+      <li>System issues a signed session token and returns the user's role.</li>
+      <li>Interface reveals the navigation for that role. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>Credentials not recognised: system returns a message identical for an unknown email and a wrong password, so the endpoint cannot enumerate accounts. Repeated failures are rate limited.</dd></div>
+  </dl>
+
+  <dl class="uc">
+    <div class="name"><dt>Submit an article for review</dt><dd>ID: 13</dd></div>
+    <div><dt>Stakeholders</dt><dd>Contributor seeks publication; editor receives work in a reviewable state.</dd></div>
+    <div><dt>Description</dt><dd>A contributor sends a completed draft into the editorial queue.</dd></div>
+    <div><dt>Actors</dt><dd>Verified contributor</dd></div>
+    <div><dt>Pre-conditions</dt><dd>The article exists as a draft owned by this contributor and has a headline, body and category.</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>Contributor selects Submit for review.</li>
+      <li>System validates that required fields are present.</li>
+      <li>System sets the status to pending and locks the article against editing.</li>
+      <li>System notifies editors assigned to that category.</li>
+      <li>The article appears in those editors' review queues. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>Required fields missing: submission is refused and the missing fields are named. Article not owned by this contributor: refused.</dd></div>
+  </dl>
+
+  <dl class="uc">
+    <div class="name"><dt>Review a submission</dt><dd>ID: 17, 18</dd></div>
+    <div><dt>Stakeholders</dt><dd>Editor maintains editorial standards; contributor receives a decision with a reason.</dd></div>
+    <div><dt>Description</dt><dd>An editor approves or rejects a pending article in an assigned category.</dd></div>
+    <div><dt>Actors</dt><dd>Editor, System administrator</dd></div>
+    <div><dt>Pre-conditions</dt><dd>The article is pending, and its category is assigned to this editor.</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>Editor opens the review queue and selects an article.</li>
+      <li>System displays the full body with every tagged source listed.</li>
+      <li>Editor selects Approve.</li>
+      <li>System sets the status to published, or scheduled if a future time was set.</li>
+      <li>System computes the credibility score and stores its breakdown.</li>
+      <li>System notifies the contributor. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>
+      Editor selects Reject and gives a reason; the article returns to the contributor as a draft with the reason attached.<br>
+      The editor is the article's author: the system refuses the decision and states that another editor or an administrator must review it.<br>
+      The article's category is not assigned to this editor: refused.
+    </dd></div>
+  </dl>
+
+  <dl class="uc">
+    <div class="name"><dt>Report an inaccuracy</dt><dd>ID: 7</dd></div>
+    <div><dt>Stakeholders</dt><dd>Reader raises a concern; editor receives triageable evidence.</dd></div>
+    <div><dt>Description</dt><dd>A registered reader reports a published article as inaccurate.</dd></div>
+    <div><dt>Actors</dt><dd>Free reader, Premium reader, Contributor, Editor</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>Reader selects Report this article.</li>
+      <li>System presents the fixed list of report categories.</li>
+      <li>Reader chooses a category and describes the problem.</li>
+      <li>System stores the report as open and links it to the article and the reader.</li>
+      <li>If open reports reach the administrator-set threshold, the article enters the flagged queue for its category. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>The reader has already reported this article: refused, one report per reader per article.</dd></div>
+  </dl>
+
+  <dl class="uc">
+    <div class="name"><dt>Log a correction</dt><dd>ID: 20</dd></div>
+    <div><dt>Stakeholders</dt><dd>Readers receive an accurate public record; contributor's accuracy rate reflects the error.</dd></div>
+    <div><dt>Description</dt><dd>An editor records a correction or retraction against a published article.</dd></div>
+    <div><dt>Actors</dt><dd>Editor, System administrator</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>Editor selects Log a correction or retraction on the article.</li>
+      <li>Editor chooses the type and describes what was wrong and what changed.</li>
+      <li>System stores the correction permanently against the article.</li>
+      <li>System recalculates the contributor's accuracy rate.</li>
+      <li>System recalculates the credibility score of every article by that contributor.</li>
+      <li>System notifies the contributor, who may dispute. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>Retraction selected: the article is additionally withdrawn from public view, but its record and its corrections remain.</dd></div>
+  </dl>
+
+  <dl class="uc">
+    <div class="name"><dt>Dispute a correction</dt><dd>ID: 16, 25</dd></div>
+    <div><dt>Stakeholders</dt><dd>Contributor defends their record; administrator ensures the scoring is accountable.</dd></div>
+    <div><dt>Description</dt><dd>A contributor appeals a correction; an administrator resolves the appeal.</dd></div>
+    <div><dt>Actors</dt><dd>Verified contributor, System administrator</dd></div>
+    <div><dt>Pre-conditions</dt><dd>A correction exists against an article written by this contributor, and they have not already disputed it.</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>Contributor selects Dispute on the correction and states their case.</li>
+      <li>System stores the dispute as open and notifies administrators.</li>
+      <li>Administrator opens the dispute queue and reviews the correction, its score effect and the case together.</li>
+      <li>Administrator selects Reverse.</li>
+      <li>System marks the correction overturned, recalculates the accuracy rate, and restores every affected credibility score.</li>
+      <li>System notifies the contributor and the editor who logged it. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>Administrator selects Uphold: the correction stands and the scores are unchanged. A contributor may dispute a given correction only once.</dd></div>
+  </dl>
+
+  <dl class="uc">
+    <div class="name"><dt>Set a scoring threshold</dt><dd>ID: 24</dd></div>
+    <div><dt>Stakeholders</dt><dd>Administrator tunes the platform; every contributor is affected.</dd></div>
+    <div><dt>Description</dt><dd>An administrator changes a constant used by the scoring engine.</dd></div>
+    <div><dt>Actors</dt><dd>System administrator</dd></div>
+    <div><dt>Normal flow</dt><dd><ol>
+      <li>Administrator opens Administration and the Scoring tab.</li>
+      <li>System lists each threshold with its current value and states that changing one recalculates every published score.</li>
+      <li>Administrator edits a value and saves.</li>
+      <li>System validates the value is within its permitted range.</li>
+      <li>System recalculates and stores the score and breakdown of every published article.</li>
+      <li>System writes the change to the audit log. End.</li>
+    </ol></dd></div>
+    <div><dt>Alternative flows</dt><dd>Value out of range: refused, with the permitted range stated.</dd></div>
+  </dl>
+
+  <h4 id="s5-3-4"><span class="n">5.3.4</span>Proposed workflow</h4>
+  <figure>
+    <pre class="mermaid">
+stateDiagram-v2
+  [*] --> Draft: contributor creates
+  Draft --> Draft: edit, tag sources
+  Draft --> Pending: submit for review
+  Pending --> Draft: editor rejects (reason given)
+  Pending --> Scheduled: editor approves, future date
+  Pending --> Published: editor approves
+  Scheduled --> Published: scheduled time reached
+  Published --> Published: correction logged (score falls)
+  Published --> Unpublished: editor or admin withdraws
+  Published --> Retracted: retraction logged
+  Unpublished --> Published: restored
+  Retracted --> [*]
+  Draft --> [*]: contributor deletes
+    </pre>
+    <figcaption>
+      <b>Figure 5.2</b>: Article lifecycle. A correction does not change the status:
+      the article stays published and carries its correction, because withdrawing it
+      would erase the record the platform exists to keep.
+    </figcaption>
+  </figure>
+
+  <figure>
+    <pre class="mermaid">
+flowchart TD
+  A["Reader reports<br/>an article"] --> B{"Open reports<br/>≥ threshold?"}
+  B -->|No| C["Report stored,<br/>score unchanged"]
+  B -->|Yes| D["Article enters the<br/>flagged queue for<br/>its category"]
+  D --> E["Editor reads<br/>every report"]
+  E --> F{"Decision<br/>per report"}
+  F -->|Dismiss| G["Report closed,<br/>no score effect"]
+  F -->|Uphold| H["Counts toward the<br/>report penalty"]
+  H --> I{"Correction<br/>warranted?"}
+  I -->|No| J["Score penalty applied,<br/>article stays published"]
+  I -->|Yes| K["Editor logs a<br/>correction or retraction"]
+  K --> L["Accuracy rate recalculated;<br/>every article by that<br/>contributor rescored"]
+  L --> M{"Contributor<br/>disputes?"}
+  M -->|No| N["Correction stands"]
+  M -->|Yes| O["Administrator<br/>resolves the dispute"]
+  O -->|Uphold| N
+  O -->|Reverse| P["Correction overturned,<br/>scores restored"]
+    </pre>
+    <figcaption><b>Figure 5.3</b>: Reporting, correction and appeal workflow.</figcaption>
+  </figure>
+
+  <h4 id="s5-3-5"><span class="n">5.3.5</span>Architecture design</h4>
+  <figure>
+    <pre class="mermaid">
+flowchart LR
+  subgraph browser["Client tier"]
+    SPA["React 18 SPA<br/>16 screens<br/>static site on Render"]
+  end
+
+  subgraph app["Application tier: Render"]
+    GU["gunicorn<br/>single worker"]
+    MW["Permission middleware<br/>six roles, one module"]
+    API["Flask REST API<br/>77 endpoints<br/>11 blueprints"]
+    SC["Scoring engine<br/>pure functions<br/>no I/O, no clock"]
+    SAN["Sanitisation<br/>bleach allow-list"]
+  end
+
+  subgraph data["Data tier: Supabase"]
+    PG[("PostgreSQL 17<br/>23 tables<br/>RLS enabled")]
+  end
+
+  SPA -->|"HTTPS, JWT bearer"| GU
+  GU --> MW
+  MW -->|"authorised"| API
+  API --> SAN
+  API --> SC
+  API -->|"SQLAlchemy, parameterised"| PG
+  SC -->|"breakdown"| API
+  PG -->|"rows"| API
+  API -->|"JSON incl. score ledger"| SPA
+  MW -->|"401 / 403"| SPA
+    </pre>
+    <figcaption>
+      <b>Figure 5.4</b>: Three-tier architecture. No client ever queries the database
+      directly; Flask is the single entry point, and every request passes the
+      permission middleware before reaching a handler.
+    </figcaption>
+  </figure>
+
+  <h4 id="s5-3-6"><span class="n">5.3.6</span>Database design</h4>
+  <p>
+    Twenty-three tables. The diagram shows the editorial core; engagement,
+    notification and platform tables are listed beneath it.
+  </p>
+  <figure>
+    <pre class="mermaid">
+erDiagram
+  USERS ||--o{ ARTICLES : writes
+  USERS ||--o{ EDITOR_CATEGORIES : "assigned to"
+  USERS ||--o{ CONTRIBUTOR_APPLICATIONS : submits
+  USERS ||--o{ REPORTS : files
+  USERS ||--o{ CORRECTION_DISPUTES : raises
+  USERS ||--o{ SUBSCRIPTIONS : holds
+  USERS ||--o{ PAYOUTS : receives
+  USERS ||--o{ AUDIT_LOGS : "acts in"
+
+  CATEGORIES ||--o{ ARTICLES : classifies
+  CATEGORIES ||--o{ EDITOR_CATEGORIES : "reviewed by"
+
+  ARTICLES ||--o{ ARTICLE_SOURCES : cites
+  ARTICLES ||--o{ ARTICLE_REVISIONS : "versioned by"
+  ARTICLES ||--o{ CORRECTIONS : "corrected by"
+  ARTICLES ||--o{ REPORTS : "reported in"
+  ARTICLES ||--o{ COMMENTS : "discussed in"
+  ARTICLES ||--o{ LIKES : "liked in"
+  ARTICLES ||--o{ SAVED_ARTICLES : "saved in"
+
+  CORRECTIONS ||--o| CORRECTION_DISPUTES : "appealed by"
+
+  USERS {
+    int id PK
+    string email UK
+    string password_hash
+    string display_name
+    enum role
+    bool suspended
+    datetime deleted_at
+  }
+  ARTICLES {
+    int id PK
+    int contributor_id FK
+    int category_id FK
+    string title
+    string slug UK
+    text body
+    enum status
+    bool premium_only
+    float credibility_score
+    json score_breakdown
+    datetime published_at
+  }
+  ARTICLE_SOURCES {
+    int id PK
+    int article_id FK
+    string url
+    string label
+  }
+  CORRECTIONS {
+    int id PK
+    int article_id FK
+    int issued_by FK
+    enum type
+    text description
+    bool overturned
+  }
+  CORRECTION_DISPUTES {
+    int id PK
+    int correction_id FK
+    int contributor_id FK
+    text argument
+    enum status
+  }
+  REPORTS {
+    int id PK
+    int article_id FK
+    int reporter_id FK
+    string reason
+    enum status
+  }
+  CATEGORIES {
+    int id PK
+    string name UK
+    string slug UK
+  }
+  EDITOR_CATEGORIES {
+    int editor_id FK
+    int category_id FK
+  }
+    </pre>
+    <figcaption>
+      <b>Figure 5.5</b>: Entity relationship diagram, editorial core. Further tables:
+      <code>article_revisions</code>, <code>comments</code>, <code>likes</code>,
+      <code>follows</code>, <code>saved_articles</code>,
+      <code>user_category_preferences</code>, <code>notifications</code>,
+      <code>notification_preferences</code>, <code>subscriptions</code>,
+      <code>payouts</code>, <code>contributor_applications</code>,
+      <code>password_reset_tokens</code>, <code>platform_settings</code> and
+      <code>audit_logs</code>.
+    </figcaption>
+  </figure>
+
+  <h5>Design decisions worth recording</h5>
+  <ul class="plain">
+    <li><strong>Scores are stored, not computed on read.</strong> Each article holds its score and the full breakdown as JSON. A score must be reproducible as it stood, and recomputing on read would silently rewrite history whenever a threshold changed.</li>
+    <li><strong>Accounts are soft-deleted.</strong> <code>deleted_at</code> preserves referential integrity for articles and corrections attributed to a removed account.</li>
+    <li><strong>Corrections are never deleted, only overturned.</strong> An overturned correction remains visible with its outcome, because the appeal is itself part of the record.</li>
+    <li><strong>One report per reader per article</strong> is enforced by a unique constraint, not by application logic, so a race between two requests cannot create two.</li>
+    <li><strong>The dispute column is named <code>argument</code>,</strong> because <code>case</code> is a reserved SQL keyword: the ORM quotes it correctly but every hand-written
+      query against it fails.</li>
+  </ul>
+
+  <h4 id="s5-3-7"><span class="n">5.3.7</span>Data flow diagram</h4>
+  <figure>
+    <pre class="mermaid">
+flowchart TD
+  READER(["Reader"])
+  CONTRIB(["Contributor"])
+  EDITOR(["Editor"])
+  ADMIN(["Administrator"])
+
+  P1["1.0<br/>Authenticate"]
+  P2["2.0<br/>Author &amp; submit"]
+  P3["3.0<br/>Review &amp; publish"]
+  P4["4.0<br/>Score"]
+  P5["5.0<br/>Report &amp; moderate"]
+  P6["6.0<br/>Govern"]
+
+  D1[("D1 Users")]
+  D2[("D2 Articles &amp; sources")]
+  D3[("D3 Corrections &amp; disputes")]
+  D4[("D4 Reports")]
+  D5[("D5 Platform settings")]
+  D6[("D6 Audit log")]
+
+  READER -->|credentials| P1
+  CONTRIB -->|credentials| P1
+  P1 <-->|account record| D1
+  P1 -->|session token| READER
+
+  CONTRIB -->|"draft, sources"| P2
+  P2 -->|"article record"| D2
+  P2 -->|"pending article"| P3
+  EDITOR -->|"approve / reject"| P3
+  P3 -->|"status, decision"| D2
+  P3 -->|"trigger"| P4
+
+  D1 -->|"accuracy record"| P4
+  D2 -->|"source count"| P4
+  D3 -->|"corrections"| P4
+  D4 -->|"upheld reports"| P4
+  D5 -->|"thresholds"| P4
+  P4 -->|"score + breakdown"| D2
+  P4 -->|"score ledger"| READER
+
+  READER -->|"report"| P5
+  P5 -->|"report record"| D4
+  EDITOR -->|"uphold / dismiss,<br/>log correction"| P5
+  P5 -->|"correction"| D3
+  P5 -->|"trigger rescore"| P4
+  CONTRIB -->|"dispute"| P5
+
+  ADMIN -->|"roles, thresholds,<br/>dispute outcome"| P6
+  P6 -->|"role change"| D1
+  P6 -->|"threshold change"| D5
+  P6 -->|"dispute outcome"| D3
+  P6 -->|"every action"| D6
+  P6 -->|"trigger rescore"| P4
+    </pre>
+    <figcaption>
+      <b>Figure 5.6</b>: Level 1 data flow diagram. Process 4.0 is the only writer of
+      credibility scores, and it reads from five stores; every other process
+      triggers it rather than computing a score itself.
+    </figcaption>
+  </figure>
+
+  <h4 id="s5-3-8"><span class="n">5.3.8</span>Sequence diagrams</h4>
+
+  <figure>
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor U as User
+  participant UI as React SPA
+  participant API as Flask API
+  participant SEC as Security module
+  participant DB as PostgreSQL
+
+  U->>UI: enter email and password
+  UI->>API: POST /api/auth/login
+  API->>SEC: verify_password(hash, raw)
+  SEC->>DB: SELECT user WHERE email
+  DB-->>SEC: user row or none
+  alt credentials valid
+    SEC->>SEC: Argon2 verify
+    SEC->>SEC: issue_access_token(user)
+    SEC-->>API: token + role
+    API-->>UI: 200 { token, user }
+    UI->>UI: store token, reveal role navigation
+    UI-->>U: signed in
+  else invalid or unknown
+    SEC-->>API: failure
+    API-->>UI: 401 identical message
+    UI-->>U: "Those details were not recognised."
+  end
+    </pre>
+    <figcaption><b>Figure 5.7</b>: Sign in. The failure branch is deliberately identical for an unknown email and a wrong password.</figcaption>
+  </figure>
+
+  <figure>
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor E as Editor
+  participant UI as React SPA
+  participant API as Flask API
+  participant MW as Permission middleware
+  participant SVC as Scoring service
+  participant ENG as Credibility engine
+  participant DB as PostgreSQL
+
+  E->>UI: select Approve
+  UI->>API: POST /api/review/{id}/approve
+  API->>MW: roles_required(EDITOR, ADMIN)
+  MW->>DB: load article + editor categories
+  DB-->>MW: article, assignments
+  alt editor owns the category and is not the author
+    MW-->>API: authorised
+    API->>DB: UPDATE status = published
+    API->>SVC: rescore_article(article)
+    SVC->>DB: count sources, corrections, upheld reports
+    SVC->>DB: read platform thresholds
+    DB-->>SVC: inputs
+    SVC->>ENG: smoothed_accuracy(published, blemished)
+    ENG-->>SVC: accuracy
+    SVC->>ENG: credibility_score(accuracy, sources, ...)
+    ENG-->>SVC: score + breakdown
+    SVC->>DB: store score and breakdown JSON
+    API->>DB: INSERT notification for contributor
+    API-->>UI: 200 { article, credibility }
+    UI-->>E: published, score shown
+  else not authorised
+    MW-->>API: refuse
+    API-->>UI: 403 with reason
+    UI-->>E: "Another editor must review this."
+  end
+    </pre>
+    <figcaption><b>Figure 5.8</b>: Approving a submission, including the self-approval refusal and the scoring that follows.</figcaption>
+  </figure>
+
+  <figure>
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor A as Administrator
+  participant UI as React SPA
+  participant API as Flask API
+  participant SVC as Scoring service
+  participant DB as PostgreSQL
+  participant LOG as Audit log
+
+  A->>UI: change source_points 5 → 3
+  UI-->>A: "This rewrites every published score."
+  A->>UI: confirm and save
+  UI->>API: PUT /api/admin/settings
+  API->>API: validate range
+  API->>DB: UPDATE platform_settings
+  API->>SVC: rescore_all_published()
+  loop every published article
+    SVC->>DB: read inputs
+    SVC->>SVC: recompute score and breakdown
+    SVC->>DB: store
+  end
+  API->>LOG: record actor, setting, old and new value
+  API-->>UI: 200 { affected: 50 }
+  UI-->>A: "50 articles rescored."
+    </pre>
+    <figcaption>
+      <b>Figure 5.9</b>: Changing a scoring threshold. The consequence is stated
+      before the action, not after, and the change is written to the audit log.
+    </figcaption>
+  </figure>
+
+  <h4 id="s5-3-9"><span class="n">5.3.9</span>The scoring engine</h4>
+  <p>
+    The engine is implemented as pure functions: no database access, no clock, no
+    randomness. Given the same inputs it returns the same score, which is what makes
+    a score defensible when a contributor disputes it.
+  </p>
+
+  <h5>Credibility score</h5>
+  <p>
+    An article's score is the sum of its positive components less its penalties,
+    clamped to the range 0–100. The <em>inputs</em> are published; the tuning
+    weights are internal and administrator-configurable, so no constant may be
+    hard-coded into the interface.
+  </p>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Component</th><th scope="col">Basis</th><th scope="col">Direction</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Contributor accuracy</td><td>The writer's smoothed accuracy rate, weighted</td><td>Raises</td></tr>
+        <tr><td class="rowhead">Verifiable sources</td><td>Points per tagged source, subject to a cap</td><td>Raises</td></tr>
+        <tr><td class="rowhead">Corrections</td><td>A penalty per logged correction</td><td>Lowers</td></tr>
+        <tr><td class="rowhead">Retraction</td><td>A single larger penalty if the article is retracted</td><td>Lowers</td></tr>
+        <tr><td class="rowhead">Upheld reader reports</td><td>A penalty once the report count crosses the administrator-set threshold</td><td>Lowers</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.2</b>: Credibility score inputs.</p>
+
+  <h5>Worked example</h5>
+  <div class="ledger">
+    <div><span>Contributor accuracy record</span><span class="v">+ 63.75</span></div>
+    <div><span>Verifiable sources (5, at the cap)</span><span class="v">+ 25.00</span></div>
+    <div><span>Logged corrections (1)</span><span class="v">− 15.00</span></div>
+    <div><span>Retraction</span><span class="v">− 0.00</span></div>
+    <div><span>Upheld reader reports (below threshold)</span><span class="v">− 0.00</span></div>
+    <div class="total"><span>Credibility score</span><span class="v">73.75</span></div>
+  </div>
+  <p>
+    The score falls into one of four bands: <strong>High</strong> (80 and above),
+    <strong>Moderate</strong> (60–79), <strong>Low</strong> (40–59) and
+    <strong>Disputed</strong> (below 40). The band word is always rendered and is
+    always the authority; no band is signalled by colour alone, so the reading
+    survives greyscale printing and colour-blind vision.
+  </p>
+
+  <h5>Accuracy rate, and why it is smoothed</h5>
+  <p>
+    A contributor's accuracy rate was originally a plain ratio of clean articles to
+    published articles. Testing against the seeded data showed that this was
+    materially unfair.
+  </p>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Contributor</th><th scope="col" class="num">Articles</th><th scope="col" class="num">Cost of one correction, raw ratio</th><th scope="col" class="num">Cost, smoothed</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">New writer</td><td class="num">5</td><td class="num">15.0 pts</td><td class="num">7.5 pts</td></tr>
+        <tr><td class="rowhead">Established writer</td><td class="num">40</td><td class="num">1.9 pts</td><td class="num">1.7 pts</td></tr>
+        <tr><td class="rowhead"><strong>Ratio</strong></td><td class="num">n/a</td><td class="num"><strong>7.9×</strong></td><td class="num"><strong>4.4×</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.3</b>: Penalty for an identical error, before and after smoothing. Measured against the seeded dataset.</p>
+
+  <p>
+    The rate is now blended toward a platform baseline, weighted by how much the
+    contributor has published. A short record moves the figure cautiously; a long
+    record moves it freely. This removed a second defect as well: under the raw
+    ratio, publishing a fifth article could move a contributor's whole back
+    catalogue by 22.5 points in a single step, because the rate crossed the
+    threshold at which it began to be displayed.
+  </p>
+  <div class="note">
+    <span class="tag">A withheld rate is not a zero</span>
+    <p>
+      Below a minimum article count, the profile reads <strong>New
+      Contributor</strong> rather than showing a figure. The scoring engine still
+      uses a smoothed value internally (the display is withheld, not the
+      arithmetic), and the ledger marks the article as being by a new writer so a
+      reader is told why no rate is shown.
+    </p>
+  </div>
+
+  <h4 id="s5-3-10"><span class="n">5.3.10</span>API surface</h4>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Blueprint</th><th scope="col" class="num">Endpoints</th><th scope="col">Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">admin</td><td class="num">17</td><td>Accounts, roles, suspension, applications, editor assignment, categories, platform-wide article moderation, thresholds, audit log</td></tr>
+        <tr><td class="rowhead">engagement</td><td class="num">13</td><td>Comments, likes, saves, follows, reports, share links, reading list</td></tr>
+        <tr><td class="rowhead">articles</td><td class="num">8</td><td>Create, edit, submit, schedule, delete, revisions, own articles</td></tr>
+        <tr><td class="rowhead">discovery</td><td class="num">8</td><td>Feeds, categories, article read, contributor profiles, search, scoring formula</td></tr>
+        <tr><td class="rowhead">moderation</td><td class="num">8</td><td>Flagged queue, report resolution, corrections, overturn, disputes</td></tr>
+        <tr><td class="rowhead">auth</td><td class="num">6</td><td>Register, sign in, sign out, current user, password reset request and confirm</td></tr>
+        <tr><td class="rowhead">subscriptions</td><td class="num">5</td><td>Tiers, subscribe, cancel, own subscription, earnings</td></tr>
+        <tr><td class="rowhead">users</td><td class="num">5</td><td>Profile, notification preferences, contributor application</td></tr>
+        <tr><td class="rowhead">notifications</td><td class="num">3</td><td>List, mark read, mark all read</td></tr>
+        <tr><td class="rowhead">review</td><td class="num">3</td><td>Review queue, approve, reject</td></tr>
+        <tr><td class="rowhead">health</td><td class="num">1</td><td>Service health check</td></tr>
+        <tr><td class="rowhead"><strong>Total</strong></td><td class="num"><strong>77</strong></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.4</b>: API surface by blueprint.</p>
+
+  <h3 id="s5-4"><span class="n">5.4</span>Non-functional requirements</h3>
+
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Attribute</th><th scope="col">Requirement</th><th scope="col">Status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowhead">Usability</td>
+          <td>80% of UAT participants complete role-specific tasks unaided (PRD 5.1). No core function hidden or inaccessible at any width from 360&nbsp;px.</td>
+          <td>Responsive layout verified at 360&nbsp;px and 1440&nbsp;px across all 16 screens. UAT not yet conducted.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Performance</td>
+          <td>95% of page loads and searches under 3&nbsp;s; scores recalculated within 2&nbsp;s (PRD 5.1).</td>
+          <td>Met in steady state. The free hosting tier sleeps when idle, giving a ~50&nbsp;s first load, which is a deployment-tier constraint rather than an application one.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Accessibility</td>
+          <td>No state signalled by colour alone. All text meets WCAG AA contrast.</td>
+          <td>Met by design. Credibility bands carry a word, a fill length and an ink value; the Disputed band adds a hatched fill. Contrast ratios were computed rather than estimated.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Security</td>
+          <td>Role separation enforced server-side; passwords never stored in plain text; no endpoint may enumerate accounts.</td>
+          <td>Met. See §4.3.3 and §6.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Reliability</td>
+          <td>A failed request must not leave a partial write.</td>
+          <td>Met. Multi-table operations run in a transaction; the correction-and-rescore path either completes or rolls back.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Auditability</td>
+          <td>Every privileged action attributable to an actor and a time.</td>
+          <td>Met. Append-only audit log.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Maintainability</td>
+          <td>Schema changes versioned and reversible.</td>
+          <td>Met. Alembic migrations; automatic table creation is forbidden. Migration round-trips are tested.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Compatibility</td>
+          <td>Latest two versions of Chrome, Edge, Firefox and Safari.</td>
+          <td>Met. No browser-specific API is used.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Scalability</td>
+          <td>Support concurrent users without degrading the 3&nbsp;s target.</td>
+          <td><strong>Constrained.</strong> The API runs a single worker because the rate limiter holds counters in process memory; two workers produced a limit twice as loose as configured. Moving counters to shared storage is required before scaling out.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.5</b>: Non-functional requirements and current status.</p>
+
+  <h3 id="s5-5"><span class="n">5.5</span>Project schedule</h3>
+  <figure>
+    <pre class="mermaid">
+gantt
+  title Project schedule
+  dateFormat YYYY-MM-DD
+  axisFormat %d %b
+  section Planning
+  Form team, select topic       :done, a1, 2026-07-01, 14d
+  Project website               :done, a2, 2026-07-08, 10d
+  section Research and findings
+  Existing product research     :done, b1, 2026-07-10, 21d
+  Comparison matrix, pick chart :done, b2, 2026-07-24, 10d
+  PRD v1                        :milestone, done, m1, 2026-08-01, 0d
+  section Analysis and design
+  Use cases and user stories    :done, c1, 2026-08-01, 5d
+  Database and UI design        :done, c2, 2026-08-03, 5d
+  PDD v1.0                      :milestone, done, m2, 2026-08-07, 0d
+  section Implementation
+  Schema, auth, RBAC            :done, d1, 2026-08-08, 7d
+  Scoring engine and API        :done, d2, 2026-08-12, 14d
+  Front end and design system   :done, d3, 2026-08-15, 20d
+  Deployment to Render          :done, d4, 2026-08-28, 4d
+  Security hardening            :done, d5, 2026-08-31, 5d
+  Feature completion            :done, d6, 2026-09-01, 4d
+  Prototype demonstration       :milestone, active, m3, 2026-09-05, 0d
+  section Remaining
+  Technical report and manual   :e1, 2026-09-06, 14d
+  User acceptance testing       :e2, 2026-09-15, 14d
+  Defect fixing from UAT        :e3, 2026-09-22, 10d
+  Final documentation           :e4, 2026-09-25, 7d
+  Final presentation            :milestone, m4, 2026-10-01, 0d
+    </pre>
+    <figcaption><b>Figure 5.10</b>: Schedule. Dates from the prototype milestone onward are indicative and to be confirmed against the subject calendar.</figcaption>
+  </figure>
+
+  <h3 id="s5-6"><span class="n">5.6</span>Team organisation</h3>
+  <div class="note">
+    <span class="tag">To be completed</span>
+    <p>
+      Replace the rows below with the team's actual names, UOW student numbers and
+      agreed responsibilities before submission.
+    </p>
+  </div>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Name</th><th scope="col">Student ID</th><th scope="col">Roles</th><th scope="col">Responsibilities</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">[ Name ]</td><td>[ ID ]</td><td>Team leader · Documenter</td><td>Project planning; liaison with supervisor and assessor; maintenance of the project website</td></tr>
+        <tr><td class="rowhead">[ Name ]</td><td>[ ID ]</td><td>Back-end developer</td><td>Flask API, database schema and migrations, scoring engine</td></tr>
+        <tr><td class="rowhead">[ Name ]</td><td>[ ID ]</td><td>Front-end developer · UI designer</td><td>React application, design system, responsive layout</td></tr>
+        <tr><td class="rowhead">[ Name ]</td><td>[ ID ]</td><td>Documenter · Researcher</td><td>Market research, requirements documentation, meeting minutes</td></tr>
+        <tr><td class="rowhead">[ Name ]</td><td>[ ID ]</td><td>Software tester</td><td>Test case design, automated test suite, user acceptance testing</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.6</b>: Project team organisation.</p>
+
+  <h3 id="s5-7"><span class="n">5.7</span>Project risk</h3>
+  <div class="t-wrap">
+    <table class="risk">
+      <thead>
+        <tr>
+          <th scope="col">Category</th><th scope="col">Identified risk</th>
+          <th scope="col" class="num">Impact</th><th scope="col" class="num">Probability</th>
+          <th scope="col" class="num">Rating</th><th scope="col">Mitigation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rowhead">Technology</td><td>Team unfamiliar with parts of the stack</td>
+          <td class="lvl h">H</td><td class="lvl m">M</td><td class="lvl h">High</td>
+          <td>Selected Python and React for existing familiarity; deliberately avoided a component framework so every rule is one the team wrote.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Technology</td><td>Free hosting tier sleeps, appearing broken during assessment</td>
+          <td class="lvl m">M</td><td class="lvl h">H</td><td class="lvl m">Medium</td>
+          <td>Documented in the user manual; the site is opened a minute before any demonstration.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Technology</td><td>Loss of source code or documents</td>
+          <td class="lvl h">H</td><td class="lvl l">L</td><td class="lvl l">Low</td>
+          <td>GitHub with full history; database backed up by Supabase.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Requirements</td><td>Design document diverges from the built system</td>
+          <td class="lvl m">M</td><td class="lvl h">H</td><td class="lvl m">Medium</td>
+          <td>Deviations recorded explicitly in §7 rather than left to be discovered; documentation amendments listed as actions.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Requirements</td><td>Scope growth into machine learning or bias analysis</td>
+          <td class="lvl h">H</td><td class="lvl m">M</td><td class="lvl m">Medium</td>
+          <td>The bounding rule in §2.5 is applied to every proposal; excluded features are recorded with reasons rather than dropped silently.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Communication</td><td>Deliverables late against fixed milestones</td>
+          <td class="lvl m">M</td><td class="lvl m">M</td><td class="lvl m">Medium</td>
+          <td>Waterfall planning against the subject calendar; sprint reviews inside each phase.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">People</td><td>Member absence blocking dependent work</td>
+          <td class="lvl m">M</td><td class="lvl l">L</td><td class="lvl l">Low</td>
+          <td>Shared repository; documented design system and API so work is not held only by one person.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Product</td><td>Scoring judged unfair by contributors</td>
+          <td class="lvl h">H</td><td class="lvl m">M</td><td class="lvl m">Medium</td>
+          <td>Smoothing introduced after measurement (§5.3.9); dispute mechanism built so a score can be challenged and reversed.</td>
+        </tr>
+        <tr>
+          <td class="rowhead">Security</td><td>Credential or data exposure</td>
+          <td class="lvl h">H</td><td class="lvl l">L</td><td class="lvl m">Medium</td>
+          <td>Argon2 hashing, RLS on all tables, secrets outside the repository, penetration checks recorded in §6.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 5.7</b>: Project risk register.</p>
+
+  <!-- 6 ================================================================== -->
+  <h2 id="s6"><span class="n">6</span>Testing</h2>
+
+  <p>
+    139 automated test cases run against the API. The suite is a development
+    dependency, not a submission artefact: it is run before every commit.
+  </p>
+
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Suite</th><th scope="col" class="num">Cases</th><th scope="col">Covers</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">test_workflow</td><td class="num">36</td><td>Registration, sign-in, the full draft-to-published lifecycle, scheduling, engagement, subscriptions</td></tr>
+        <tr><td class="rowhead">test_error_handling</td><td class="num">27</td><td>Malformed input, missing fields, unauthorised access, not-found paths, validation boundaries</td></tr>
+        <tr><td class="rowhead">test_credibility</td><td class="num">24</td><td>The scoring engine in isolation: every component, the clamp, band boundaries, smoothing, the withheld-rate case</td></tr>
+        <tr><td class="rowhead">test_admin_editors</td><td class="num">15</td><td>Role changes, suspension, editor assignment, category management including rename</td></tr>
+        <tr><td class="rowhead">test_admin_moderation</td><td class="num">14</td><td>Reports, corrections, retractions, disputes and their score effects</td></tr>
+        <tr><td class="rowhead">test_rate_limit</td><td class="num">8</td><td>Authentication and write-endpoint throttling</td></tr>
+        <tr><td class="rowhead"><strong>Total</strong></td><td class="num"><strong>139</strong></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 6.1</b>: Automated test coverage.</p>
+
+  <h3>Security testing against the deployed system</h3>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Test</th><th scope="col">Result</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Script injection into article body, title, comments and reports</td><td>All payloads stripped on write by the sanitisation allow-list.</td></tr>
+        <tr><td class="rowhead">Free reader requesting every privileged route directly</td><td>403 on every one. Hiding a control in the interface is a courtesy; the server refuses regardless.</td></tr>
+        <tr><td class="rowhead">Tampered session token</td><td>401. Signature verification fails before the handler is reached.</td></tr>
+        <tr><td class="rowhead">Account enumeration via sign-in and password reset</td><td>Responses byte-identical whether or not the account exists.</td></tr>
+        <tr><td class="rowhead">Editor acting outside assigned categories</td><td>403, both for review and for moderation.</td></tr>
+        <tr><td class="rowhead">Contributor approving their own article</td><td>403 with an explanatory message.</td></tr>
+        <tr><td class="rowhead">Rate limiting under repeated failed sign-ins</td><td>Clean cut-off at the configured limit on a single worker.</td></tr>
+        <tr><td class="rowhead">Debug information exposed in production</td><td>None. No stack traces, no debug console.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 6.2</b>: Security tests performed against the deployed prototype.</p>
+
+  <h3>Interface testing</h3>
+  <p>
+    A batched Playwright pass captures every screen at 1440&nbsp;px and 390&nbsp;px,
+    signed in as each role, and fails the run on any console error, failed network
+    request or horizontal page overflow. The current pass is clean across all 16
+    screens.
+  </p>
+
+  <h3>Outstanding</h3>
+  <p>
+    User acceptance testing against the PRD 5.1 target (80% of participants
+    completing role-specific tasks unaided) has not yet been conducted. It is
+    scheduled in §5.5.
+  </p>
+
+  <!-- 7 ================================================================== -->
+  <h2 id="s7"><span class="n">7</span>Deviations from the PRD and PDD</h2>
+
+  <p>
+    This section exists because the built system differs from the signed-off design
+    documents in several respects. Each is recorded with its reason and the action
+    required.
+  </p>
+
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Document</th><th scope="col">Specified</th><th scope="col">Built</th><th scope="col">Reason and action</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="rowhead">PDD §2.1, §2.2, §4</td>
+          <td>MySQL as the database</td>
+          <td>PostgreSQL hosted on Supabase</td>
+          <td>A managed instance the whole team shares, with row-level security and automated backup, without each member running a local server. <strong>Action: amend the PDD.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PDD Figure 5.96</td>
+          <td>Threshold changes do not affect existing scores</td>
+          <td>A threshold change recalculates every published score</td>
+          <td>Two articles with identical inputs must not hold different scores because they were published either side of a settings change. The behaviour is correct; the document is wrong. <strong>Action: amend the PDD.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PDD Figure 5.87</td>
+          <td>"Remove articles" on account deletion</td>
+          <td>Articles are unpublished, not deleted</td>
+          <td>A corrected article is the record of that correction; deleting it erases the accountability the platform exists to provide. The administrator chooses whether to keep or unpublish. <strong>Action: amend the PDD wording.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PRD / PDD</td>
+          <td>The full scoring formula, including weights, published to readers</td>
+          <td>Inputs published; tuning weights internal</td>
+          <td>Team decision taken after the PDD. Publishing exact weights invites optimisation against them. Every article still carries its own ledger, so the promise of traceability is kept. <strong>Action: record in the final documentation.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PDD</td>
+          <td>Accuracy rate as a ratio of clean to published articles</td>
+          <td>Rate smoothed toward a platform baseline</td>
+          <td>The raw ratio penalised a five-article writer 7.9× more than a forty-article writer for the same error, and produced a 22.5-point cliff at the fifth article. <strong>Action: amend the PDD formula.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PDD Figure 5.78</td>
+          <td>Comment moderation interface</td>
+          <td>Endpoint exists; no interface built</td>
+          <td>Deferred by client decision for version 1. <strong>Action: note as deferred scope.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PDD</td>
+          <td>Article cover images</td>
+          <td>Not implemented</td>
+          <td>Deferred by client decision; requires object storage and an upload moderation path. <strong>Action: note as deferred scope.</strong></td>
+        </tr>
+        <tr>
+          <td class="rowhead">PDD figure numbering</td>
+          <td>n/a</td>
+          <td>n/a</td>
+          <td>Figure numbering in the PDD is internally inconsistent. <strong>Action: renumber in the final document.</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cap"><b>Table 7.1</b>: Deviations from the requirements and design documents.</p>
+
+  <!-- 8 ================================================================== -->
+  <h2 id="s8"><span class="n">8</span>Case study</h2>
+
+  <p>
+    Trust in news media has declined across most surveyed markets over the past
+    decade, while the volume of published material has risen sharply. The two
+    trends compound: as more is published, less of it can be verified by any
+    individual reader, and the absence of a usable signal is itself a reason to
+    distrust everything.
+  </p>
+
+  <p>
+    The responses the industry has produced fall into two groups, and both have a
+    structural weakness. <strong>Outlet-level ratings</strong> (NewsGuard, Media
+    Bias/Fact Check) assess the publication. This is tractable, because there are
+    thousands of outlets and millions of articles, but it assigns the same rating to
+    the best and worst article a publication produces, and it has nothing to say
+    about an independent writer with no publication behind them.
+    <strong>Claim-level fact-checking</strong> (Full Fact, and the fact-checking
+    programmes operated by the large platforms) is accurate but arrives after
+    publication and cannot scale to everything.
+  </p>
+
+  <p>
+    The gap between them is the article, and the writer who produced it. That is the
+    unit a reader actually encounters, and it is the unit no existing product
+    scores.
+  </p>
+
+  <p>
+    This project's position is that the unit is scoreable without judging the truth
+    of any claim, provided the system measures process rather than content. Whether
+    a writer attributed their claims, whether they have been corrected before, and
+    whether readers have raised concerns that editors upheld: these are all
+    countable, and all of them correlate with care. None of them requires the
+    platform to adjudicate what is true.
+  </p>
+
+  <p>
+    The approach has real limits, and it is worth stating them plainly. A careful
+    writer who is wrong about something no one catches keeps a high score. A
+    contentious but accurate article can attract reports that cost it credibility
+    before an editor dismisses them. Sourcing can be padded at the margin. The
+    formula measures the visible correlates of rigour, not rigour itself.
+  </p>
+
+  <p>
+    What it does provide is a signal that is <em>legible</em>. A reader who
+    disagrees with a score can see exactly which input they disagree with, which is
+    more than any algorithmic feed offers and more than an unexplained editorial
+    judgement offers. A writer whose score falls can see why and can appeal it. In a
+    domain where the failure mode of every existing system is opacity, an imperfect
+    but inspectable measure is a defensible contribution.
+  </p>
+
+  <!-- 9 ================================================================== -->
+  <h2 id="s9"><span class="n">9</span>Project website</h2>
+  <div class="note">
+    <span class="tag">To be completed</span>
+    <p>
+      Insert the project website address and screenshots of its main page, team and
+      roles page, meeting minutes page and documentation page, per the subject
+      requirements.
+    </p>
+  </div>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th scope="col">Resource</th><th scope="col">Address</th></tr></thead>
+      <tbody>
+        <tr><td class="rowhead">Project website</td><td class="mono">[ to be filled in ]</td></tr>
+        <tr><td class="rowhead">Deployed application</td><td class="mono">https://fyp-26-s3-10-web.onrender.com</td></tr>
+        <tr><td class="rowhead">Application API</td><td class="mono">https://fyp-26-s3-10-api.onrender.com</td></tr>
+        <tr><td class="rowhead">Source repository</td><td class="mono">[ GitHub URL ]</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 10 ================================================================= -->
+  <h2 id="s10"><span class="n">10</span>References</h2>
+
+  <div class="note">
+    <span class="tag">Verify before submission</span>
+    <p>
+      The entries below identify the sources consulted. Confirm each URL and access
+      date, and reformat to the citation style the subject requires, before
+      submitting.
+    </p>
+  </div>
+
+  <ul class="plain" style="font-size:.9375rem;">
+    <li>NewsGuard Technologies, <em>Rating Process and Criteria</em>. Available at: newsguardtech.com/ratings/rating-process-criteria</li>
+    <li>Ground News, <em>How We Rate News Sources</em>. Available at: ground.news/rating-system</li>
+    <li>Media Bias/Fact Check, <em>Methodology</em>. Available at: mediabiasfactcheck.com/methodology</li>
+    <li>Full Fact, <em>Our Approach to Fact Checking</em>. Available at: fullfact.org/about/our-approach</li>
+    <li>Reuters Institute for the Study of Journalism, <em>Digital News Report</em>, University of Oxford.</li>
+    <li>Wineburg, S. and McGrew, S., 2019. Lateral Reading and the Nature of Expertise: Reading Less and Learning More When Evaluating Digital Information. <em>Teachers College Record</em>, 121(11).</li>
+    <li>Coalition for Content Provenance and Authenticity, <em>C2PA Technical Specification</em>. Available at: c2pa.org/specifications</li>
+    <li>Wojcik, S. et al., 2022. <em>Birdwatch: Crowd Wisdom and Bridging Algorithms can Inform Understanding and Reduce the Spread of Misinformation</em>. arXiv:2210.15723.</li>
+    <li>European Union, 2022. <em>Regulation (EU) 2022/2065 on a Single Market for Digital Services (Digital Services Act)</em>.</li>
+    <li>Pallets Projects, <em>Flask Documentation</em>. Available at: flask.palletsprojects.com</li>
+    <li>Meta Open Source, <em>React Documentation</em>. Available at: react.dev</li>
+    <li>Supabase, <em>Row Level Security</em>. Available at: supabase.com/docs/guides/database/postgres/row-level-security</li>
+    <li>PostgreSQL Global Development Group, <em>PostgreSQL 17 Documentation</em>. Available at: postgresql.org/docs/17</li>
+    <li>SQLAlchemy, <em>ORM and Alembic Documentation</em>. Available at: docs.sqlalchemy.org</li>
+    <li>Biryukov, A., Dinu, D. and Khovratovich, D., 2016. Argon2: New Generation of Memory-Hard Functions for Password Hashing. <em>IEEE European Symposium on Security and Privacy</em>.</li>
+    <li>OWASP Foundation, <em>Application Security Verification Standard</em>. Available at: owasp.org/www-project-application-security-verification-standard</li>
+    <li>W3C, <em>Web Content Accessibility Guidelines (WCAG) 2.2</em>. Available at: w3.org/TR/WCAG22</li>
+    <li>Render, <em>Blueprint Specification</em>. Available at: render.com/docs/blueprint-spec</li>
+  </ul>
+
+  <p style="color:var(--mute);font-size:.875rem;border-top:1px solid var(--hair);padding-top:var(--s-4);margin-top:var(--s-7);">
+    Preliminary Technical Report v1.0 · FYP-26-S3-10 · CSIT321 Final Year Project ·
+    University of Wollongong, SIM Global Education.
+  </p>
+
+</div>
+</main>
+</div>

@@ -93,7 +93,7 @@ export default function LoginPage() {
 
       <aside className="auth-aside">
         <p className="lead">
-          Every article on The Record carries a credibility score produced by a
+          Every article on Wollongong News carries a credibility score produced by a
           fixed set of rules. The working sits beside the article, where you can
           check it.
         </p>
