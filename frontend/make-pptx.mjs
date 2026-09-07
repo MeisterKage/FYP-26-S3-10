@@ -785,16 +785,20 @@ const th = (t) => ({
 {
   const { s, y } = slide({ title: "Future development" });
   const cw = (COLW - 0.5) / 2;
+  // Six blocks, two columns of three. Security and Expansion were cut from the
+  // roadmap in favour of Country-based news and Monthly digest. Of what the
+  // Security block listed, only "moving rate-limit counters to shared storage"
+  // survives elsewhere, in the technical report's rate-limiting note. Two-factor
+  // authentication and email verification at registration are now recorded in no
+  // deliverable at all, so add them back somewhere if they are still intended.
   const left = [
-    ["Security", "Two-factor authentication for editor and administrator accounts; email verification at registration; moving rate-limit counters to shared storage so the API can run more than one worker."],
+    ["Country-based news", "Country-scoped feeds so readers see coverage from their own region first, with editors assigned by country as they are by category today."],
     ["Account management", "Real transactional email for password resets and notifications, which the prototype currently logs rather than sends."],
     ["Payments", "A real payment gateway in place of the stubbed integration, and scheduled payout runs against the tiered revenue share."],
-    ["Country-based news", "Country-scoped feeds so readers see coverage from their own region first, with editors assigned by country as they are by category today."],
   ];
   const right = [
     ["Scoring", "Per-category weights, since a science article and a sports report do not carry the same sourcing expectation; and a public history of threshold changes, so a score movement can be attributed to a policy change rather than to the writer."],
     ["Editorial", "Cover images, comment moderation, and a duplicate-content check surfaced to editors during review."],
-    ["Expansion", "A native mobile client, and multi-language publishing with per-language editorial assignment."],
     ["Monthly digest", "A month-end compilation for a chosen topic, collecting the highest-scoring articles in that category into one issue readers can subscribe to."],
   ];
   left.forEach(([t, d], i) => block(s, { x: L, y: y + i * 1.28, w: cw, h: 1.14, title: t, text: d, size: 11 }));
