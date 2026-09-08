@@ -797,7 +797,7 @@ const th = (t) => ({
     ["Payments", "A real payment gateway in place of the stubbed integration, and scheduled payout runs against the tiered revenue share."],
   ];
   const right = [
-    ["Scoring", "Per-category weights, since a science article and a sports report do not carry the same sourcing expectation; and a public history of threshold changes, so a score movement can be attributed to a policy change rather than to the writer."],
+    ["Panel of reputable editors", "A standing panel of named editors with published credentials and visible track records, so a reader can see who vouched for an article, not only the score attached to it."],
     ["Editorial", "Cover images, comment moderation, and a duplicate-content check surfaced to editors during review."],
     ["Monthly digest", "A month-end compilation for a chosen topic, collecting the highest-scoring articles in that category into one issue readers can subscribe to."],
   ];

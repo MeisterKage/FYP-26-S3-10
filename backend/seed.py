@@ -63,7 +63,49 @@ HEADLINES = [
     "Small businesses adopt digital payments at record pace",
     "Air quality index improves after emissions rules tighten",
     "National team qualifies after decisive away fixture",
+    "Cabinet reshuffle brings three new ministers into portfolio roles",
+    "Electoral boundaries review opens for public submissions",
+    "Freedom of information requests rise for a fourth year",
+    "Cross-border tax agreement enters its ratification stage",
+    "Housing grant changes take effect for first-time buyers",
+    "Container throughput steadies after a volatile first half",
+    "Insurance premiums climb as claims from flooding mount",
+    "Two regional carriers confirm merger talks",
+    "Manufacturing output edges up on export orders",
+    "Sovereign fund reports a narrower annual return",
+    "Undersea cable landing adds regional bandwidth capacity",
+    "Open-source licence change splits a developer community",
+    "Data centre operators pledge water use disclosure",
+    "Payment outage prompts review of settlement redundancy",
+    "Rail signalling upgrade completes ahead of schedule",
+    "Deep-sea survey records twelve previously undescribed species",
+    "Long-running soil study finds nutrient decline levelling off",
+    "Observatory upgrade sharpens gravitational wave detection",
+    "Peer review trial publishes referee reports alongside papers",
+    "Antibiotic resistance surveillance widens to private clinics",
+    "Waiting times shorten at restructured outpatient units",
+    "Vaccine coverage holds steady after a schedule change",
+    "Mental health helpline reports sustained demand",
+    "Stadium redevelopment pushes two fixtures to a neutral ground",
+    "Youth academy funding tied to coaching accreditation",
+    "Athletics body adopts revised qualification standards",
+    "Swimming records fall at the regional championships",
+    "Mangrove replanting reaches its five-year target early",
+    "Fishing quota cut follows a lower stock assessment",
+    "Heat advisory days double against the decade average",
+    "Recycling contamination rates fall after a bin redesign",
+    "Peatland restoration draws cross-border funding",
 ]
+
+# The article loop below runs ARTICLE_COUNT times and indexes into HEADLINES. If
+# it runs out it wraps and appends "(2)", "(3)" to the repeats, which is how the
+# deployed site ended up showing the same headline three times: eighteen
+# headlines were feeding fifty articles. Assert rather than wrap silently.
+ARTICLE_COUNT = 50
+assert len(HEADLINES) >= ARTICLE_COUNT, (
+    f"HEADLINES has {len(HEADLINES)} entries for {ARTICLE_COUNT} articles; "
+    "add more headlines rather than letting the seed repeat them."
+)
 
 BODY = (
     "<p>{lede}</p>"
@@ -179,7 +221,7 @@ def seed() -> None:
     contributors = [veteran, mixed, newcomer]
     articles: list[Article] = []
 
-    for index in range(50):
+    for index in range(ARTICLE_COUNT):
         contributor = contributors[index % 3]
         headline = f"{HEADLINES[index % len(HEADLINES)]}"
         if index >= len(HEADLINES):
