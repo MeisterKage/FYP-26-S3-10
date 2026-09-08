@@ -296,6 +296,12 @@
   text-decoration: none;
   padding: var(--s-2) var(--s-3);
   border-radius: var(--r-pill);
+  /* A label is one phrase and must not break inside itself. Without this the
+     administrator, who sees more nav items than any other role, gets "How
+     scoring / works" and "Platform / Administrator" stacked on two ragged
+     lines: flex shrinks each item below its content width before the row
+     itself overflows, so the text wraps rather than the nav. */
+  white-space: nowrap;
   transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease);
 }
 .nav-link:hover {
@@ -313,7 +319,37 @@
   margin-inline: var(--s-2);
 }
 
-@media (max-width: 52rem) {
+/* Between the phone layout and a full desktop the administrator's nav is the
+   first to run out of room, because that role carries six links where a reader
+   carries two. Tightening the horizontal padding recovers 8px an item, and the
+   signed-in name goes for the same reason it goes on a phone: it is the only
+   item here that names nothing the reader can do, and keeping it pushes "Sign
+   out" past the right edge. */
+@media (max-width: 72rem) {
+  .nav-link {
+    padding-inline: var(--s-2);
+  }
+  .nav-name,
+  .nav-divider {
+    display: none;
+  }
+  /* Below about 1000px even the trimmed nav is wider than the space left beside
+     the wordmark, but only for the two privileged roles. Letting the nav scroll
+     within itself keeps that off the page: a reader, whose nav fits, sees no
+     change at all, where moving the whole masthead to its stacked layout this
+     early would have restructured the header for everyone. min-width is needed
+     because a flex item will not shrink below its content without it. */
+  .nav {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 60rem) {
   .masthead-inner {
     height: auto;
     padding-block: var(--s-3);
