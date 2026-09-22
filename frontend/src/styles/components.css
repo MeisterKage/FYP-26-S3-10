@@ -1131,6 +1131,16 @@
 .bell-wrap {
   position: relative;
   display: inline-flex;
+  /* The bell is an icon, not slack to be taken up. As a flex child of .nav it
+     would otherwise absorb whatever compression the row needs, and it is the
+     only nav item without a natural minimum: the administrator's nav squeezed
+     it to 18px, the button kept its 8px of padding either side, and the glyph
+     was left 2px to draw an 18px bell in. What reached the screen was a dot. */
+  flex-shrink: 0;
+}
+
+.bell svg {
+  flex-shrink: 0;
 }
 
 .bell {
