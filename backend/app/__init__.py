@@ -43,10 +43,12 @@ def create_app(config_object=Config) -> Flask:
     from .modules.notifications import bp as notifications_bp
     from .modules.subscriptions import bp as subscriptions_bp
     from .modules.admin import bp as admin_bp
+    from .modules.editors import bp as editors_bp
 
     for blueprint in (
         auth_bp, users_bp, articles_bp, review_bp, discovery_bp,
         engagement_bp, moderation_bp, notifications_bp, subscriptions_bp, admin_bp,
+        editors_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
 

@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 
 import { api } from "../api";
 import { ROLES, useAuth } from "../auth";
-import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
+import { Button, Empty, Field, Notice, SectionHead, formatDate } from "../components/UI";
 
 const TABS = [
   ["overview", "Overview"],
@@ -403,6 +403,76 @@ function Applications({ onNotice }) {
 /*  Editor assignments                                                 */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The title and credentials readers see on the public editor panel. Set here,
+ * by an administrator, so a credential on the panel is one the platform has
+ * checked rather than one the editor typed about themselves.
+ */
+function PanelProfile({ editor, onSaved }) {
+  const [title, setTitle] = useState(editor.title || "");
+  const [credentials, setCredentials] = useState(editor.credentials || "");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  const changed =
+    title !== (editor.title || "") || credentials !== (editor.credentials || "");
+
+  async function save(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api.put(`/admin/editors/${editor.id}/profile`, { title, credentials });
+      onSaved(`Updated ${editor.name}'s public panel entry.`);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="panel-profile mt-5" onSubmit={save}>
+      <Field label="Title on the panel" id={`title-${editor.id}`} hint="e.g. Politics Editor">
+        {(props) => (
+          <input
+            {...props}
+            className="input"
+            maxLength={120}
+            value={title}
+            onChange={(ev) => setTitle(ev.target.value)}
+          />
+        )}
+      </Field>
+      <Field
+        label="Credentials"
+        id={`cred-${editor.id}`}
+        hint="Shown publicly. Only enter experience you have verified."
+        error={error}
+      >
+        {(props) => (
+          <textarea
+            {...props}
+            className="textarea"
+            rows={2}
+            maxLength={500}
+            value={credentials}
+            onChange={(ev) => setCredentials(ev.target.value)}
+          />
+        )}
+      </Field>
+      <div className="row gap-4">
+        <Button type="submit" variant="outline" size="sm" busy={busy} disabled={!changed}>
+          Save panel entry
+        </Button>
+        <Link className="link-quiet meta" to={`/editors/${editor.id}`}>
+          View public profile
+        </Link>
+      </div>
+    </form>
+  );
+}
+
 function Editors({ onNotice }) {
   const state = useResource("/admin/editors");
   const [categories, setCategories] = useState([]);
@@ -463,7 +533,10 @@ function Editors({ onNotice }) {
                   </div>
                 )}
 
-                <div className="checkbox-grid mt-5">
+                <PanelProfile editor={e} onSaved={(msg) => { onNotice(msg); state.reload(); }} />
+
+                <p className="label mt-5">Sections reviewed</p>
+                <div className="checkbox-grid mt-3">
                   {categories.map((c) => (
                     <label className="checkbox" key={c.id}>
                       <input

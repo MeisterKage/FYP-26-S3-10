@@ -172,6 +172,16 @@ def seed() -> None:
     admin = make_user("admin@newsrelease.test", "Platform Administrator", Role.SYSTEM_ADMIN)
     editor_a = make_user("editor.tech@newsrelease.test", "Priya Raman", Role.EDITOR)
     editor_b = make_user("editor.politics@newsrelease.test", "Daniel Ong", Role.EDITOR)
+    # Placeholder panel details for the demo. Fictional people, generic
+    # experience, no real publication named.
+    editor_a.editor_title = "Technology and Science Editor"
+    editor_a.editor_credentials = (
+        "Nine years on a regional daily's science desk. Degree in computer science."
+    )
+    editor_b.editor_title = "Politics and Business Editor"
+    editor_b.editor_credentials = (
+        "Former parliamentary reporter. Eleven years covering state and federal politics."
+    )
 
     veteran = make_user(
         "veteran@newsrelease.test", "Marcus Lim", Role.VERIFIED_CONTRIBUTOR,

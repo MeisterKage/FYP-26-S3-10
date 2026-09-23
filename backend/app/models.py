@@ -73,6 +73,10 @@ class User(TimestampMixin, db.Model):
     autopublish_suspended_until: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True)
     )
+    #: Shown on the public editor panel. Set by an administrator, never by the
+    #: editor, so a credential there is one the platform vouches for.
+    editor_title: Mapped[str | None] = mapped_column(String(120))
+    editor_credentials: Mapped[str | None] = mapped_column(String(500))
 
     articles: Mapped[list["Article"]] = relationship(
         back_populates="contributor", foreign_keys="Article.contributor_id"
@@ -225,6 +229,8 @@ class Article(TimestampMixin, db.Model):
     contributor: Mapped[User] = relationship(
         back_populates="articles", foreign_keys=[contributor_id]
     )
+    #: Whoever approved it, or confirmed it after auto-publish.
+    reviewer: Mapped[User | None] = relationship(foreign_keys=[reviewed_by_id])
     sources: Mapped[list["ArticleSource"]] = relationship(
         back_populates="article", cascade="all, delete-orphan"
     )

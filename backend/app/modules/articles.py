@@ -66,6 +66,27 @@ def _clean_tags(data: dict) -> str | None:
     return ",".join(tags)[:500] or None
 
 
+def _reviewer(article: Article) -> dict | None:
+    """Who vouched for this article, for the "Approved by" line.
+
+    Only once it is public, and never while it is awaiting review: an
+    auto-published article has had no editor vouch for it yet. `onPanel` says
+    whether the name links to a public editor profile; an administrator can
+    approve too but is not a member of the editor panel.
+    """
+    if article.status not in {ArticleStatus.PUBLISHED, ArticleStatus.RETRACTED}:
+        return None
+    if article.awaiting_review or article.reviewer is None:
+        return None
+    reviewer = article.reviewer
+    return {
+        "id": reviewer.id,
+        "name": reviewer.byline,
+        "title": reviewer.editor_title,
+        "onPanel": reviewer.role == Role.EDITOR and reviewer.deleted_at is None,
+    }
+
+
 def serialize(article: Article, *, include_body: bool = True, viewer=None) -> dict:
     """Serialise an article.
 
@@ -102,6 +123,7 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
             "autoPublishedAt": (
                 article.auto_published_at.isoformat() if article.auto_published_at else None
             ),
+            "reviewer": _reviewer(article),
         },
         "contributor": {
             "id": article.contributor_id,

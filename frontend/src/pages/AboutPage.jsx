@@ -151,6 +151,11 @@ export default function AboutPage() {
             Nothing here reads your article and decides whether it is true. The
             score counts sourcing and corrections; a human editor makes every
             call about accuracy, and an administrator can overturn that editor.
+            Every article names the editor who approved it, and{" "}
+            <Link className="link-quiet" to="/editors">
+              each editor&rsquo;s record is public
+            </Link>
+            .
           </Term>
           <Term name="No ranking you cannot see">
             Search matches keywords against titles, tags, and categories. There

@@ -310,6 +310,8 @@ def list_editor_assignments():
                     "id": editor.id,
                     "name": editor.display_name,
                     "email": editor.email,
+                    "title": editor.editor_title,
+                    "credentials": editor.editor_credentials,
                     "categories": assignments.get(editor.id, []),
                     # Surfaced deliberately: this is the state that silently
                     # produces an empty review queue.
@@ -364,6 +366,44 @@ def set_editor_categories(editor_id: int):
         {
             "editorId": editor.id,
             "categories": [{"id": c.id, "name": c.name} for c in found],
+        }
+    )
+
+
+@bp.put("/admin/editors/<int:editor_id>/profile")
+@admin_only
+def set_editor_profile(editor_id: int):
+    """Set the title and credentials shown on the public editor panel.
+
+    Administrator-only on purpose. An editor describing themselves would make
+    the panel a list of claims; an administrator setting it makes it a list of
+    things the platform has checked. Empty text clears a field.
+    """
+    editor = User.query.filter_by(id=editor_id, deleted_at=None).first()
+    if editor is None:
+        raise ApiError("User not found.", status=404)
+    if editor.role != Role.EDITOR:
+        raise ApiError(
+            f"{editor.display_name} is not an editor. Change their role first.",
+            status=422, field="editorId",
+        )
+
+    data = json_body()
+    title = require_str(data, "title", max_length=120, default=None, allow_empty=True)
+    credentials = require_str(
+        data, "credentials", max_length=500, default=None, allow_empty=True
+    )
+    editor.editor_title = (clean_plain_text(title) or None) if title else None
+    editor.editor_credentials = (clean_plain_text(credentials) or None) if credentials else None
+
+    _audit("editor.profile_set", "user", editor.id, editor.editor_title or "no title")
+    db.session.commit()
+
+    return jsonify(
+        {
+            "editorId": editor.id,
+            "title": editor.editor_title,
+            "credentials": editor.editor_credentials,
         }
     )
 

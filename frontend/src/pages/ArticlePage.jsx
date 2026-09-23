@@ -26,6 +26,28 @@ import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
 
+/**
+ * Who vouched for this article. Absent while it awaits review: the meter
+ * already says so, and no editor has vouched for it yet.
+ */
+function ApprovedBy({ review }) {
+  const reviewer = review?.reviewer;
+  if (!reviewer) return null;
+  return (
+    <span>
+      Approved by{" "}
+      {reviewer.onPanel ? (
+        <Link className="link-quiet" to={`/editors/${reviewer.id}`}>
+          {reviewer.name}
+        </Link>
+      ) : (
+        reviewer.name
+      )}
+      {reviewer.title && `, ${reviewer.title}`}
+    </span>
+  );
+}
+
 export default function ArticlePage() {
   const { slug } = useParams();
   const { user } = useAuth();
@@ -97,6 +119,7 @@ export default function ArticlePage() {
           </Link>
           <AccuracyRate rate={article.contributor.accuracyRate} />
           {date && <span>{date}</span>}
+          <ApprovedBy review={article.review} />
         </div>
       </header>
 

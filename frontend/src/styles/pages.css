@@ -704,3 +704,59 @@
     padding-inline: var(--s-3);
   }
 }
+
+/* --- editor panel ----------------------------------------------------------
+   Same ruled index as an article listing. The record sits where a listing puts
+   its score, because for an editor the record is the credibility. */
+
+.editor-title {
+  margin-top: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.editor-sections {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.editor-sections .tag {
+  text-decoration: none;
+}
+.editor-sections .tag:hover {
+  border-color: var(--rule);
+  color: var(--ink);
+}
+
+.editor-record {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: var(--s-2) var(--s-6);
+  text-align: right;
+}
+.editor-figure {
+  margin-top: var(--s-1);
+  font-family: var(--font-display);
+  font-size: var(--t-heading);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.panel-profile {
+  display: grid;
+  gap: var(--s-4);
+  max-width: var(--w-form);
+}
+
+@media (max-width: 40rem) {
+  .editor-entry {
+    grid-template-columns: 1fr;
+  }
+  .editor-record {
+    text-align: left;
+    justify-content: start;
+  }
+}
