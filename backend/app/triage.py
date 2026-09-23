@@ -19,6 +19,14 @@ The wait term is the anti-starvation guarantee. Without it a trusted writer's
 article can sit at the bottom of a busy queue indefinitely. With it, everything
 surfaces eventually, however safe it looks.
 
+It has to stay a tiebreaker, though, not a driver. The first shipped value, 0.5
+an hour, overtook a whole new-writer flag in three days, so in a real backlog,
+where articles wait days, the queue quietly reverted to oldest-first: the very
+behaviour this module replaces. At 0.1 an hour (2.4 a day) two weeks of waiting
+adds about 34, less than a single risk signal, so risk still sets the order; past
+roughly a month a safe article outranks even an unsourced one from a new writer
+(40 + 30), so nothing starves.
+
 --------------------------------------------------------------------------------
 AUTO-PUBLISH  (a pressure valve, off by default)
 --------------------------------------------------------------------------------
@@ -43,7 +51,7 @@ DEFAULTS: dict[str, float] = {
     "triage_expected_sources": 3,           # sourcing below this adds priority
     "triage_missing_source_weight": 10.0,   # per missing source
     "triage_duplicate_weight": 30.0,        # title matches another article
-    "triage_wait_weight": 0.5,              # per hour already waiting
+    "triage_wait_weight": 0.1,              # per hour waiting: 2.4 a day, see below
     # ---- auto-publish valve ----
     "autopublish_enabled": 0,               # 0 = off, 1 = on. Off by default.
     "autopublish_queue_depth": 25,          # opens above this many pending...

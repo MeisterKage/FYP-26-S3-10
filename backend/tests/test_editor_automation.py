@@ -64,8 +64,23 @@ def test_sources_beyond_the_expected_number_add_nothing():
 def test_waiting_eventually_lifts_a_safe_article_above_a_risky_new_one():
     """Nothing starves. A trusted article that has waited long enough surfaces."""
     risky_just_arrived = priority(contributor_accuracy=None, source_count=0)
-    safe_but_old = priority(hours_waiting=500)
-    assert safe_but_old > risky_just_arrived
+    safe_after_six_weeks = priority(hours_waiting=24 * 42)
+    assert safe_after_six_weeks > risky_just_arrived
+
+
+def test_risk_still_sets_the_order_in_a_two_week_backlog():
+    """Waiting must stay a tiebreaker. Found on the live site, not in review.
+
+    The first shipped wait weight overtook a whole new-writer flag in three
+    days, so in a genuine backlog the queue silently reverted to oldest-first.
+    """
+    risky_just_arrived = priority(contributor_accuracy=None, source_count=0)
+    safe_after_two_weeks = priority(hours_waiting=24 * 14)
+    assert risky_just_arrived > safe_after_two_weeks
+
+    new_writer_just_arrived = priority(contributor_accuracy=None)
+    veteran_after_one_week = priority(hours_waiting=24 * 7)
+    assert new_writer_just_arrived > veteran_after_one_week
 
 
 def test_the_breakdown_adds_up_to_the_total():
