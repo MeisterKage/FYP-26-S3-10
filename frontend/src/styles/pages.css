@@ -626,3 +626,81 @@
   height: 100%;
   background: var(--ink);
 }
+
+/* --- review queue: priority, batch approval, confirmation ------------------ */
+
+.priority-list {
+  list-style: none;
+  display: grid;
+  gap: var(--s-1);
+  max-width: 28rem;
+  font-size: var(--t-caption);
+  color: var(--quiet);
+}
+.priority-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: 0.15rem;
+  border-bottom: 1px dotted var(--hair);
+}
+.priority-value {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--t-caption);
+  color: var(--quiet);
+  cursor: pointer;
+}
+.batch-pick input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--deep);
+  cursor: pointer;
+}
+
+/* Selection is carried by the checkbox itself; the ground only confirms it. */
+.submission--selected {
+  background: var(--sunken);
+  padding-inline: var(--s-4);
+  margin-inline: calc(-1 * var(--s-4));
+}
+
+.batch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: var(--s-4);
+  margin-bottom: var(--s-3);
+  border-bottom: 1px solid var(--hair);
+}
+
+.confirm-list {
+  list-style: none;
+}
+.confirm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--hair);
+}
+
+@media (max-width: 40rem) {
+  .confirm-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .submission--selected {
+    margin-inline: calc(-1 * var(--s-3));
+    padding-inline: var(--s-3);
+  }
+}

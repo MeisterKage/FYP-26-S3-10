@@ -105,7 +105,7 @@ export default function SearchPage() {
                 <ArticleEntry
                   key={article.id}
                   article={article}
-                  aside={<CredibilityInline credibility={article.credibility} />}
+                  aside={<CredibilityInline credibility={article.credibility} review={article.review} />}
                 />
               ))}
             </div>

@@ -1,17 +1,23 @@
 """Scheduled jobs, exposed as Flask CLI commands.
 
-Two things in the PDD happen on a clock rather than on a request:
+Three things happen on a clock rather than on a request:
 
   * scheduled publication (Figure 5.44)
   * email dispatch within 60 seconds of a trigger (PRD 5.1 Performance)
+  * the auto-publish sweep, which only acts when the review queue is overloaded
 
-v1 runs both from the CLI, which is enough to demonstrate the behaviour:
+They run from the CLI:
 
     flask publish-due
     flask dispatch-notifications
+    flask autopublish-backlog
 
 For the deployed system, point cron (or the host's scheduler) at these every
 minute. Nothing in the application code needs to change to do that.
+
+None of this may run inside a web request. Production serves every request from
+a single gunicorn worker, so a sweep over the backlog in a request handler would
+stall the whole site for its duration.
 """
 from __future__ import annotations
 
@@ -59,6 +65,32 @@ def register_cli(app) -> None:
 
         sent = dispatch_pending(limit=limit)
         click.echo(f"Dispatched {sent} notification(s).")
+
+    @app.cli.command("autopublish-backlog")
+    def autopublish_backlog():
+        """Publish eligible articles while the review queue is overloaded.
+
+        Does nothing unless an administrator has switched auto-publish on and the
+        queue is past the depth or wait threshold. Everything it publishes is
+        labelled for readers until an editor confirms it.
+        """
+        from .review_service import run_autopublish
+
+        result = run_autopublish()
+        if not result["open"]:
+            click.echo(
+                f"Valve closed: {result['queueDepth']} pending, oldest waiting "
+                f"{result['oldestWaitHours']}h. Nothing published."
+            )
+            return
+
+        click.echo(
+            f"Valve open: {result['queueDepth']} pending, oldest waiting "
+            f"{result['oldestWaitHours']}h. Published {len(result['published'])}, "
+            f"held {len(result['held'])} for review."
+        )
+        for article_id, reasons in result["held"].items():
+            click.echo(f"  held {article_id}: {'; '.join(reasons)}")
 
     @app.cli.command("create-admin")
     @click.argument("email")

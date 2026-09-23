@@ -637,6 +637,48 @@ function Categories({ onNotice }) {
 /*  Scoring thresholds (PRD 1.3.2, administrator power 5)              */
 /* ------------------------------------------------------------------ */
 
+function SettingsTable({ settings, draft, setDraft, label }) {
+  return (
+    <div className="table-scroll mt-5">
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">{label}</th>
+            <th scope="col">Value</th>
+            <th scope="col">Shipped default</th>
+          </tr>
+        </thead>
+        <tbody>
+          {settings.map((s) => (
+            <tr key={s.key}>
+              <td>
+                <span style={{ color: "var(--ink)" }}>{s.key.replace(/_/g, " ")}</span>
+                {s.isOverridden && (
+                  <>
+                    {" "}
+                    <span className="tag">Changed</span>
+                  </>
+                )}
+              </td>
+              <td>
+                <input
+                  className="input input-sm"
+                  type="number"
+                  step="any"
+                  aria-label={s.key}
+                  value={draft[s.key] ?? s.value}
+                  onChange={(e) => setDraft((p) => ({ ...p, [s.key]: e.target.value }))}
+                />
+              </td>
+              <td className="meta">{s.default}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Scoring({ onNotice }) {
   const state = useResource("/admin/settings");
   const [draft, setDraft] = useState({});
@@ -647,12 +689,13 @@ function Scoring({ onNotice }) {
   async function save() {
     setBusy(true);
     try {
-      await api.put("/admin/settings", {
+      const result = await api.put("/admin/settings", {
         settings: Object.fromEntries(
           Object.entries(draft).map(([k, v]) => [k, Number(v)]),
         ),
       });
-      onNotice("Thresholds saved. Every published score has been recalculated.");
+      // The server says whether scores moved: review settings do not touch them.
+      onNotice(result.message);
       setDraft({});
       state.reload();
     } catch (e) {
@@ -667,53 +710,38 @@ function Scoring({ onNotice }) {
       {(d) => (
         <>
           <Notice tone="quiet">
-            These constants are published on the How scoring works page. Changing one
-            recalculates every article&rsquo;s credibility score immediately.
+            Scoring thresholds are published on the How scoring works page. Changing
+            one recalculates every article&rsquo;s credibility score immediately.
           </Notice>
 
-          <div className="table-scroll mt-5">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">Threshold</th>
-                  <th scope="col">Value</th>
-                  <th scope="col">Shipped default</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.settings.map((s) => (
-                  <tr key={s.key}>
-                    <td>
-                      <span style={{ color: "var(--ink)" }}>{s.key.replace(/_/g, " ")}</span>
-                      {s.isOverridden && (
-                        <>
-                          {" "}
-                          <span className="tag">Changed</span>
-                        </>
-                      )}
-                    </td>
-                    <td>
-                      <input
-                        className="input input-sm"
-                        type="number"
-                        step="any"
-                        aria-label={s.key}
-                        value={draft[s.key] ?? s.value}
-                        onChange={(e) =>
-                          setDraft((p) => ({ ...p, [s.key]: e.target.value }))
-                        }
-                      />
-                    </td>
-                    <td className="meta">{s.default}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <SettingsTable
+            label="Scoring threshold"
+            settings={d.settings.filter((s) => (s.group ?? "scoring") === "scoring")}
+            draft={draft}
+            setDraft={setDraft}
+          />
+
+          <h3 className="sub mt-7">Review automation</h3>
+          <p className="meta mt-3">
+            The triage weights decide the order of every editor&rsquo;s queue. The
+            auto-publish valve is off while <strong>autopublish enabled</strong> is 0.
+            When it is 1, a scheduled sweep may publish articles from trusted writers
+            once the queue is past the depth or wait threshold. Readers see those
+            marked as not yet reviewed until an editor confirms them, and a correction
+            on one suspends the writer from auto-publish. None of these change any
+            score.
+          </p>
+
+          <SettingsTable
+            label="Review setting"
+            settings={d.settings.filter((s) => s.group === "review")}
+            draft={draft}
+            setDraft={setDraft}
+          />
 
           <div className="row gap-4 mt-6">
             <Button variant="primary" onClick={save} busy={busy} disabled={!changed}>
-              Save and rescore
+              Save changes
             </Button>
             {changed && (
               <Button variant="quiet" onClick={() => setDraft({})}>

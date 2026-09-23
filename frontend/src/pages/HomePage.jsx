@@ -50,7 +50,7 @@ function Lead({ article }) {
       <aside className="lead-aside">
         <p className="label">Credibility</p>
         <div className="mt-4">
-          <CredibilityMeter credibility={article.credibility} />
+          <CredibilityMeter credibility={article.credibility} review={article.review} />
         </div>
         <Link className="link-quiet lead-trace" to={`/articles/${article.slug}`}>
           Trace this score
@@ -68,7 +68,7 @@ function Index({ articles }) {
         <ArticleEntry
           key={article.id}
           article={article}
-          aside={<CredibilityInline credibility={article.credibility} />}
+          aside={<CredibilityInline credibility={article.credibility} review={article.review} />}
         />
       ))}
     </div>

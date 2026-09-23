@@ -204,7 +204,7 @@ export default function ArticlePage() {
           <div className="margin-card">
             <p className="label">Credibility</p>
             <div className="mt-4">
-              <CredibilityMeter credibility={article.credibility} />
+              <CredibilityMeter credibility={article.credibility} review={article.review} />
             </div>
             <CredibilityLedger credibility={article.credibility} />
             <p className="meta mt-5">

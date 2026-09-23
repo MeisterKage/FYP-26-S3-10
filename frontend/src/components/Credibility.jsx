@@ -14,10 +14,33 @@
  * "Disputed" also switches to a hatched fill, so the state that matters most
  * survives grayscale printing and colour-blind vision.
  */
-import { ScaleIcon } from "./Icon";
+import { InfoIcon, ScaleIcon } from "./Icon";
+
+/**
+ * Whether an editor has read this article yet.
+ *
+ * During a review backlog the system may publish an article before an editor
+ * reads it. A reader must never mistake that for an article a human approved,
+ * so the flag travels with every credibility reading rather than living on one
+ * page. It is words, not a colour, like every other state on the platform, and
+ * it sits beside the score rather than changing it: the score is the arithmetic,
+ * this is who has checked it.
+ */
+function ReviewFlag({ review, compact = false }) {
+  if (!review?.awaitingReview) return null;
+  return (
+    <span
+      className={compact ? "review-flag review-flag--compact" : "review-flag"}
+      title="Published automatically while the review queue was backed up. An editor has not read it yet."
+    >
+      <InfoIcon size={compact ? 12 : 14} />
+      {compact ? "Not yet reviewed" : "Not yet reviewed by an editor"}
+    </span>
+  );
+}
 
 /** Full readout: score, band, meter. Used where the score is the subject. */
-export function CredibilityMeter({ credibility, animate = true }) {
+export function CredibilityMeter({ credibility, review, animate = true }) {
   if (!credibility || credibility.score == null) return null;
   const { score, band } = credibility;
 
@@ -45,12 +68,13 @@ export function CredibilityMeter({ credibility, animate = true }) {
           }}
         />
       </div>
+      <ReviewFlag review={review} />
     </div>
   );
 }
 
 /** Compact reading for listings, where the score is a column, not the subject. */
-export function CredibilityInline({ credibility }) {
+export function CredibilityInline({ credibility, review }) {
   if (!credibility || credibility.score == null) return null;
   const { score, band } = credibility;
   const rounded = Math.round(score);
@@ -65,6 +89,7 @@ export function CredibilityInline({ credibility }) {
       <span className="sr-only">
         Credibility {rounded} out of 100, rated {band}
       </span>
+      <ReviewFlag review={review} compact />
     </span>
   );
 }

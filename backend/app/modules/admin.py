@@ -10,7 +10,8 @@ from datetime import timedelta
 from flask import Blueprint, g, jsonify, request
 from sqlalchemy import func
 
-from ..credibility import DEFAULTS
+from ..credibility import DEFAULTS as SCORING_DEFAULTS
+from ..triage import DEFAULTS as REVIEW_DEFAULTS
 from ..enums import (
     ApplicationStatus, ArticleStatus, DisputeStatus, ReportStatus, Role,
 )
@@ -459,6 +460,15 @@ def delete_category(category_id: int):
 #  Platform thresholds  (PDD Figure 5.60)
 # --------------------------------------------------------------------------- #
 
+#: Every tunable constant, whichever engine owns it. Each engine keeps its own
+#: defaults so the scoring engine stays about scoring; this is the one place
+#: that needs to see them all.
+ALL_SETTINGS = {
+    **{key: ("scoring", value) for key, value in SCORING_DEFAULTS.items()},
+    **{key: ("review", value) for key, value in REVIEW_DEFAULTS.items()},
+}
+
+
 @bp.get("/admin/settings")
 @admin_only
 def get_settings():
@@ -469,11 +479,12 @@ def get_settings():
             "settings": [
                 {
                     "key": key,
+                    "group": group,
                     "value": overrides.get(key, default),
                     "default": default,
                     "isOverridden": key in overrides,
                 }
-                for key, default in DEFAULTS.items()
+                for key, (group, default) in ALL_SETTINGS.items()
             ]
         }
     )
@@ -482,11 +493,12 @@ def get_settings():
 @bp.put("/admin/settings")
 @admin_only
 def update_settings():
-    """Changing a threshold changes every published score, so rescore everything.
+    """Changing a scoring threshold changes every published score, so rescore everything.
 
     This is O(articles) and is fine at project scale. At real scale it would be a
     background job, worth saying so in the report rather than pretending
-    otherwise.
+    otherwise. Review settings change which articles need a human and which may
+    skip one, not what any article is worth, so they do not trigger a rescore.
     """
     data = json_body().get("settings")
     if not isinstance(data, dict) or not data:
@@ -498,7 +510,7 @@ def update_settings():
     # Validate every key before writing any, so a bad third value cannot leave
     # the first two applied.
     for key in data:
-        if key not in DEFAULTS:
+        if key not in ALL_SETTINGS:
             raise ApiError(f"Unknown setting '{key}'.", status=422, field=key)
 
     for key in data:
@@ -517,15 +529,26 @@ def update_settings():
 
     db.session.flush()
 
-    contributors = User.query.filter(User.role.in_(list(
-        {Role.VERIFIED_CONTRIBUTOR, Role.EDITOR, Role.SYSTEM_ADMIN}
-    ))).all()
-    for contributor in contributors:
-        rescore_contributor_articles(contributor)
+    rescored = any(key in SCORING_DEFAULTS for key in data)
+    if rescored:
+        contributors = User.query.filter(User.role.in_(list(
+            {Role.VERIFIED_CONTRIBUTOR, Role.EDITOR, Role.SYSTEM_ADMIN}
+        ))).all()
+        for contributor in contributors:
+            rescore_contributor_articles(contributor)
 
     _audit("settings.update", "platform_settings", 0, ", ".join(data))
     db.session.commit()
-    return jsonify({"message": "Thresholds updated and all scores recalculated."})
+    return jsonify(
+        {
+            "message": (
+                "Thresholds updated and all scores recalculated."
+                if rescored
+                else "Review settings updated. No scores were affected."
+            ),
+            "rescored": rescored,
+        }
+    )
 
 
 # --------------------------------------------------------------------------- #

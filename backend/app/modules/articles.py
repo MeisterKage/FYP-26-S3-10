@@ -93,6 +93,16 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
             "score": article.credibility_score,
             "band": article.credibility_band,
         },
+        # Public, and deliberately separate from the score. The score is the
+        # arithmetic; this says whether an editor has read the article yet. A
+        # reader should never mistake one published by the system during a
+        # backlog for one a human approved.
+        "review": {
+            "awaitingReview": article.awaiting_review,
+            "autoPublishedAt": (
+                article.auto_published_at.isoformat() if article.auto_published_at else None
+            ),
+        },
         "contributor": {
             "id": article.contributor_id,
             "name": article.contributor.byline,

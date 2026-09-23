@@ -157,7 +157,7 @@ export default function ContributorProfile() {
                   </p>
                 </div>
                 <div className="entry-aside">
-                  <CredibilityInline credibility={a.credibility} />
+                  <CredibilityInline credibility={a.credibility} review={a.review} />
                 </div>
               </article>
             ))}

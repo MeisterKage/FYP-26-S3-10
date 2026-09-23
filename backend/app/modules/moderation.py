@@ -19,6 +19,7 @@ from ..models import (
     Article, AuditLog, Comment, Correction, CorrectionDispute, Notification, Report,
     utcnow,
 )
+from ..review_service import lift_suspension_if_cleared, suspend_after_correction
 from ..sanitize import clean_plain_text
 from ..scoring_service import load_settings, rescore_contributor_articles
 from ..security import editor_owns_category, roles_required
@@ -174,6 +175,9 @@ def log_correction(article_id: int):
 
     db.session.flush()
     rescore_contributor_articles(article.contributor)
+    # A correction on something that skipped review costs the writer the right
+    # to skip it again. See review_service.suspend_after_correction.
+    suspend_after_correction(article)
 
     db.session.add(
         Notification(
@@ -217,6 +221,7 @@ def overturn_correction(correction_id: int):
 
     db.session.flush()
     rescore_contributor_articles(article.contributor)
+    lift_suspension_if_cleared(article.contributor)
 
     db.session.add(
         AuditLog(
@@ -387,6 +392,7 @@ def resolve_dispute(dispute_id: int):
             article.status = ArticleStatus.PUBLISHED
         db.session.flush()
         rescore_contributor_articles(article.contributor)
+        lift_suspension_if_cleared(article.contributor)
 
     db.session.add(
         Notification(

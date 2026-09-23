@@ -163,7 +163,7 @@ export default function ContributorDashboard() {
                         where the CSS drops it entirely. */}
                     <td data-blank={article.status !== "published" || undefined}>
                       {article.status === "published" ? (
-                        <CredibilityInline credibility={article.credibility} />
+                        <CredibilityInline credibility={article.credibility} review={article.review} />
                       ) : (
                         <span className="meta">—</span>
                       )}

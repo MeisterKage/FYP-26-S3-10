@@ -68,6 +68,11 @@ class User(TimestampMixin, db.Model):
 
     #: Denormalised, maintained by the scoring engine. NULL => "New Contributor".
     accuracy_rate: Mapped[float | None] = mapped_column(Float)
+    #: Set when a correction lands on one of this writer's auto-published
+    #: articles. Until it passes, nothing of theirs skips review.
+    autopublish_suspended_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
 
     articles: Mapped[list["Article"]] = relationship(
         back_populates="contributor", foreign_keys="Article.contributor_id"
@@ -205,6 +210,15 @@ class Article(TimestampMixin, db.Model):
     reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     rejection_reason: Mapped[str | None] = mapped_column(Text)
 
+    #: Auto-publish marks an article with timestamps rather than a new status.
+    #: A PROVISIONAL status would have to be added to every query that filters
+    #: on PUBLISHED (feeds, search, categories, scoring, the accuracy counts),
+    #: and missing one would silently drop the article out of a feed. As columns,
+    #: nothing that already works has to change. The reader sees "Not yet
+    #: reviewed" while the first is set and the second is not.
+    auto_published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    review_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     like_count: Mapped[int] = mapped_column(Integer, default=0)
 
@@ -227,6 +241,11 @@ class Article(TimestampMixin, db.Model):
     @property
     def is_retracted(self) -> bool:
         return self.status == ArticleStatus.RETRACTED
+
+    @property
+    def awaiting_review(self) -> bool:
+        """Published by the system, and no editor has confirmed it yet."""
+        return self.auto_published_at is not None and self.review_confirmed_at is None
 
 
 class ArticleRevision(db.Model):
