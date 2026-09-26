@@ -350,6 +350,21 @@ COUNTRY_SAMPLES = [
      ["New rules in US college sport allow universities to share a portion of broadcast "
       "revenue directly with athletes, starting this season.",
       "Smaller programmes say the change favours schools with large television deals."]),
+    ("US", "Environment", "veteran@newsrelease.test",
+     "US coastal cities publish shared flood maps for the first time",
+     "A common mapping standard lets residents compare flood risk street by street.",
+     ["A group of US coastal cities has published flood risk maps built to a shared "
+      "standard, so residents can compare risk street by street across city lines.",
+      "The maps combine tide gauge records with rainfall projections. Planners say the "
+      "common format will make it easier to prioritise drainage upgrades.",
+      "Property groups asked for an appeals process where maps differ from surveys."]),
+    ("US", "Health", "contributor@newsrelease.test",
+     "US rural hospitals expand telehealth links to specialist centres",
+     "Video consultations aim to cut long drives for cardiology and neurology visits.",
+     ["Rural hospitals in several US states are expanding telehealth links to "
+      "specialist centres, starting with cardiology and neurology consultations.",
+      "Patients will attend their local hospital, where a nurse joins the video call. "
+      "Hospitals will report how many in-person transfers the links avoid."]),
 ]
 
 #: Sources per sample, matching each writer's habit in the main seed, so their
