@@ -866,7 +866,7 @@
 .cover-field {
   border: 0;
   padding: 0;
-  margin: 0;
+  margin: var(--s-6) 0 0;
 }
 .cover-field legend {
   margin-bottom: var(--s-3);
