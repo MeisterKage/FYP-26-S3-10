@@ -24,6 +24,7 @@ from flask import Blueprint, g, jsonify, request
 from ..enums import AUTHORING_ROLES, ArticleStatus, Role
 from ..errors import ApiError
 from ..extensions import db
+from ..countries import country_name, normalise as normalise_country
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
 from ..scoring_service import rescore_article
@@ -66,6 +67,14 @@ def _clean_tags(data: dict) -> str | None:
     return ",".join(tags)[:500] or None
 
 
+def _country(data: dict) -> str | None:
+    """A submitted country code, validated against the fixed list. Null = international."""
+    try:
+        return normalise_country(data.get("countryCode"))
+    except ValueError:
+        raise ApiError("Choose a country from the list.", status=422, field="countryCode")
+
+
 def _reviewer(article: Article) -> dict | None:
     """Who vouched for this article, for the "Approved by" line.
 
@@ -102,6 +111,10 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         "status": article.status.value,
         "isPremium": article.is_premium,
         "categoryId": article.category_id,
+        "country": (
+            {"code": article.country_code, "name": country_name(article.country_code)}
+            if article.country_code else None
+        ),
         "coverImageUrl": article.cover_image_url,
         "tags": [t for t in (article.tags or "").split(",") if t],
         "publishedAt": article.published_at.isoformat() if article.published_at else None,
@@ -197,6 +210,7 @@ def create_article():
     article = Article(
         contributor_id=g.current_user.id,
         category_id=category.id,
+        country_code=_country(data),
         title=title,
         slug=slugify(title),
         summary=clean_plain_text(data.get("summary") or "")[:500] or None,
@@ -263,6 +277,8 @@ def update_article(article_id: int):
         if category is None:
             raise ApiError("That category does not exist.", status=422, field="categoryId")
         article.category_id = category.id
+    if "countryCode" in data:
+        article.country_code = _country(data)
     if "sources" in data:
         _replace_sources(article, require_list(data, "sources", max_items=MAX_SOURCES))
         # Source count is a scoring input, so the score moves with it.

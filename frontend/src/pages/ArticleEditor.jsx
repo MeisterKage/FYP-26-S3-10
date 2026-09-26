@@ -28,6 +28,8 @@ const BLANK = {
   summary: "",
   body: "",
   categoryId: "",
+  // What the article is about. Starts on Australia; "" means international.
+  countryCode: "AU",
   tags: "",
   isPremium: false,
 };
@@ -102,6 +104,7 @@ export default function ArticleEditor() {
   const [form, setForm] = useState(BLANK);
   const [sources, setSources] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [status, setStatus] = useState("draft");
   const [articleId, setArticleId] = useState(null);
   const [rejection, setRejection] = useState(null);
@@ -119,6 +122,10 @@ export default function ArticleEditor() {
       .get("/categories")
       .then((d) => setCategories(d.categories || []))
       .catch(() => setCategories([]));
+    api
+      .get("/countries/all")
+      .then((d) => setCountries(d.countries || []))
+      .catch(() => setCountries([]));
   }, []);
 
   // The owner-scoped read, which includes the body. The public route is keyed
@@ -141,6 +148,7 @@ export default function ArticleEditor() {
           summary: found.summary || "",
           body: found.body || "",
           categoryId: found.categoryId ? String(found.categoryId) : "",
+          countryCode: found.country?.code || "",
           tags: (found.tags || []).join(", "),
           isPremium: Boolean(found.isPremium),
         });
@@ -173,6 +181,7 @@ export default function ArticleEditor() {
       summary: form.summary,
       body: form.body,
       categoryId: Number(form.categoryId),
+      countryCode: form.countryCode || null,
       isPremium: form.isPremium,
       tags: form.tags
         .split(",")
@@ -394,6 +403,35 @@ export default function ArticleEditor() {
               <option value="">Choose a section</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </Field>
+
+        <Field
+          label="Country"
+          id="countryCode"
+          hint="The country the article is about, not where you are."
+          error={fieldError.countryCode}
+        >
+          {(props) => (
+            <select
+              {...props}
+              className="input"
+              value={form.countryCode}
+              onChange={set("countryCode")}
+              disabled={!editable}
+            >
+              <option value="">International / no single country</option>
+              {/* Until the list arrives, keep the current value selectable so
+                  the select does not silently show a different country. */}
+              {countries.length === 0 && form.countryCode && (
+                <option value={form.countryCode}>{form.countryCode}</option>
+              )}
+              {countries.map((c) => (
+                <option key={c.code} value={c.code}>
                   {c.name}
                 </option>
               ))}

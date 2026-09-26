@@ -10,7 +10,7 @@ matching, because the ranking has to stay inspectable.
 from __future__ import annotations
 
 from flask import Blueprint, current_app, g, jsonify, request
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..enums import ArticleStatus
@@ -19,6 +19,7 @@ from ..extensions import db
 from ..models import (
     Article, Category, Follow, Like, SavedArticle, User, UserCategoryPreference,
 )
+from ..countries import COUNTRIES, DEFAULT_COUNTRY, codes_matching
 from ..credibility import DEFAULTS, credibility_score
 from ..scoring_service import explain_article, load_settings
 from ..security import current_user
@@ -133,6 +134,101 @@ def by_category(slug: str):
     return jsonify(result)
 
 
+@bp.get("/countries")
+def list_countries():
+    """Every country with at least one published article, and how many.
+
+    Countries with nothing published are left out: a page of 249 names, most
+    leading to an empty list, would be a directory of absences.
+    """
+    rows = (
+        db.session.query(Article.country_code, func.count())
+        .filter(
+            Article.status == ArticleStatus.PUBLISHED,
+            Article.country_code.isnot(None),
+        )
+        .group_by(Article.country_code)
+        .all()
+    )
+    countries = [
+        {"code": code, "name": COUNTRIES[code], "articleCount": count}
+        for code, count in rows
+        if code in COUNTRIES
+    ]
+    countries.sort(key=lambda c: (-c["articleCount"], c["name"]))
+    return jsonify({"countries": countries})
+
+
+@bp.get("/countries/all")
+def all_countries():
+    """The full fixed list, for the article editor's country picker."""
+    return jsonify(
+        {
+            "countries": sorted(
+                ({"code": c, "name": n} for c, n in COUNTRIES.items()),
+                key=lambda c: c["name"],
+            ),
+            "default": DEFAULT_COUNTRY,
+        }
+    )
+
+
+@bp.get("/countries/<code>/articles")
+def by_country(code: str):
+    """One country's articles, optionally narrowed to a section.
+
+    Country plus section ("Politics in Australia") is the unit the monthly
+    digest compiles, so the filter exists here first.
+    """
+    code = code.upper()
+    if code not in COUNTRIES:
+        raise ApiError("Country not found.", status=404)
+
+    page = request.args.get("page", 1, type=int)
+    sort = request.args.get("sort", "recent")
+    section = request.args.get("category")
+
+    query = _published().filter(Article.country_code == code)
+
+    # Sections that actually have articles for this country, for the filter
+    # chips. Counted before the section filter is applied, so every chip stays
+    # visible while one is selected.
+    section_rows = (
+        db.session.query(Category, func.count(Article.id))
+        .join(Article, Article.category_id == Category.id)
+        .filter(
+            Article.status == ArticleStatus.PUBLISHED,
+            Article.country_code == code,
+            Category.deleted_at.is_(None),
+        )
+        .group_by(Category.id)
+        .order_by(Category.name)
+        .all()
+    )
+
+    selected = None
+    if section:
+        selected = Category.query.filter_by(slug=section, deleted_at=None).first()
+        if selected is None:
+            raise ApiError("Section not found.", status=404)
+        query = query.filter(Article.category_id == selected.id)
+
+    if sort == "credibility":
+        query = query.order_by(Article.credibility_score.desc(), Article.published_at.desc())
+    else:
+        query = query.order_by(Article.published_at.desc(), Article.credibility_score.desc())
+
+    result = _paginate(query, page)
+    result["country"] = {"code": code, "name": COUNTRIES[code]}
+    result["sections"] = [
+        {"name": c.name, "slug": c.slug, "articleCount": n} for c, n in section_rows
+    ]
+    result["selectedSection"] = selected.slug if selected else None
+    if not result["articles"] and page == 1:
+        result["message"] = "No articles about this country yet"
+    return jsonify(result)
+
+
 @bp.get("/search")
 def search():
     """PDD Figure 5.7. Keyword matching against title, tags, and category."""
@@ -152,6 +248,10 @@ def search():
                 Article.tags.ilike(like),
                 Article.summary.ilike(like),
                 Category.name.ilike(like),
+                # "japan" finds articles tagged Japan even if the word is not
+                # in the headline. Names are matched in Python against the
+                # fixed list, then filtered by code.
+                Article.country_code.in_(codes_matching(q) or ["--"]),
             )
         )
         .order_by(Article.credibility_score.desc(), Article.published_at.desc())

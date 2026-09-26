@@ -17,6 +17,7 @@ import ArticlePage from "./pages/ArticlePage";
 import ContributorDashboard from "./pages/ContributorDashboard";
 import CategoryPage from "./pages/CategoryPage";
 import ContributorProfile from "./pages/ContributorProfile";
+import { CountryIndex, CountryPage } from "./pages/CountryPages";
 import { EditorPanel, EditorProfile } from "./pages/EditorPanel";
 import ResetPassword from "./pages/ResetPassword";
 import HomePage from "./pages/HomePage";
@@ -87,6 +88,8 @@ export default function App() {
             <Route path="/articles/:slug" element={<ArticlePage />} />
             <Route path="/categories/:slug" element={<CategoryPage />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />
+            <Route path="/countries" element={<CountryIndex />} />
+            <Route path="/countries/:code" element={<CountryPage />} />
             <Route path="/editors" element={<EditorPanel />} />
             <Route path="/editors/:id" element={<EditorProfile />} />
             <Route path="/reset-password" element={<ResetPassword />} />

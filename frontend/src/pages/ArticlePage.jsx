@@ -119,6 +119,11 @@ export default function ArticlePage() {
           </Link>
           <AccuracyRate rate={article.contributor.accuracyRate} />
           {date && <span>{date}</span>}
+          {article.country && (
+            <Link className="link-quiet" to={`/countries/${article.country.code.toLowerCase()}`}>
+              {article.country.name}
+            </Link>
+          )}
           <ApprovedBy review={article.review} />
         </div>
       </header>

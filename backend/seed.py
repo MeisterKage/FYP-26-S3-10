@@ -8,6 +8,7 @@ corrections, and reports.
     flask db upgrade     # schema first -- migrations own it
     py seed.py           # then load demo data
     py seed.py --reset   # empty the tables and reload
+    py seed.py --countries   # tag countries and add samples to existing data
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
 deployment anyone else can reach.
@@ -122,6 +123,315 @@ BODY = (
     "<p>Responses have been mixed. Supporters point to clearer obligations, while "
     "critics argue the timeline is short for smaller organisations.</p>"
 )
+
+
+# ---- countries -------------------------------------------------------------- #
+#
+# What each demo headline above is about. Keyed by title, not index, so the same
+# map tags the live database, whose older seed repeated headlines with "(2)" and
+# "(3)" suffixes. None = international.
+COUNTRY_OF_HEADLINE = {
+    "Parliament passes revised data protection framework": "AU",
+    "Regional startups raise record funding despite slowdown": "SG",
+    "New study links urban green space to lower stress markers": "GB",
+    "Grid operators report record renewable share in Q3": "AU",
+    "Semiconductor shortage eases as new fabrication capacity opens": "JP",
+    "Public transport ridership returns to pre-pandemic levels": "NZ",
+    "Researchers publish open dataset on coastal erosion": "AU",
+    "Health ministry expands subsidised screening programme": "SG",
+    "Local league announces revised season structure": "AU",
+    "Central bank holds rates steady for third quarter": "NZ",
+    "Universities pilot shared research computing cluster": "GB",
+    "Coastal reclamation project clears environmental review": "SG",
+    "Retail sector reports uneven recovery across segments": "US",
+    "New guidelines issued for clinical trial transparency": "GB",
+    "Wind capacity overtakes coal in regional generation mix": "AU",
+    "Small businesses adopt digital payments at record pace": "JP",
+    "Air quality index improves after emissions rules tighten": "JP",
+    "National team qualifies after decisive away fixture": "NZ",
+    "Cabinet reshuffle brings three new ministers into portfolio roles": "GB",
+    "Electoral boundaries review opens for public submissions": "AU",
+    "Freedom of information requests rise for a fourth year": "NZ",
+    "Cross-border tax agreement enters its ratification stage": None,
+    "Housing grant changes take effect for first-time buyers": "AU",
+    "Container throughput steadies after a volatile first half": "SG",
+    "Insurance premiums climb as claims from flooding mount": "AU",
+    "Two regional carriers confirm merger talks": "US",
+    "Manufacturing output edges up on export orders": "JP",
+    "Sovereign fund reports a narrower annual return": "SG",
+    "Undersea cable landing adds regional bandwidth capacity": "AU",
+    "Open-source licence change splits a developer community": None,
+    "Data centre operators pledge water use disclosure": "US",
+    "Payment outage prompts review of settlement redundancy": "GB",
+    "Rail signalling upgrade completes ahead of schedule": "GB",
+    "Deep-sea survey records twelve previously undescribed species": "NZ",
+    "Long-running soil study finds nutrient decline levelling off": "AU",
+    "Observatory upgrade sharpens gravitational wave detection": "US",
+    "Peer review trial publishes referee reports alongside papers": None,
+    "Antibiotic resistance surveillance widens to private clinics": "SG",
+    "Waiting times shorten at restructured outpatient units": "GB",
+    "Vaccine coverage holds steady after a schedule change": "NZ",
+    "Mental health helpline reports sustained demand": "AU",
+    "Stadium redevelopment pushes two fixtures to a neutral ground": "GB",
+    "Youth academy funding tied to coaching accreditation": "AU",
+    "Athletics body adopts revised qualification standards": None,
+    "Swimming records fall at the regional championships": "AU",
+    "Mangrove replanting reaches its five-year target early": "SG",
+    "Fishing quota cut follows a lower stock assessment": "NZ",
+    "Heat advisory days double against the decade average": "US",
+    "Recycling contamination rates fall after a bin redesign": "JP",
+    "Peatland restoration draws cross-border funding": None,
+}
+
+# Stories written for one country, so each country page has something that could
+# only be about that country. Fictional demo reporting: no real person is named,
+# and every source is an example.org placeholder, like the rest of the seed.
+# (country, section, writer email, title, summary, paragraphs)
+COUNTRY_SAMPLES = [
+    ("AU", "Politics", "veteran@newsrelease.test",
+     "Wollongong council opens consultation on a revised city centre plan",
+     "Residents have six weeks to comment on building heights, laneways and parking.",
+     ["Wollongong City Council has opened public consultation on a revised plan for "
+      "the city centre, covering building heights, laneway activation and parking.",
+      "The draft keeps the tallest buildings near the station and steps heights down "
+      "toward the foreshore. Submissions close in six weeks, with drop-in sessions "
+      "planned at the central library.",
+      "Business groups welcomed the laneway proposals. Some residents questioned "
+      "whether parking forecasts reflect growth in the northern suburbs."]),
+    ("AU", "Environment", "contributor@newsrelease.test",
+     "Illawarra escarpment walking tracks reopen after landslip repairs",
+     "Three tracks closed since the winter storms are open again, with new drainage.",
+     ["Three walking tracks on the Illawarra escarpment have reopened after repairs to "
+      "sections damaged by landslips during the winter storms.",
+      "Crews rebuilt stairways and added drainage designed to carry heavy rain off the "
+      "track surface rather than along it. Rangers ask walkers to stay on marked "
+      "paths while vegetation re-establishes.",
+      "One lookout remains closed while engineers monitor the slope beneath it."]),
+    ("AU", "Sport", "newcontributor@newsrelease.test",
+     "Wollongong prepares to host a regional surf life saving carnival",
+     "More than forty clubs are expected on the northern beaches next month.",
+     ["Wollongong will host a regional surf life saving carnival next month, with more "
+      "than forty clubs expected across two northern beaches.",
+      "Organisers say the event runs over a weekend, with junior events on the first "
+      "day. Road closures near the beaches will be signposted in advance."]),
+    ("AU", "Business", "veteran@newsrelease.test",
+     "Port Kembla precinct courts renewable manufacturing investors",
+     "A new prospectus pitches the precinct's port, rail links and skilled workforce.",
+     ["A prospectus released this week pitches the Port Kembla industrial precinct to "
+      "manufacturers of wind turbine components and other renewable equipment.",
+      "It points to existing deep-water berths, rail links and a workforce with heavy "
+      "industry experience. Local training providers have been asked to map courses "
+      "against the skills manufacturers say they need.",
+      "No firm commitments have been announced. Analysts say grid connection costs "
+      "will weigh heavily on any final decision."]),
+    ("AU", "Science", "contributor@newsrelease.test",
+     "University researchers map seagrass recovery along the Illawarra coast",
+     "Drone surveys show meadows returning in sheltered bays, but not on open coast.",
+     ["Researchers have published drone surveys mapping seagrass along the Illawarra "
+      "coast, showing recovery in sheltered bays over five years.",
+      "Meadows on exposed stretches have not returned, which the team attributes to "
+      "storm disturbance and sediment. The maps and raw imagery are published for "
+      "other researchers to reuse."]),
+
+    ("NZ", "Environment", "veteran@newsrelease.test",
+     "New Zealand extends predator trapping network across two more regions",
+     "The expansion adds thousands of traps and links community projects to one register.",
+     ["New Zealand's predator-free programme is extending its trapping network across "
+      "two more regions, adding thousands of traps maintained by community groups.",
+      "Catch data from every trap will be recorded on a single national register, so "
+      "results can be compared between regions for the first time.",
+      "Conservation groups say volunteer numbers, not funding, are now the main limit."]),
+    ("NZ", "Business", "contributor@newsrelease.test",
+     "Dairy export prices lift as New Zealand co-operatives report stronger orders",
+     "Whole milk powder led the rise at the latest auction.",
+     ["Dairy export prices rose at the latest global auction, led by whole milk powder, "
+      "as New Zealand co-operatives reported stronger forward orders.",
+      "Economists cautioned that one auction is a thin basis for revising farm income "
+      "forecasts, and noted the currency has also moved."]),
+    ("NZ", "Sport", "newcontributor@newsrelease.test",
+     "Wellington club confirms stadium upgrade ahead of the rugby season",
+     "New lighting and a covered stand are due before the first home fixture.",
+     ["A Wellington rugby club has confirmed upgrades to its home ground, including new "
+      "lighting and a covered stand, due before the first home fixture.",
+      "The club says the work is funded through a mix of council grants and member "
+      "contributions."]),
+
+    ("SG", "Technology", "contributor@newsrelease.test",
+     "Singapore expands public trials of autonomous shuttle buses",
+     "Driverless shuttles will run on two more routes, with a safety operator on board.",
+     ["Singapore is expanding public trials of autonomous shuttle buses to two more "
+      "routes, each with a safety operator on board during the trial.",
+      "Operators will publish monthly figures on disengagements, the moments a human "
+      "takes control, so the public can follow how the vehicles perform.",
+      "Commuters on the existing trial route have used the service steadily since launch."]),
+    ("SG", "Health", "veteran@newsrelease.test",
+     "Singapore clinics pilot shared electronic records for chronic care",
+     "Patients with diabetes and hypertension will have one record across clinics.",
+     ["Clinics in Singapore are piloting a shared electronic record for patients with "
+      "chronic conditions such as diabetes and hypertension.",
+      "Patients must consent before their record is shared, and can see which clinics "
+      "have accessed it. The pilot will be evaluated on missed follow-ups and "
+      "duplicated tests.",
+      "Privacy advocates asked for the evaluation to be published in full."]),
+    ("SG", "Business", "veteran@newsrelease.test",
+     "Singapore port handles record transhipment volumes this quarter",
+     "Rerouted shipping and new berths pushed container handling to a quarterly high.",
+     ["Singapore's port handled record transhipment volumes this quarter, as rerouted "
+      "shipping lanes and newly opened berths lifted container throughput.",
+      "Port authorities said automated cranes at the newest terminal accounted for a "
+      "growing share of moves. Shipping analysts expect volumes to ease if routes "
+      "normalise."]),
+
+    ("JP", "Technology", "contributor@newsrelease.test",
+     "Japanese carmakers agree a shared battery recycling standard",
+     "A common labelling and dismantling standard aims to make recovery cheaper.",
+     ["Several Japanese carmakers have agreed a shared standard for labelling and "
+      "dismantling electric vehicle batteries, aimed at making recycling cheaper.",
+      "Recyclers have long said inconsistent battery designs are the main cost. The "
+      "standard covers labelling of cell chemistry and the placement of fasteners.",
+      "It applies to new models from the next design cycle."]),
+    ("JP", "Science", "veteran@newsrelease.test",
+     "Japan's earthquake early warning network adds offshore sensors",
+     "Seafloor sensors could add several seconds of warning for coastal areas.",
+     ["Japan's earthquake early warning network is adding a line of seafloor sensors, "
+      "which researchers say could give coastal areas several extra seconds of warning.",
+      "The sensors detect shaking before it reaches land-based stations. Data will be "
+      "made available to universities studying offshore fault behaviour."]),
+    ("JP", "Health", "newcontributor@newsrelease.test",
+     "Tokyo hospitals trial robotic lifting assistance in elderly care wards",
+     "The trial measures staff injuries and patient comfort over twelve months.",
+     ["Hospitals in Tokyo are trialling robotic lifting assistance in elderly care wards, "
+      "to reduce back injuries among nursing staff.",
+      "The twelve-month trial will measure staff injuries, time spent on transfers and "
+      "patient comfort."]),
+
+    ("GB", "Politics", "veteran@newsrelease.test",
+     "UK councils gain new powers to convert empty shops into housing",
+     "Councils can require long-vacant high street units to be offered for conversion.",
+     ["Councils in the UK are gaining powers to require long-vacant high street shops to "
+      "be offered for conversion into housing.",
+      "Owners will be notified before any requirement takes effect and can appeal. "
+      "Councils say the powers will be used sparingly, for units empty over a year.",
+      "Retail groups warned the measure should not replace support for struggling "
+      "high streets."]),
+    ("GB", "Environment", "contributor@newsrelease.test",
+     "UK water companies ordered to publish sewage overflow data daily",
+     "Overflow data will be published daily for every monitored outlet.",
+     ["Water companies in the UK have been ordered to publish sewage overflow data "
+      "daily for every monitored outlet, replacing annual summaries.",
+      "Campaigners say daily data will let swimmers and anglers check conditions before "
+      "going into the water. Companies say monitors need calibrating first."]),
+    ("GB", "Science", "veteran@newsrelease.test",
+     "UK polar researchers retrieve their deepest ice core yet",
+     "The core could extend the climate record back hundreds of thousands of years.",
+     ["UK polar researchers have retrieved their deepest ice core yet, which could "
+      "extend the climate record back hundreds of thousands of years.",
+      "Sections will be shipped frozen for analysis of trapped air bubbles. First "
+      "results are not expected for at least a year."]),
+
+    ("US", "Technology", "contributor@newsrelease.test",
+     "US states agree a common framework for data broker registration",
+     "A shared registry would let residents find which brokers hold their data.",
+     ["A group of US states has agreed a common framework for registering data brokers, "
+      "which would let residents find which brokers hold their personal information.",
+      "Each state will still set its own penalties. Privacy groups called it a useful "
+      "first step; industry groups asked for a single national rule instead.",
+      "The shared registry is expected to open next year."]),
+    ("US", "Business", "veteran@newsrelease.test",
+     "US airlines add capacity on transpacific routes to Australia",
+     "More seats from the West Coast are expected to push fares down for the summer.",
+     ["US airlines are adding capacity on transpacific routes to Australia, with extra "
+      "services from West Coast hubs scheduled for the southern summer.",
+      "Travel analysts expect fares to soften as seat numbers rise, though fuel costs "
+      "remain the largest uncertainty."]),
+    ("US", "Sport", "newcontributor@newsrelease.test",
+     "US college sport adopts new athlete revenue-sharing rules",
+     "Universities can now share part of their broadcast revenue directly with athletes.",
+     ["New rules in US college sport allow universities to share a portion of broadcast "
+      "revenue directly with athletes, starting this season.",
+      "Smaller programmes say the change favours schools with large television deals."]),
+]
+
+#: Sources per sample, matching each writer's habit in the main seed, so their
+#: scores differ for a reason a reader can inspect.
+SAMPLE_SOURCES = {"veteran@newsrelease.test": 5, "contributor@newsrelease.test": 3}
+
+
+def seed_countries() -> None:
+    """Tag demo articles with countries and add the country sample articles.
+
+    Safe to run more than once, and on a database that is already seeded (the
+    live one): an article that already has a country keeps it, and a sample
+    whose title already exists is skipped.
+    """
+    import re
+    from sqlalchemy import func
+
+    tagged = 0
+    for article in Article.query.filter(Article.country_code.is_(None)).all():
+        code = COUNTRY_OF_HEADLINE.get(re.sub(r" \(\d+\)$", "", article.title))
+        if code:
+            article.country_code = code
+            tagged += 1
+
+    sections = {c.name: c for c in Category.query.filter_by(deleted_at=None)}
+    people = {u.email: u for u in User.query.filter(User.deleted_at.is_(None))}
+    admin = people["admin@newsrelease.test"]
+    # Each sample is approved by the editor who covers its section.
+    editor_for: dict[int, int] = {}
+    for row in EditorCategory.query.order_by(EditorCategory.id):
+        editor_for.setdefault(row.category_id, row.editor_id)
+
+    now = utcnow()
+    added = 0
+    writers = set()
+    for n, (code, section, email, title, summary, paragraphs) in enumerate(COUNTRY_SAMPLES):
+        if Article.query.filter_by(title=title).first():
+            continue
+        writer = people[email]
+        category = sections[section]
+        published_at = now - timedelta(days=n + 1, hours=(n * 5) % 20)
+        article = Article(
+            contributor_id=writer.id,
+            category_id=category.id,
+            country_code=code,
+            title=title,
+            slug=slugify(title),
+            summary=summary,
+            body="".join(f"<p>{p}</p>" for p in paragraphs),
+            tags="regional,analysis",
+            status=ArticleStatus.PUBLISHED,
+            published_at=published_at,
+            submitted_at=published_at - timedelta(hours=6),
+            reviewed_by_id=editor_for.get(category.id, admin.id),
+            view_count=150 + (n * 97) % 1800,
+        )
+        db.session.add(article)
+        db.session.flush()
+        article.slug = slugify(title, article.id)
+        for i in range(SAMPLE_SOURCES.get(email, 1)):
+            db.session.add(ArticleSource(
+                article_id=article.id,
+                url=f"https://example.org/source/{article.id}/{i}",
+                label=f"Primary source {i + 1}",
+            ))
+        writers.add(writer)
+        added += 1
+
+    db.session.flush()
+    for writer in writers:
+        rescore_contributor_articles(writer)
+    db.session.commit()
+
+    print(f"Countries: tagged {tagged} existing article(s), added {added} sample(s).")
+    rows = (
+        db.session.query(Article.country_code, func.count())
+        .filter(Article.status == ArticleStatus.PUBLISHED)
+        .group_by(Article.country_code)
+        .all()
+    )
+    for code, count in sorted(rows, key=lambda r: -r[1]):
+        print(f"  {code or 'international':<14} {count} published")
 
 
 def reset() -> None:
@@ -264,7 +574,13 @@ def seed() -> None:
             status=status,
             published_at=published_at,
             submitted_at=published_at or now,
-            reviewed_by_id=editor_a.id if status == ArticleStatus.PUBLISHED else None,
+            # Approved by the editor who covers the section, so the "Approved
+            # by" line agrees with the assignments above.
+            reviewed_by_id=(
+                {"Technology": editor_a, "Science": editor_a,
+                 "Politics": editor_b, "Business": editor_b}.get(category.name, admin).id
+                if status == ArticleStatus.PUBLISHED else None
+            ),
             is_premium=(index % 7 == 0),
             view_count=random.randint(40, 4000),
         )
@@ -345,6 +661,7 @@ def seed() -> None:
         rescore_contributor_articles(contributor)
 
     db.session.commit()
+    seed_countries()
 
     print("Seeded.")
     print(f"  categories   {len(categories)}")
@@ -380,6 +697,9 @@ if __name__ == "__main__":
     app = create_app()
     with app.app_context():
         require_schema()
+        if "--countries" in sys.argv:
+            seed_countries()
+            sys.exit(0)
         if "--reset" in sys.argv:
             reset()
         seed()

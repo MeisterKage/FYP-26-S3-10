@@ -186,6 +186,9 @@ class Article(TimestampMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     contributor_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), index=True)
+    #: ISO 3166-1 alpha-2 code of the country the article is about (app.countries).
+    #: NULL means international, or not about any single country.
+    country_code: Mapped[str | None] = mapped_column(String(2), index=True)
 
     title: Mapped[str] = mapped_column(String(255))
     slug: Mapped[str] = mapped_column(String(280), unique=True, index=True)

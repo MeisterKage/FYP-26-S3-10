@@ -760,3 +760,40 @@
     justify-content: start;
   }
 }
+
+/* --- countries -------------------------------------------------------------
+   A directory, so a grid of equal cells is right here: every country is the
+   same kind of thing, and the count is the only figure. */
+
+.country-grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  list-style: none;
+  padding: 0;
+}
+.country-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-5);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  text-decoration: none;
+  transition: border-color var(--fast) var(--ease);
+}
+.country-card:hover,
+.country-card:focus-visible {
+  border-color: var(--quiet);
+}
+.country-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.chip-count {
+  margin-left: var(--s-2);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
