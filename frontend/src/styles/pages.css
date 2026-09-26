@@ -1034,8 +1034,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   gap: var(--s-5);
-  padding-block: var(--s-5);
-  border-block: 1px solid var(--hair);
+  padding-bottom: var(--s-5);
+  /* The page header above already draws the top rule. */
+  border-bottom: 1px solid var(--hair);
 }
 .digest-stats dd {
   margin: var(--s-2) 0 0;
@@ -1131,5 +1132,8 @@
     grid-column: 2;
     grid-row: auto;
     text-align: left;
+  }
+  .digest-list .digest-entry.entry--media > .entry-thumb {
+    max-width: 12rem;
   }
 }
