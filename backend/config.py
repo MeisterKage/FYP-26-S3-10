@@ -37,6 +37,10 @@ class Config:
     # PRD 5.1 Security: "passwords of at least 12 characters"
     MIN_PASSWORD_LENGTH = 12
 
+    # Largest request body Flask will read: a 5 MB image plus multipart
+    # overhead. Anything bigger is refused with 413 before it is buffered.
+    MAX_CONTENT_LENGTH = 6 * 1024 * 1024
+
     # Rate-limit counters. In-process memory is correct for development and a
     # single-process demo, but it resets on restart and is not shared between
     # workers -- so a multi-worker deployment gives each worker its own budget.

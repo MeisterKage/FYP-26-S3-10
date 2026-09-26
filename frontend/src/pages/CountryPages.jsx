@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { api } from "../api";
+import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
 
@@ -182,7 +183,8 @@ export function CountryPage() {
         {data && data.articles.length > 0 && (
           <div className="index">
             {data.articles.map((a) => (
-              <article className="entry" key={a.id}>
+              <article className={`entry${a.coverImage ? " entry--media" : ""}`} key={a.id}>
+                <EntryThumb image={a.coverImage} />
                 <div className="entry-main">
                   <h3 className="entry-title">
                     <Link className="link-quiet" to={`/articles/${a.slug}`}>

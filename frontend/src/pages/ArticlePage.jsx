@@ -20,6 +20,7 @@ import {
   CredibilityMeter,
 } from "../components/Credibility";
 import ArticleExtras from "../components/ArticleExtras";
+import { CoverFigure } from "../components/CoverImage";
 import Corrections from "../components/Corrections";
 import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
@@ -130,6 +131,7 @@ export default function ArticlePage() {
 
       <div className="article-grid">
         <div className="article-body">
+          <CoverFigure image={article.coverImage} priority />
           {article.paywalled ? (
             <>
               <div className="prose">

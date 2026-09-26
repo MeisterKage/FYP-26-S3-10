@@ -23,6 +23,7 @@ import {
   CredibilityLedger,
   CredibilityMeter,
 } from "../components/Credibility";
+import { CoverFigure } from "../components/CoverImage";
 import { SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
 
@@ -210,6 +211,16 @@ function Submission({ article, selected, onToggle, onDone, onError }) {
         {article.summary && <p className="entry-summary mt-4">{article.summary}</p>}
 
         <PriorityNote priority={article.priority} />
+
+        {/* The image is part of what is being approved: an editor checks it
+            shows what the credit says, and that the credit is plausible. */}
+        {article.coverImage && (
+          <div className="review-cover mt-5">
+            <p className="label">Cover image</p>
+            <CoverFigure image={article.coverImage} className="mt-3" />
+            <p className="meta mt-2">Described as: {article.coverImage.alt || "no description"}</p>
+          </div>
+        )}
 
         <details className="review-body mt-5">
           <summary>Read the full submission</summary>

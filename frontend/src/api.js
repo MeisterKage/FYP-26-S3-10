@@ -27,6 +27,11 @@ export function setToken(token) {
   }
 }
 
+/** Absolute URL for an image path the API returned, e.g. "/images/<key>.webp". */
+export function imageUrl(path) {
+  return path ? `${BASE}/api${path}` : null;
+}
+
 export class ApiError extends Error {
   constructor(message, status, field) {
     super(message);
@@ -37,7 +42,10 @@ export class ApiError extends Error {
 
 async function request(path, { method = "GET", body, auth = true } = {}) {
   const headers = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  // A file upload is FormData, and the browser must set its own Content-Type
+  // (it carries the multipart boundary). Everything else is JSON.
+  const isForm = body instanceof FormData;
+  if (body !== undefined && !isForm) headers["Content-Type"] = "application/json";
 
   const token = auth ? getToken() : null;
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -45,7 +53,7 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
   const response = await fetch(`${BASE}/api${path}`, {
     method,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined || isForm ? body : JSON.stringify(body),
   });
 
   if (response.status === 204) return null;
@@ -70,6 +78,13 @@ export const api = {
   // DELETE carries a body in one place: removing an account also decides what
   // happens to that account's published articles.
   del: (path, body) => request(path, { method: "DELETE", body }),
+
+  /** Upload one image file. Resolves to { key, url, thumbUrl, width, height }. */
+  uploadImage: (file) => {
+    const form = new FormData();
+    form.append("file", file);
+    return request("/images", { method: "POST", body: form }).then((d) => d.image);
+  },
 
   // Auth is the one group that must work without a token.
   login: (email, password) =>

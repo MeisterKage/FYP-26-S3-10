@@ -797,3 +797,93 @@
   font-variant-numeric: tabular-nums;
   opacity: 0.7;
 }
+
+/* --- cover images ----------------------------------------------------------
+   The credit sits under the picture in the caption voice, the way a source
+   line sits under a claim. No rounded corners or shadow: it is a photograph
+   on a page, not a card. */
+
+.cover {
+  margin: 0 0 var(--s-6);
+}
+.cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--sunken);
+}
+.cover-credit {
+  margin-top: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+}
+.lead-cover {
+  margin-bottom: var(--s-6);
+}
+.lead-cover img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+.review-cover .cover {
+  max-width: 28rem;
+  margin-bottom: 0;
+}
+
+/* A listing with an image: thumbnail, text, score. */
+.entry--media {
+  grid-template-columns: 9rem minmax(0, 1fr) auto;
+}
+.entry--media > .entry-thumb {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+}
+.entry--media > :not(.entry-thumb):not(.entry-aside) {
+  grid-column: 2;
+}
+.entry--media > .entry-aside {
+  grid-column: 3;
+}
+.entry-thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--sunken);
+}
+
+@media (max-width: 40rem) {
+  .entry--media {
+    grid-template-columns: 6rem minmax(0, 1fr);
+  }
+  .entry--media > .entry-aside {
+    grid-column: 2;
+    grid-row: auto;
+  }
+}
+
+.cover-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.cover-field legend {
+  margin-bottom: var(--s-3);
+}
+.cover-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--s-4);
+}
+.cover-preview img {
+  display: block;
+  width: 20rem;
+  max-width: 100%;
+  height: auto;
+}
+.cover-meta {
+  display: grid;
+  gap: var(--s-4);
+}

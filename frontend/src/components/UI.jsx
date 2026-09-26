@@ -3,6 +3,8 @@
  */
 import { Link } from "react-router-dom";
 
+import { EntryThumb } from "./CoverImage";
+
 import { AlertIcon, InfoIcon } from "./Icon";
 
 export function Button({
@@ -145,7 +147,8 @@ export function ArticleEntry({ article, aside }) {
   const date = formatDate(article.publishedAt);
 
   return (
-    <article className="entry">
+    <article className={`entry${article.coverImage ? " entry--media" : ""}`}>
+      <EntryThumb image={article.coverImage} />
       <h3 className="entry-title">
         <Link to={`/articles/${article.slug}`}>{article.title}</Link>
       </h3>

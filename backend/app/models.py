@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean, CheckConstraint, DateTime, Enum as SAEnum, Float, ForeignKey,
-    Index, Integer, String, Text, UniqueConstraint,
+    Index, Integer, LargeBinary, String, Text, UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -196,6 +196,13 @@ class Article(TimestampMixin, db.Model):
     #: Sanitised HTML from the rich-text editor. Cleaned on write, never on read.
     body: Mapped[str] = mapped_column(Text)
     cover_image_url: Mapped[str | None] = mapped_column(String(500))
+    #: An uploaded cover image (ArticleImage). Alt text and a credit are
+    #: required before submission: every image states where it came from.
+    cover_image_id: Mapped[int | None] = mapped_column(
+        ForeignKey("article_images.id", ondelete="SET NULL")
+    )
+    cover_image_alt: Mapped[str | None] = mapped_column(String(300))
+    cover_image_credit: Mapped[str | None] = mapped_column(String(300))
     #: Comma-separated. Rule-based search only, no semantic matching (PDD Fig 5.7).
     tags: Mapped[str | None] = mapped_column(String(500))
 
@@ -234,6 +241,7 @@ class Article(TimestampMixin, db.Model):
     )
     #: Whoever approved it, or confirmed it after auto-publish.
     reviewer: Mapped[User | None] = relationship(foreign_keys=[reviewed_by_id])
+    cover_image: Mapped["ArticleImage | None"] = relationship(foreign_keys=[cover_image_id])
     sources: Mapped[list["ArticleSource"]] = relationship(
         back_populates="article", cascade="all, delete-orphan"
     )
@@ -255,6 +263,29 @@ class Article(TimestampMixin, db.Model):
     def awaiting_review(self) -> bool:
         """Published by the system, and no editor has confirmed it yet."""
         return self.auto_published_at is not None and self.review_confirmed_at is None
+
+
+class ArticleImage(db.Model):
+    """An uploaded image, stored already processed (app/images.py).
+
+    Held in the database rather than a storage bucket so it works with nothing
+    extra to provision. Only modules/images.py reads or writes these rows, so
+    moving to object storage later changes that one module.
+
+    `key` is the public identifier: random, so an image attached to an
+    unpublished draft cannot be found by counting upward through ids.
+    """
+
+    __tablename__ = "article_images"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    width: Mapped[int] = mapped_column(Integer)
+    height: Mapped[int] = mapped_column(Integer)
+    large: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
+    thumb: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class ArticleRevision(db.Model):

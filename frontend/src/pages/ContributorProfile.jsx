@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { api } from "../api";
+import { EntryThumb } from "../components/CoverImage";
 import { useAuth } from "../auth";
 import { AccuracyRate, CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
@@ -138,7 +139,8 @@ export default function ContributorProfile() {
         ) : (
           <div className="index">
             {data.articles.map((a) => (
-              <article className="entry" key={a.id}>
+              <article className={`entry${a.coverImage ? " entry--media" : ""}`} key={a.id}>
+                <EntryThumb image={a.coverImage} />
                 <div className="entry-main">
                   <h3 className="entry-title">
                     <Link className="link-quiet" to={`/articles/${a.slug}`}>

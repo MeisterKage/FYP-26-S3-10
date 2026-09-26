@@ -66,6 +66,13 @@ def register_cli(app) -> None:
         sent = dispatch_pending(limit=limit)
         click.echo(f"Dispatched {sent} notification(s).")
 
+    @app.cli.command("prune-images")
+    def prune_images():
+        """Delete uploaded images never attached to an article within a day."""
+        from .modules.images import prune_orphans
+
+        click.echo(f"Removed {prune_orphans()} unattached image(s).")
+
     @app.cli.command("autopublish-backlog")
     def autopublish_backlog():
         """Publish eligible articles while the review queue is overloaded.

@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { api } from "../api";
+import { CoverFigure } from "../components/CoverImage";
 import { useAuth } from "../auth";
 import { AccuracyRate, CredibilityInline, CredibilityMeter } from "../components/Credibility";
 import { ArrowIcon } from "../components/Icon";
@@ -31,6 +32,7 @@ function Lead({ article }) {
   return (
     <article className="lead-article">
       <div className="lead-body">
+        <CoverFigure image={article.coverImage} priority className="lead-cover" />
         <h1 className="display">
           <Link className="link" to={`/articles/${article.slug}`}>
             {article.title}

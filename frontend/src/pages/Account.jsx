@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { api } from "../api";
+import { EntryThumb } from "../components/CoverImage";
 import { CAN_AUTHOR, ROLES, useAuth } from "../auth";
 import { CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Field, Notice, SectionHead, formatDate } from "../components/UI";
@@ -151,7 +152,8 @@ function ReadingList() {
   return (
     <div className="index">
       {data.articles.map((a) => (
-        <article className="entry" key={a.id}>
+        <article className={`entry${a.coverImage ? " entry--media" : ""}`} key={a.id}>
+          <EntryThumb image={a.coverImage} />
           <div className="entry-main">
             <h3 className="entry-title">
               <Link className="link-quiet" to={`/articles/${a.slug}`}>

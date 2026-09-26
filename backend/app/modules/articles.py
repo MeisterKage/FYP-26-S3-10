@@ -25,6 +25,7 @@ from ..enums import AUTHORING_ROLES, ArticleStatus, Role
 from ..errors import ApiError
 from ..extensions import db
 from ..countries import country_name, normalise as normalise_country
+from .images import find_attachable, image_urls
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
 from ..scoring_service import rescore_article
@@ -75,6 +76,56 @@ def _country(data: dict) -> str | None:
         raise ApiError("Choose a country from the list.", status=422, field="countryCode")
 
 
+def _apply_cover(article: Article, data: dict) -> None:
+    """Attach, replace or remove the cover image, and set its alt text and credit.
+
+    `coverImage` is an image key from POST /images, or null to remove it. Only
+    an image this writer uploaded can be attached.
+    """
+    if "coverImage" in data:
+        key = data["coverImage"]
+        if key is None or key == "":
+            article.cover_image_id = None
+        elif not isinstance(key, str):
+            raise ApiError("'coverImage' must be an image key.", status=422, field="coverImage")
+        else:
+            article.cover_image_id = find_attachable(key, g.current_user).id
+    if "coverImageAlt" in data:
+        alt = require_str(data, "coverImageAlt", max_length=300, allow_empty=True, default=None)
+        article.cover_image_alt = clean_plain_text(alt or "") or None
+    if "coverImageCredit" in data:
+        credit = require_str(
+            data, "coverImageCredit", max_length=300, allow_empty=True, default=None
+        )
+        article.cover_image_credit = clean_plain_text(credit or "") or None
+
+
+def _require_image_provenance(article: Article) -> None:
+    """An image goes out with a description and a stated source, or not at all.
+
+    Alt text is what a blind reader gets instead of the picture. The credit is
+    the image's source, the same standard this platform holds claims to.
+    """
+    if article.cover_image_id is None:
+        return
+    if not article.cover_image_alt:
+        raise ApiError("Describe the image for readers who cannot see it.",
+                       status=422, field="coverImageAlt")
+    if not article.cover_image_credit:
+        raise ApiError("Say who took the image or where it came from.",
+                       status=422, field="coverImageCredit")
+
+
+def _cover(article: Article) -> dict | None:
+    if article.cover_image is None:
+        return None
+    return {
+        **image_urls(article.cover_image),
+        "alt": article.cover_image_alt,
+        "credit": article.cover_image_credit,
+    }
+
+
 def _reviewer(article: Article) -> dict | None:
     """Who vouched for this article, for the "Approved by" line.
 
@@ -116,6 +167,7 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
             if article.country_code else None
         ),
         "coverImageUrl": article.cover_image_url,
+        "coverImage": _cover(article),
         "tags": [t for t in (article.tags or "").split(",") if t],
         "publishedAt": article.published_at.isoformat() if article.published_at else None,
         "submittedAt": article.submitted_at.isoformat() if article.submitted_at else None,
@@ -225,6 +277,7 @@ def create_article():
     # Slug needs the id to guarantee uniqueness across identical titles.
     article.slug = slugify(title, article.id)
     _replace_sources(article, require_list(data, "sources", default=None, max_items=MAX_SOURCES))
+    _apply_cover(article, data)
 
     db.session.commit()
     return jsonify(serialize(article, viewer=g.current_user)), 201
@@ -279,6 +332,10 @@ def update_article(article_id: int):
         article.category_id = category.id
     if "countryCode" in data:
         article.country_code = _country(data)
+    _apply_cover(article, data)
+    if article.status == ArticleStatus.PUBLISHED:
+        # A live article never shows an image without its description and source.
+        _require_image_provenance(article)
     if "sources" in data:
         _replace_sources(article, require_list(data, "sources", max_items=MAX_SOURCES))
         # Source count is a scoring input, so the score moves with it.
@@ -301,6 +358,7 @@ def submit_article(article_id: int):
         )
     if not article.body.strip():
         raise ApiError("Add some content before submitting.", status=422, field="body")
+    _require_image_provenance(article)
 
     article.status = ArticleStatus.PENDING
     article.submitted_at = utcnow()

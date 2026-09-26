@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { api, ApiError } from "../api";
+import { CoverImageField } from "../components/CoverImage";
 import { SourceIcon } from "../components/Icon";
 import RichText from "../components/RichText";
 import { Button, Field, Notice, SectionHead, formatDate } from "../components/UI";
@@ -103,6 +104,8 @@ export default function ArticleEditor() {
 
   const [form, setForm] = useState(BLANK);
   const [sources, setSources] = useState([]);
+  // { image: {key, url, thumbUrl, width, height} | null, alt, credit }
+  const [cover, setCover] = useState({ image: null, alt: "", credit: "" });
   const [categories, setCategories] = useState([]);
   const [countries, setCountries] = useState([]);
   const [status, setStatus] = useState("draft");
@@ -153,6 +156,11 @@ export default function ArticleEditor() {
           isPremium: Boolean(found.isPremium),
         });
         setSources((found.sources || []).map((s) => ({ url: s.url, label: s.label || "" })));
+        setCover({
+          image: found.coverImage || null,
+          alt: found.coverImage?.alt || "",
+          credit: found.coverImage?.credit || "",
+        });
         setLoading(false);
       })
       .catch((e) => {
@@ -182,6 +190,9 @@ export default function ArticleEditor() {
       body: form.body,
       categoryId: Number(form.categoryId),
       countryCode: form.countryCode || null,
+      coverImage: cover.image?.key || null,
+      coverImageAlt: cover.alt,
+      coverImageCredit: cover.credit,
       isPremium: form.isPremium,
       tags: form.tags
         .split(",")
@@ -190,7 +201,7 @@ export default function ArticleEditor() {
         .slice(0, MAX_TAGS),
       sources: sources.filter((s) => s.url.trim()),
     }),
-    [form, sources],
+    [form, sources, cover],
   );
 
   const validSources = payload.sources.filter((s) =>
@@ -438,6 +449,18 @@ export default function ArticleEditor() {
             </select>
           )}
         </Field>
+
+        <CoverImageField
+          value={cover.image}
+          alt={cover.alt}
+          credit={cover.credit}
+          disabled={!editable}
+          errors={fieldError}
+          onChange={(change) => {
+            setCover((c) => ({ ...c, ...change }));
+            setFieldError((f) => ({ ...f, coverImageAlt: undefined, coverImageCredit: undefined }));
+          }}
+        />
 
         <Field
           label="Article"
