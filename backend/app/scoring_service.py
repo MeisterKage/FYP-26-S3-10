@@ -23,13 +23,21 @@ def load_settings() -> dict[str, float]:
     return {row.key: row.value for row in PlatformSetting.query.all()}
 
 
+#: Articles that count towards a writer's record: everything that was ever
+#: published. UNPUBLISHED is included on purpose. Leaving it out meant a writer
+#: could unpublish a corrected article and watch their accuracy rate go back up,
+#: so a correction could be laundered away. Once published, an article stays on
+#: the record, and so does anything logged against it.
+RECORD_STATUSES = (ArticleStatus.PUBLISHED, ArticleStatus.RETRACTED, ArticleStatus.UNPUBLISHED)
+
+
 def _published_counts(contributor_id: int) -> tuple[int, int]:
-    """(published articles, of which corrected or retracted)."""
+    """(articles on the writer's record, of which corrected or retracted)."""
     published = (
         db.session.query(func.count(Article.id))
         .filter(
             Article.contributor_id == contributor_id,
-            Article.status.in_([ArticleStatus.PUBLISHED, ArticleStatus.RETRACTED]),
+            Article.status.in_(RECORD_STATUSES),
         )
         .scalar()
         or 0
@@ -42,7 +50,7 @@ def _published_counts(contributor_id: int) -> tuple[int, int]:
         .outerjoin(Correction, Correction.article_id == Article.id)
         .filter(
             Article.contributor_id == contributor_id,
-            Article.status.in_([ArticleStatus.PUBLISHED, ArticleStatus.RETRACTED]),
+            Article.status.in_(RECORD_STATUSES),
             db.or_(
                 Article.status == ArticleStatus.RETRACTED,
                 Correction.overturned_at.is_(None) & Correction.id.isnot(None),
@@ -53,6 +61,31 @@ def _published_counts(contributor_id: int) -> tuple[int, int]:
     )
 
     return published, blemished
+
+
+def _is_blemished(article: Article) -> bool:
+    """Counted as corrected or retracted in the writer's record."""
+    if article.status not in RECORD_STATUSES:
+        return False
+    return article.status == ArticleStatus.RETRACTED or any(
+        c.overturned_at is None for c in article.corrections
+    )
+
+
+def _accuracy_input(article: Article, cfg: dict) -> float:
+    """The accuracy figure one article's score is built from.
+
+    The writer's record, minus this article's own correction or retraction.
+    That one is already charged to this article directly, as the correction or
+    retraction penalty. Counting it again through the accuracy input charged the
+    corrected article twice: a correction cost it about 18 points rather than
+    the stated 15. Every other article by the writer still carries the lower
+    accuracy, which is the intended effect of a correction on a track record.
+    """
+    published, blemished = _published_counts(article.contributor_id)
+    if _is_blemished(article):
+        blemished = max(0, blemished - 1)
+    return credibility.smoothed_accuracy(published, blemished, cfg)
 
 
 def recalculate_accuracy(contributor: User, settings: dict | None = None) -> float | None:
@@ -78,8 +111,7 @@ def rescore_article(article: Article, settings: dict | None = None):
     # uses the same curve without that cutoff, so a contributor crossing the
     # minimum does not shift their whole back catalogue in one step.
     published_rate = recalculate_accuracy(article.contributor, cfg)
-    published, blemished = _published_counts(article.contributor_id)
-    accuracy = credibility.smoothed_accuracy(published, blemished, cfg)
+    accuracy = _accuracy_input(article, cfg)
 
     valid_sources = sum(1 for s in article.sources if s.is_valid)
     corrections = sum(1 for c in article.corrections if c.overturned_at is None)
@@ -116,7 +148,7 @@ def explain_article(article: Article, settings: dict | None = None):
     cfg = settings if settings is not None else load_settings()
 
     published, blemished = _published_counts(article.contributor_id)
-    accuracy = credibility.smoothed_accuracy(published, blemished, cfg)
+    accuracy = _accuracy_input(article, cfg)
 
     upheld = (
         db.session.query(func.count(Report.id))
