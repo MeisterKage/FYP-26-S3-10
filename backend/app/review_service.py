@@ -68,6 +68,7 @@ def priority_for(article: Article, settings: dict, now: datetime) -> triage.Prio
         source_count=valid_source_count(article),
         has_duplicate_title=has_duplicate_title(article),
         hours_waiting=hours_since(article.submitted_at, now),
+        similarity_percent=article.originality_percent,
         settings=settings,
     )
 
@@ -151,6 +152,11 @@ def confirm_article(article: Article, *, reviewer_id: int, now: datetime) -> Non
 
 def eligibility_for(article: Article, settings: dict, now: datetime) -> triage.Eligibility:
     published, _ = _published_counts(article.contributor_id)
+    if article.originality_percent is None:
+        # Submitted before checking existed, or never checked: check now,
+        # rather than let an unchecked article through or hold it forever.
+        from .originality_service import check
+        check(article, settings=settings, now=now)
     return triage.autopublish_eligibility(
         contributor_accuracy=article.contributor.accuracy_rate,
         published_count=published,
@@ -158,6 +164,7 @@ def eligibility_for(article: Article, settings: dict, now: datetime) -> triage.E
         source_count=valid_source_count(article),
         has_duplicate_title=has_duplicate_title(article),
         is_premium=article.is_premium,
+        similarity_percent=article.originality_percent,
         settings=settings,
     )
 

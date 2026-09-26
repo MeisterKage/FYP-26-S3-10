@@ -41,6 +41,10 @@ class Config:
     # overhead. Anything bigger is refused with 413 before it is buffered.
     MAX_CONTENT_LENGTH = 6 * 1024 * 1024
 
+    # Whether originality checks fetch the pages an article cites. On in every
+    # real deployment; off in tests, which must not depend on the network.
+    ORIGINALITY_FETCH_SOURCES = True
+
     # Rate-limit counters. In-process memory is correct for development and a
     # single-process demo, but it resets on restart and is not shared between
     # workers -- so a multi-worker deployment gives each worker its own budget.
@@ -50,6 +54,7 @@ class Config:
 
 class TestConfig(Config):
     TESTING = True
+    ORIGINALITY_FETCH_SOURCES = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:")
     SQLALCHEMY_ENGINE_OPTIONS = {}
     # Off by default: the suite signs in repeatedly and would trip its own

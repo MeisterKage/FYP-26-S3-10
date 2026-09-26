@@ -20,7 +20,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from sqlalchemy import (
-    Boolean, CheckConstraint, DateTime, Enum as SAEnum, Float, ForeignKey,
+    BigInteger, Boolean, CheckConstraint, DateTime, Enum as SAEnum, Float, ForeignKey,
     Index, Integer, LargeBinary, String, Text, UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -236,6 +236,13 @@ class Article(TimestampMixin, db.Model):
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     like_count: Mapped[int] = mapped_column(Integer, default=0)
 
+    #: Latest originality check (app/originality_service.py). The percentage is
+    #: kept as a column because review ordering and auto-publish read it; the
+    #: full report with matched passages is JSON, read only by the report view.
+    originality_percent: Mapped[float | None] = mapped_column(Float)
+    originality_report: Mapped[str | None] = mapped_column(Text, deferred=True)
+    originality_checked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
     contributor: Mapped[User] = relationship(
         back_populates="articles", foreign_keys=[contributor_id]
     )
@@ -263,6 +270,45 @@ class Article(TimestampMixin, db.Model):
     def awaiting_review(self) -> bool:
         """Published by the system, and no editor has confirmed it yet."""
         return self.auto_published_at is not None and self.review_confirmed_at is None
+
+
+class ArticleFingerprint(db.Model):
+    """One winnowed fingerprint of an article's text (app/originality.py).
+
+    The index a submission is looked up against: one query for the submission's
+    hashes returns every article sharing a passage with it, without reading any
+    article body. Rewritten whenever an article's text changes.
+    """
+
+    __tablename__ = "article_fingerprints"
+    __table_args__ = (Index("ix_article_fingerprints_hash", "hash"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("articles.id", ondelete="CASCADE"), index=True
+    )
+    hash: Mapped[int] = mapped_column(BigInteger)
+    position: Mapped[int] = mapped_column(Integer)
+
+
+class SourceSnapshot(db.Model):
+    """The text of a cited page as it was when last checked.
+
+    A cache, so re-checking an article does not re-fetch every source, and a
+    record: if a page later changes, what it said when the article was checked
+    is still here.
+    """
+
+    __tablename__ = "source_snapshots"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    url_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    url: Mapped[str] = mapped_column(String(1000))
+    #: "ok", or "unavailable" with the reason in `error`.
+    status: Mapped[str] = mapped_column(String(20))
+    error: Mapped[str | None] = mapped_column(String(300))
+    text: Mapped[str | None] = mapped_column(Text, deferred=True)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class ArticleImage(db.Model):

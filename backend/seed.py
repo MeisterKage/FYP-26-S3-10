@@ -9,6 +9,7 @@ corrections, and reports.
     py seed.py           # then load demo data
     py seed.py --reset   # empty the tables and reload
     py seed.py --countries   # tag countries and add samples to existing data
+    py seed.py --originality # distinct demo bodies, index, and a planted copy
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
 deployment anyone else can reach.
@@ -31,6 +32,7 @@ from app.models import (
 from app.modules.articles import slugify
 from app.scoring_service import rescore_contributor_articles
 from app.security import hash_password
+from demo_bodies import body_for
 
 DEMO_PASSWORD = "DemoPassword123!"
 
@@ -108,21 +110,9 @@ assert len(HEADLINES) >= ARTICLE_COUNT, (
     "add more headlines rather than letting the seed repeat them."
 )
 
-BODY = (
-    "<p>{lede}</p>"
-    "<p>The change follows a period of consultation with affected parties, "
-    "including industry representatives, academic reviewers, and members of the "
-    "public who submitted feedback during the review window.</p>"
-    "<h3>What changes</h3>"
-    "<p>Officials confirmed the measures take effect at the start of the next "
-    "quarter. Existing arrangements remain valid until then, and no immediate "
-    "action is required from those already compliant.</p>"
-    "<p>Analysts noted the practical impact will depend on enforcement, which has "
-    "historically varied between jurisdictions.</p>"
-    "<h3>Reaction</h3>"
-    "<p>Responses have been mixed. Supporters point to clearer obligations, while "
-    "critics argue the timeline is short for smaller organisations.</p>"
-)
+# Article text comes from demo_bodies.py: one distinct body per headline. The
+# seed once gave every article the same template, which made every demo article
+# a near-total copy of every other.
 
 
 # ---- countries -------------------------------------------------------------- #
@@ -449,6 +439,92 @@ def seed_countries() -> None:
         print(f"  {code or 'international':<14} {count} published")
 
 
+# ---- originality ------------------------------------------------------------ #
+#
+# One pending submission that copies an existing article and part of a real
+# cited page, so the review queue has a genuine case to show. It also quotes the
+# same page correctly, which the check reports as a verified quote rather than
+# copying.
+PLANTED_COPY = {
+    "title": "New privacy rules give Australians the right to erase their data",
+    "summary": "What the revised privacy framework means for households.",
+    "source": ("https://en.wikipedia.org/wiki/Privacy_Act_1988", "Privacy Act 1988, Wikipedia"),
+    "paragraphs": [
+        # Copied from "Parliament passes revised data protection framework".
+        "Federal parliament has passed a revised privacy framework that gives individuals a "
+        "statutory right to ask organisations to delete personal information they no longer "
+        "need. Businesses with annual turnover above the small business threshold will have "
+        "eighteen months to update their handling practices.",
+        # Copied from the cited page without quotation marks.
+        "The principles govern when and how personal information can be collected by these "
+        "entities. Information can only be collected if it is relevant to the agencies' "
+        "functions.",
+        # Quoted from the cited page, correctly.
+        "As the legislation already provides, “Australians have the right to know why "
+        "information about them is being acquired and who will see the information.”",
+        "Consumer advocates in the Illawarra said they would run sessions at local libraries "
+        "to explain the new rights to older residents.",
+    ],
+}
+
+
+def seed_originality() -> None:
+    """Give demo articles distinct text, build the index, and plant one copy.
+
+    Safe to run more than once and on the live database: only bodies still
+    carrying the old shared template are rewritten, and the planted article is
+    added once. Pending articles are checked so the review queue shows results.
+    """
+    from app.originality_service import check, index_article
+    from app.scoring_service import load_settings
+
+    rewritten = 0
+    for article in Article.query.all():
+        if "The change follows a period of consultation" in (article.body or ""):
+            if article.title in dict.fromkeys(HEADLINES):
+                article.body = body_for(article.title)
+                rewritten += 1
+
+    if not Article.query.filter_by(title=PLANTED_COPY["title"]).first():
+        writer = User.query.filter_by(email="newcontributor@newsrelease.test").one()
+        politics = Category.query.filter_by(name="Politics").one()
+        now = utcnow()
+        copy = Article(
+            contributor_id=writer.id,
+            category_id=politics.id,
+            country_code="AU",
+            title=PLANTED_COPY["title"],
+            slug=slugify(PLANTED_COPY["title"]),
+            summary=PLANTED_COPY["summary"],
+            body="".join(f"<p>{p}</p>" for p in PLANTED_COPY["paragraphs"]),
+            tags="privacy,policy",
+            status=ArticleStatus.PENDING,
+            submitted_at=now - timedelta(hours=3),
+        )
+        db.session.add(copy)
+        db.session.flush()
+        copy.slug = slugify(copy.title, copy.id)
+        url, label = PLANTED_COPY["source"]
+        db.session.add(ArticleSource(article_id=copy.id, url=url, label=label))
+
+    db.session.flush()
+    articles = Article.query.all()
+    for article in articles:
+        index_article(article)
+    db.session.flush()
+
+    settings = load_settings()
+    checked = []
+    for article in Article.query.filter_by(status=ArticleStatus.PENDING):
+        report = check(article, settings=settings)
+        checked.append((article.title, report["percent"], report["level"]))
+    db.session.commit()
+
+    print(f"Originality: rewrote {rewritten} template bodies, indexed {len(articles)} articles.")
+    for title, percent, level in checked:
+        print(f"  pending {percent:5.1f}% {level:<12} {title}")
+
+
 def reset() -> None:
     """Empty every table, keeping the schema and the Alembic revision intact.
 
@@ -582,7 +658,7 @@ def seed() -> None:
             title=headline,
             slug=slugify(headline, index + 1),
             summary=f"{headline}. What the change means and who it affects.",
-            body=BODY.format(lede=f"{headline}, according to a statement issued this week."),
+            body=body_for(headline),
             tags=",".join(random.sample(
                 ["policy", "analysis", "explainer", "data", "regional", "industry"], 3
             )),
@@ -677,6 +753,7 @@ def seed() -> None:
 
     db.session.commit()
     seed_countries()
+    seed_originality()
 
     print("Seeded.")
     print(f"  categories   {len(categories)}")
@@ -714,6 +791,9 @@ if __name__ == "__main__":
         require_schema()
         if "--countries" in sys.argv:
             seed_countries()
+            sys.exit(0)
+        if "--originality" in sys.argv:
+            seed_originality()
             sys.exit(0)
         if "--reset" in sys.argv:
             reset()

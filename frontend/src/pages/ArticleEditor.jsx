@@ -14,6 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { api, ApiError } from "../api";
 import { CoverImageField } from "../components/CoverImage";
+import { OriginalityCheck } from "../components/Originality";
 import { SourceIcon } from "../components/Icon";
 import RichText from "../components/RichText";
 import { Button, Field, Notice, SectionHead, formatDate } from "../components/UI";
@@ -496,6 +497,20 @@ export default function ArticleEditor() {
             <SourceRows sources={sources} onChange={setSources} disabled={!editable} />
           </div>
         </section>
+
+        {editable && (
+          <section className="section mt-7">
+            <SectionHead title="Originality" />
+            <p className="field-hint">
+              Runs automatically when you submit, and your editor sees the result. Check
+              first so nothing surprises you. Quotations are never counted as copying.
+            </p>
+            <div className="mt-4">
+              {/* Saves first: the check reads what is stored, not the form. */}
+              <OriginalityCheck beforeCheck={persist} />
+            </div>
+          </section>
+        )}
 
         <Field
           label="Tags"

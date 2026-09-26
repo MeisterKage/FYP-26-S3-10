@@ -40,6 +40,8 @@ Revocation (in the service layer) is what makes that expensive.
 """
 from dataclasses import dataclass, field
 
+from .originality import DEFAULTS as ORIGINALITY_DEFAULTS
+
 #: Shipped defaults. Admin overrides live in PlatformSetting rows keyed by these
 #: same names. Kept apart from credibility.DEFAULTS so the scoring engine stays
 #: about scoring; the admin endpoint validates against the union of the two.
@@ -51,6 +53,11 @@ DEFAULTS: dict[str, float] = {
     "triage_expected_sources": 3,           # sourcing below this adds priority
     "triage_missing_source_weight": 10.0,   # per missing source
     "triage_duplicate_weight": 30.0,        # title matches another article
+    # Text matching elsewhere, scaled by how much: 50% overlap adds 30, 100%
+    # adds 60, as much as a new writer and an unsourced article combined.
+    # Applied only at or above originality_flag_percent.
+    "triage_similarity_weight": 60.0,
+    **ORIGINALITY_DEFAULTS,
     "triage_wait_weight": 0.1,              # per hour waiting: 2.4 a day, see below
     # ---- auto-publish valve ----
     "autopublish_enabled": 0,               # 0 = off, 1 = on. Off by default.
@@ -76,6 +83,7 @@ class PriorityBreakdown:
     sources: float
     duplicate: float
     waiting: float
+    similarity: float = 0.0
 
     def as_dict(self) -> dict:
         return {
@@ -85,6 +93,7 @@ class PriorityBreakdown:
                 "accuracy": self.accuracy,
                 "sources": self.sources,
                 "duplicate": self.duplicate,
+                "similarity": self.similarity,
                 "waiting": self.waiting,
             },
         }
@@ -108,6 +117,7 @@ def review_priority(
     source_count: int,
     has_duplicate_title: bool,
     hours_waiting: float,
+    similarity_percent: float | None = None,
     settings: dict | None = None,
 ) -> PriorityBreakdown:
     """Rank one pending article. Pure: the caller supplies the wait time.
@@ -133,7 +143,13 @@ def review_priority(
     duplicate = float(cfg["triage_duplicate_weight"]) if has_duplicate_title else 0.0
     waiting = float(cfg["triage_wait_weight"]) * max(0.0, hours_waiting)
 
-    total = new_contributor + accuracy + sources + duplicate + waiting
+    percent = similarity_percent or 0.0
+    similarity = (
+        float(cfg["triage_similarity_weight"]) * percent / 100.0
+        if percent >= float(cfg["originality_flag_percent"]) else 0.0
+    )
+
+    total = new_contributor + accuracy + sources + duplicate + waiting + similarity
     return PriorityBreakdown(
         priority=round(total, 2),
         new_contributor=round(new_contributor, 2),
@@ -141,6 +157,7 @@ def review_priority(
         sources=round(sources, 2),
         duplicate=round(duplicate, 2),
         waiting=round(waiting, 2),
+        similarity=round(similarity, 2),
     )
 
 
@@ -168,6 +185,7 @@ def autopublish_eligibility(
     source_count: int,
     has_duplicate_title: bool,
     is_premium: bool,
+    similarity_percent: float | None = 0.0,
     settings: dict | None = None,
 ) -> Eligibility:
     """May this one article skip review? Returns every failing rule, not the first.
@@ -192,6 +210,12 @@ def autopublish_eligibility(
         reasons.append("no verified source tagged")
     if has_duplicate_title:
         reasons.append("title matches another article")
+    if similarity_percent is None:
+        reasons.append("originality has not been checked")
+    elif similarity_percent >= float(cfg["originality_flag_percent"]):
+        # Anything flagged waits for a person. Auto-publish is for articles
+        # with nothing to judge, and matching text is always a judgement.
+        reasons.append("text matches another article or a cited source")
     if is_premium:
         # A reader who is paying gets an article a human has read.
         reasons.append("premium articles always need an editor")

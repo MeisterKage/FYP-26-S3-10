@@ -21,7 +21,11 @@ services:
     # configured limits are multiplied by the worker count. One worker keeps
     # deployed behaviour identical to what tests/test_rate_limit.py verifies.
     # Raise this only alongside RATELIMIT_STORAGE_URI pointing at Redis.
-    startCommand: gunicorn --workers 1 --timeout 60 wsgi:app
+    # Threads, by contrast, share the one process and its limiter, so they add
+    # concurrency without multiplying the limits. They matter because an
+    # originality check waits several seconds on cited pages; with one thread
+    # that wait would stall every other visitor.
+    startCommand: gunicorn --workers 1 --threads 4 --timeout 60 wsgi:app
     healthCheckPath: /api/scoring/formula
     envVars:
       - key: PYTHON_VERSION

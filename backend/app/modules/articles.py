@@ -26,9 +26,10 @@ from ..errors import ApiError
 from ..extensions import db
 from ..countries import country_name, normalise as normalise_country
 from .images import find_attachable, image_urls
+from ..originality_service import check as check_originality, index_article, summary as originality_summary
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
-from ..scoring_service import rescore_article
+from ..scoring_service import load_settings, rescore_article
 from ..security import login_required, roles_required
 from ..validation import json_body, require_int, require_list, require_str
 
@@ -213,11 +214,15 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         ],
     }
 
+    is_author = viewer is not None and viewer.id == article.contributor_id
+    privileged = viewer is not None and viewer.role in {Role.EDITOR, Role.SYSTEM_ADMIN}
+    if is_author or privileged:
+        # An editorial tool, never shown to readers.
+        payload["originality"] = originality_summary(article)
+
     if not include_body:
         return payload
 
-    is_author = viewer is not None and viewer.id == article.contributor_id
-    privileged = viewer is not None and viewer.role in {Role.EDITOR, Role.SYSTEM_ADMIN}
     may_read_premium = (
         not article.is_premium
         or is_author
@@ -278,6 +283,7 @@ def create_article():
     article.slug = slugify(title, article.id)
     _replace_sources(article, require_list(data, "sources", default=None, max_items=MAX_SOURCES))
     _apply_cover(article, data)
+    index_article(article)
 
     db.session.commit()
     return jsonify(serialize(article, viewer=g.current_user)), 201
@@ -320,6 +326,11 @@ def update_article(article_id: int):
         article.summary = clean_plain_text(summary)[:500] or None
     if "body" in data:
         article.body = clean_article_body(require_str(data, "body", allow_empty=True))
+        index_article(article)
+        # The last report described different text.
+        article.originality_percent = None
+        article.originality_report = None
+        article.originality_checked_at = None
     if "isPremium" in data:
         article.is_premium = bool(data["isPremium"])
     if "tags" in data:
@@ -359,6 +370,11 @@ def submit_article(article_id: int):
     if not article.body.strip():
         raise ApiError("Add some content before submitting.", status=422, field="body")
     _require_image_provenance(article)
+
+    # Every submission reaches the editor with its originality report. It
+    # informs the review; it never blocks the submission, because quoting
+    # heavily or updating one's own earlier story can be entirely proper.
+    check_originality(article, settings=load_settings())
 
     article.status = ArticleStatus.PENDING
     article.submitted_at = utcnow()

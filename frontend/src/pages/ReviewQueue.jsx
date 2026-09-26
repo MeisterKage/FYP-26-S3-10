@@ -24,6 +24,7 @@ import {
   CredibilityMeter,
 } from "../components/Credibility";
 import { CoverFigure } from "../components/CoverImage";
+import { StoredOriginality } from "../components/Originality";
 import { SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
 
@@ -84,6 +85,7 @@ const PRIORITY_LABELS = {
   accuracy: "Writer accuracy below the baseline",
   sources: "Fewer sources than expected",
   duplicate: "Title matches another article",
+  similarity: "Text matches another article or a cited source",
   waiting: "Time spent waiting",
 };
 
@@ -221,6 +223,8 @@ function Submission({ article, selected, onToggle, onDone, onError }) {
             <p className="meta mt-2">Described as: {article.coverImage.alt || "no description"}</p>
           </div>
         )}
+
+        <StoredOriginality articleId={article.id} summary={article.originality} />
 
         <details className="review-body mt-5">
           <summary>Read the full submission</summary>

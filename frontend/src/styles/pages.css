@@ -887,3 +887,108 @@
   display: grid;
   gap: var(--s-4);
 }
+
+/* --- originality report ----------------------------------------------------
+   The figure leads, the evidence follows. Matched text is marked the way a
+   sub-editor marks a proof: a tint behind the words, not a colour change. */
+
+.orig-head {
+  display: flex;
+  gap: var(--s-5);
+  align-items: flex-start;
+}
+.orig-percent {
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 5.5rem;
+}
+.orig-percent--substantial {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+.orig-matches,
+.orig-passages,
+.orig-sources,
+.orig-quotes {
+  list-style: none;
+  padding: 0;
+}
+.orig-match {
+  padding-block: var(--s-4);
+  border-top: 1px solid var(--hair);
+}
+.orig-match-head {
+  display: flex;
+  gap: var(--s-4);
+  align-items: baseline;
+}
+.orig-match-percent {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 3rem;
+  color: var(--ink);
+}
+.orig-toggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: var(--t-caption);
+  cursor: pointer;
+  color: var(--quiet);
+  text-decoration: underline;
+}
+.orig-passages > li + li {
+  margin-top: var(--s-4);
+}
+.orig-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-4);
+}
+.orig-passages blockquote {
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  background: var(--paper);
+  border-left: 2px solid var(--hair);
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+  line-height: 1.55;
+}
+.orig-passages mark {
+  background: var(--sunken);
+  color: var(--ink);
+  box-decoration-break: clone;
+  padding: 0 0.1em;
+}
+.orig-quotes li + li,
+.orig-sources li + li {
+  margin-top: var(--s-2);
+}
+.orig-badge {
+  margin-left: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+}
+.orig-badge--partial,
+.orig-badge--substantial {
+  color: var(--ink);
+  font-weight: 600;
+}
+.review-originality > summary {
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+}
+
+@media (max-width: 40rem) {
+  .orig-pair {
+    grid-template-columns: 1fr;
+  }
+}

@@ -45,11 +45,12 @@ def create_app(config_object=Config) -> Flask:
     from .modules.admin import bp as admin_bp
     from .modules.editors import bp as editors_bp
     from .modules.images import bp as images_bp
+    from .modules.originality import bp as originality_bp
 
     for blueprint in (
         auth_bp, users_bp, articles_bp, review_bp, discovery_bp,
         engagement_bp, moderation_bp, notifications_bp, subscriptions_bp, admin_bp,
-        editors_bp, images_bp,
+        editors_bp, images_bp, originality_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
 

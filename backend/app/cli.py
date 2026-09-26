@@ -66,6 +66,17 @@ def register_cli(app) -> None:
         sent = dispatch_pending(limit=limit)
         click.echo(f"Dispatched {sent} notification(s).")
 
+    @app.cli.command("index-originality")
+    def index_originality():
+        """Rebuild every article's originality fingerprints.
+
+        Needed once after the originality migration, and after any change to
+        how text is normalised in app/originality.py.
+        """
+        from .originality_service import reindex_all
+
+        click.echo(f"Indexed {reindex_all()} article(s).")
+
     @app.cli.command("prune-images")
     def prune_images():
         """Delete uploaded images never attached to an article within a day."""
