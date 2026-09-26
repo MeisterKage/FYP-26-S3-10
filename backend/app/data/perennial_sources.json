@@ -1,0 +1,3057 @@
+{
+ "source": "https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources",
+ "license": "CC BY-SA 4.0",
+ "retrieved": "2026-09-26",
+ "revisions": {
+  "Wikipedia:Reliable sources/Perennial sources/1": 1362380199,
+  "Wikipedia:Reliable sources/Perennial sources/2": 1376325166,
+  "Wikipedia:Reliable sources/Perennial sources/3": 1369127299,
+  "Wikipedia:Reliable sources/Perennial sources/4": 1369128252,
+  "Wikipedia:Reliable sources/Perennial sources/5": 1370597655,
+  "Wikipedia:Reliable sources/Perennial sources/6": 1373937193,
+  "Wikipedia:Reliable sources/Perennial sources/7": 1376226918,
+  "Wikipedia:Reliable sources/Perennial sources/8": 1373937352,
+  "Wikipedia:Reliable sources/Perennial sources/9": 1333867350
+ },
+ "statuses": {
+  "gr": "generally reliable",
+  "nc": "no consensus",
+  "gu": "generally unreliable",
+  "d": "deprecated",
+  "b": "blacklisted"
+ },
+ "domains": {
+  "112.international": {
+   "name": "112 Ukraine",
+   "status": "gu"
+  },
+  "112.ua": {
+   "name": "112 Ukraine",
+   "status": "gu"
+  },
+  "aa.com.tr": {
+   "name": "Anadolu Agency",
+   "status": "nc"
+  },
+  "abcnews.com": {
+   "name": "ABC News",
+   "status": "gr"
+  },
+  "abcnews.go.com": {
+   "name": "ABC News",
+   "status": "gr"
+  },
+  "about.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "academia.edu": {
+   "name": "Academic repositories",
+   "status": "nc"
+  },
+  "acclaimedmusic.net": {
+   "name": "Acclaimed Music",
+   "status": "gu"
+  },
+  "actualidad-rt.com": {
+   "name": "RT",
+   "status": "d"
+  },
+  "adfontesmedia.com": {
+   "name": "Ad Fontes Media",
+   "status": "gu"
+  },
+  "adl.org": {
+   "name": "Anti-Defamation League",
+   "status": "gr"
+  },
+  "afp.com": {
+   "name": "Agence France-Presse",
+   "status": "gr"
+  },
+  "alarabiya.net": {
+   "name": "Al Arabiya",
+   "status": "nc"
+  },
+  "alexa.com": {
+   "name": "Alexa Internet",
+   "status": "nc"
+  },
+  "aljazeera.com": {
+   "name": "Al Jazeera",
+   "status": "gr"
+  },
+  "aljazeera.net": {
+   "name": "Al Jazeera",
+   "status": "gr"
+  },
+  "allgame.com": {
+   "name": "RhythmOne",
+   "status": "nc"
+  },
+  "allmovie.com": {
+   "name": "AllMovie",
+   "status": "gu"
+  },
+  "allmusic.com": {
+   "name": "RhythmOne",
+   "status": "nc"
+  },
+  "allsides.com": {
+   "name": "AllSides",
+   "status": "nc"
+  },
+  "almanar.com.lb": {
+   "name": "Al-Manar",
+   "status": "nc"
+  },
+  "almayadeen.net": {
+   "name": "Al Mayadeen",
+   "status": "d"
+  },
+  "almayadeen.tv": {
+   "name": "Al Mayadeen",
+   "status": "d"
+  },
+  "alternet.org": {
+   "name": "AlterNet",
+   "status": "gu"
+  },
+  "amazon.ca": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.cn": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.co.jp": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.co.uk": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.com": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.com.au": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.com.br": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.com.mx": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.com.sg": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.com.tr": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.de": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.es": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.fr": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.in": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.it": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amazon.nl": {
+   "name": "Amazon",
+   "status": "gu"
+  },
+  "amnesty.org": {
+   "name": "Amnesty International",
+   "status": "gr"
+  },
+  "ancestry.com": {
+   "name": "Ancestry.com",
+   "status": "gu"
+  },
+  "aninews.in": {
+   "name": "Asian News International",
+   "status": "nc"
+  },
+  "anna-news.info": {
+   "name": "ANNA News",
+   "status": "d"
+  },
+  "anphoblacht.com": {
+   "name": "An Phoblacht",
+   "status": "gu"
+  },
+  "answers.com": {
+   "name": "Answers.com",
+   "status": "gu"
+  },
+  "antiwar.com": {
+   "name": "Antiwar.com",
+   "status": "gu"
+  },
+  "antiwar.org": {
+   "name": "Antiwar.com",
+   "status": "gu"
+  },
+  "antwerpen-indymedia.be": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "aon.com": {
+   "name": "Aon",
+   "status": "gr"
+  },
+  "ap.org": {
+   "name": "Associated Press",
+   "status": "gr"
+  },
+  "api.parliament.uk": {
+   "name": "Hansard",
+   "status": "nc"
+  },
+  "apnews.com": {
+   "name": "Associated Press",
+   "status": "gr"
+  },
+  "arabnews.com": {
+   "name": "Arab News",
+   "status": "nc"
+  },
+  "armeniasputnik.am": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "armyrecognition.com": {
+   "name": "Army Recognition",
+   "status": "gu"
+  },
+  "arstechnica.co.uk": {
+   "name": "Ars Technica",
+   "status": "gr"
+  },
+  "arstechnica.com": {
+   "name": "Ars Technica",
+   "status": "gr"
+  },
+  "arxiv.org": {
+   "name": "Preprints",
+   "status": "gu"
+  },
+  "askmen.com": {
+   "name": "AskMen",
+   "status": "nc"
+  },
+  "askubuntu.com": {
+   "name": "Stack Exchange",
+   "status": "gu"
+  },
+  "aspi.org.au": {
+   "name": "Asian News International",
+   "status": "nc"
+  },
+  "astronautix.com": {
+   "name": "Encyclopedia Astronautica",
+   "status": "nc"
+  },
+  "atlasobscura.com": {
+   "name": "Atlas Obscura places",
+   "status": "gu"
+  },
+  "avclub.com": {
+   "name": "The A.V. Club",
+   "status": "gr"
+  },
+  "avn.com": {
+   "name": "AVN",
+   "status": "gr"
+  },
+  "axios.com": {
+   "name": "Axios",
+   "status": "gr"
+  },
+  "b.baidu.com": {
+   "name": "Baidu Baike",
+   "status": "d"
+  },
+  "baike.baidu.com": {
+   "name": "Baidu Baike",
+   "status": "d"
+  },
+  "baike.baidu.hk": {
+   "name": "Baidu Baike",
+   "status": "d"
+  },
+  "ballotpedia.org": {
+   "name": "Ballotpedia",
+   "status": "gr"
+  },
+  "banned.video": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "bariweiss.substack.com": {
+   "name": "The Free Press (Bari Weiss)",
+   "status": "nc"
+  },
+  "bbc.co.uk": {
+   "name": "BBC",
+   "status": "gr"
+  },
+  "bbc.com": {
+   "name": "BBC",
+   "status": "gr"
+  },
+  "behindthevoiceactors.com": {
+   "name": "Behind the Voice Actors",
+   "status": "gr"
+  },
+  "bellingcat.com": {
+   "name": "Bellingcat",
+   "status": "gr"
+  },
+  "benzinga.com": {
+   "name": "Benzinga",
+   "status": "gu"
+  },
+  "bestgore.com": {
+   "name": "Best Gore",
+   "status": "b"
+  },
+  "biggovernment.com": {
+   "name": "Breitbart News",
+   "status": "b"
+  },
+  "bigmuddyimc.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "bild.de": {
+   "name": "Bild",
+   "status": "gu"
+  },
+  "biorxiv.org": {
+   "name": "Preprints",
+   "status": "gu"
+  },
+  "bitterwinter.org": {
+   "name": "CESNUR",
+   "status": "gu"
+  },
+  "blogspot.com": {
+   "name": "Blogger",
+   "status": "gu"
+  },
+  "bloomberg.com": {
+   "name": "Bloomberg",
+   "status": "gr"
+  },
+  "boingboing.net": {
+   "name": "Boing Boing",
+   "status": "nc"
+  },
+  "breitbart.com": {
+   "name": "Breitbart News",
+   "status": "b"
+  },
+  "britannica.com": {
+   "name": "Encyclopædia Britannica",
+   "status": "nc"
+  },
+  "broadwayworld.com": {
+   "name": "BroadwayWorld",
+   "status": "gu"
+  },
+  "burkespeerage.com": {
+   "name": "Burke's Peerage",
+   "status": "gr"
+  },
+  "businessinsider.com": {
+   "name": "Business Insider",
+   "status": "nc"
+  },
+  "businessweek.com": {
+   "name": "Bloomberg",
+   "status": "gr"
+  },
+  "bustle.com": {
+   "name": "Bustle",
+   "status": "nc"
+  },
+  "buzzfeed.com": {
+   "name": "BuzzFeed",
+   "status": "nc"
+  },
+  "buzzfeednews.com": {
+   "name": "BuzzFeed News",
+   "status": "gr"
+  },
+  "californiaglobe.com": {
+   "name": "BuzzFeed News",
+   "status": "gr"
+  },
+  "catalyst-journal.com": {
+   "name": "Jacobin",
+   "status": "nc"
+  },
+  "catholic-hierarchy.org": {
+   "name": "Catholic-Hierarchy.org",
+   "status": "gu"
+  },
+  "cato.org": {
+   "name": "Cato Institute",
+   "status": "nc"
+  },
+  "cbn.com": {
+   "name": "Christian Broadcasting Network",
+   "status": "nc"
+  },
+  "cbsnews.com": {
+   "name": "Cato Institute",
+   "status": "nc"
+  },
+  "celebritynetworth.com": {
+   "name": "CelebrityNetWorth",
+   "status": "gu"
+  },
+  "cepr.net": {
+   "name": "Center for Economic and Policy Research",
+   "status": "nc"
+  },
+  "cesnur.net": {
+   "name": "CESNUR",
+   "status": "gu"
+  },
+  "cesnur.org": {
+   "name": "CESNUR",
+   "status": "gu"
+  },
+  "cgtn.com": {
+   "name": "China Global Television Network",
+   "status": "d"
+  },
+  "change.org": {
+   "name": "Change.org",
+   "status": "b"
+  },
+  "channelnewsasia.com": {
+   "name": "CNA",
+   "status": "gr"
+  },
+  "checkyourfact.com": {
+   "name": "Check Your Fact",
+   "status": "gr"
+  },
+  "chinadaily.com.cn": {
+   "name": "China Daily",
+   "status": "nc"
+  },
+  "chinadailyasia.com": {
+   "name": "China Daily",
+   "status": "nc"
+  },
+  "chinadailyhk.com": {
+   "name": "China Daily",
+   "status": "nc"
+  },
+  "cinemos.com": {
+   "name": "Rate Your Music",
+   "status": "d"
+  },
+  "climatefeedback.org": {
+   "name": "Climate Feedback",
+   "status": "gr"
+  },
+  "cnet.com": {
+   "name": "CNET (pre-October 2020)",
+   "status": "gr"
+  },
+  "cnn.com": {
+   "name": "CNN",
+   "status": "gr"
+  },
+  "cnsnews.com": {
+   "name": "Media Research Center",
+   "status": "gu"
+  },
+  "codastory.com": {
+   "name": "Coda Media",
+   "status": "gr"
+  },
+  "coindesk.com": {
+   "name": "CoinDesk",
+   "status": "gu"
+  },
+  "commonsensemedia.org": {
+   "name": "Common Sense Media",
+   "status": "gr"
+  },
+  "company-histories.com": {
+   "name": "Advameg",
+   "status": "b"
+  },
+  "conservativereview.com": {
+   "name": "Blaze Media",
+   "status": "gu"
+  },
+  "consortiumnews.com": {
+   "name": "Consortium News",
+   "status": "gu"
+  },
+  "correodelorinoco.gob.ve": {
+   "name": "Correo del Orinoco",
+   "status": "gu"
+  },
+  "cosmopolitan.com": {
+   "name": "Cosmopolitan",
+   "status": "nc"
+  },
+  "council.rollingstone.com": {
+   "name": "Rolling Stone (Culture Council)",
+   "status": "gu"
+  },
+  "counterpunch.com": {
+   "name": "CounterPunch",
+   "status": "gu"
+  },
+  "counterpunch.org": {
+   "name": "CounterPunch",
+   "status": "gu"
+  },
+  "cracked.com": {
+   "name": "Cracked.com",
+   "status": "gu"
+  },
+  "crunchbase.com": {
+   "name": "Crunchbase",
+   "status": "d"
+  },
+  "crwflags.com": {
+   "name": "Flags of the World",
+   "status": "gu"
+  },
+  "csmonitor.com": {
+   "name": "The Christian Science Monitor",
+   "status": "gr"
+  },
+  "dailycaller.com": {
+   "name": "The Daily Caller",
+   "status": "d"
+  },
+  "dailycallernewsfoundation.org": {
+   "name": "The Daily Caller",
+   "status": "d"
+  },
+  "dailydot.com": {
+   "name": "The Daily Dot",
+   "status": "nc"
+  },
+  "dailykos.com": {
+   "name": "Daily Kos",
+   "status": "gu"
+  },
+  "dailym.ai": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "dailymail.co.uk": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "dailymail.com": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "dailymail.com.au": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "dailynk.com": {
+   "name": "Daily NK",
+   "status": "nc"
+  },
+  "dailysabah.com": {
+   "name": "Daily_Sabah",
+   "status": "gu"
+  },
+  "dailystar.co.uk": {
+   "name": "Daily Star",
+   "status": "d"
+  },
+  "dailywire.com": {
+   "name": "The Daily Wire",
+   "status": "gu"
+  },
+  "deadline.com": {
+   "name": "Deadline Hollywood",
+   "status": "gr"
+  },
+  "deadlinehollywooddaily.com": {
+   "name": "Deadline Hollywood",
+   "status": "gr"
+  },
+  "debretts.com": {
+   "name": "Debrett's",
+   "status": "gr"
+  },
+  "decider.com": {
+   "name": "New York Post Entertainment",
+   "status": "nc"
+  },
+  "democracynow.org": {
+   "name": "Democracy Now!",
+   "status": "nc"
+  },
+  "denofgeek.com": {
+   "name": "Den of Geek",
+   "status": "gr"
+  },
+  "deseret.com": {
+   "name": "Deseret News",
+   "status": "gr"
+  },
+  "deseretnews.com": {
+   "name": "Deseret News",
+   "status": "gr"
+  },
+  "destructoid.com": {
+   "name": "Destructoid",
+   "status": "nc"
+  },
+  "deviantart.com": {
+   "name": "DeviantArt",
+   "status": "gu"
+  },
+  "dexerto.com": {
+   "name": "Dexerto",
+   "status": "gu"
+  },
+  "dexerto.es": {
+   "name": "Dexerto",
+   "status": "gu"
+  },
+  "dexerto.fr": {
+   "name": "Dexerto",
+   "status": "gu"
+  },
+  "digitalspy.co.uk": {
+   "name": "Digital Spy",
+   "status": "gr"
+  },
+  "digitalspy.com": {
+   "name": "Digital Spy",
+   "status": "gr"
+  },
+  "digitaltrends.com": {
+   "name": "Digital Trends",
+   "status": "gr"
+  },
+  "discogs.com": {
+   "name": "Discogs",
+   "status": "gu"
+  },
+  "distractify.com": {
+   "name": "Distractify",
+   "status": "gu"
+  },
+  "dorchesterreview.ca": {
+   "name": "The Dorchester Review",
+   "status": "gu"
+  },
+  "dreamteamfc.com": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "dw.com": {
+   "name": "Deutsche Welle",
+   "status": "gr"
+  },
+  "eadaily.com": {
+   "name": "EurAsia Daily",
+   "status": "d"
+  },
+  "economist.com": {
+   "name": "The Economist",
+   "status": "gr"
+  },
+  "electronicintifada.net": {
+   "name": "The Electronic Intifada",
+   "status": "gu"
+  },
+  "encyclopedia.com": {
+   "name": "Encyclopedia.com",
+   "status": "nc"
+  },
+  "engadget.com": {
+   "name": "Engadget",
+   "status": "gr"
+  },
+  "entrepreneur.com": {
+   "name": "Entrepreneur",
+   "status": "nc"
+  },
+  "epoch-archive.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epoch.org.il": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes-romania.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.co.il": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.co.kr": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.cz": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.de": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.fr": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.it": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.ru": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "epochtimes.se": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "ethnicelebs.com": {
+   "name": "Ethnicity of Celebs",
+   "status": "gu"
+  },
+  "etindonesia.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "eurasiantimes.com": {
+   "name": "The EurAsian Times",
+   "status": "gu"
+  },
+  "eurogamer.cz": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "eurogamer.de": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "eurogamer.es": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "eurogamer.net": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "eurogamer.nl": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "eurogamer.pl": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "eurogamer.pt": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "euromedmonitor.org": {
+   "name": "Euro-Med",
+   "status": "nc"
+  },
+  "ew.com": {
+   "name": "Entertainment Weekly",
+   "status": "gr"
+  },
+  "examiner.com": {
+   "name": "Examiner.com",
+   "status": "b"
+  },
+  "express.co.uk": {
+   "name": "Daily Express",
+   "status": "gu"
+  },
+  "facebook.com": {
+   "name": "Facebook",
+   "status": "gu"
+  },
+  "fair.org": {
+   "name": "Fairness and Accuracy in Reporting",
+   "status": "nc"
+  },
+  "familysearch.org": {
+   "name": "FamilySearch",
+   "status": "gu"
+  },
+  "famousbirthdays.com": {
+   "name": "Famous Birthdays",
+   "status": "b"
+  },
+  "fandom.com": {
+   "name": "Fandom",
+   "status": "gu"
+  },
+  "faroutmagazine.co.uk": {
+   "name": "Far Out",
+   "status": "gu"
+  },
+  "filmaffinity.com": {
+   "name": "FilmAffinity",
+   "status": "gu"
+  },
+  "findagrave.com": {
+   "name": "Find a Grave",
+   "status": "gu"
+  },
+  "findmypast.co.uk": {
+   "name": "Findmypast",
+   "status": "gu"
+  },
+  "findmypast.com": {
+   "name": "Findmypast",
+   "status": "gu"
+  },
+  "flickr.com": {
+   "name": "Flickr",
+   "status": "gu"
+  },
+  "forbes.com": {
+   "name": "Forbes",
+   "status": "nc"
+  },
+  "fotw.info": {
+   "name": "Flags of the World",
+   "status": "gu"
+  },
+  "foxbusiness.com": {
+   "name": "Fox News",
+   "status": "nc"
+  },
+  "foxnews.com": {
+   "name": "Fox News",
+   "status": "nc"
+  },
+  "freebeacon.com": {
+   "name": "The Washington Free Beacon 2012-2018",
+   "status": "gu"
+  },
+  "frontpagemag.com": {
+   "name": "FrontPage Magazine",
+   "status": "d"
+  },
+  "frontpagemagazine.com": {
+   "name": "FrontPage Magazine",
+   "status": "d"
+  },
+  "ft.com": {
+   "name": "Financial Times",
+   "status": "gr"
+  },
+  "fundinguniverse.com": {
+   "name": "Advameg",
+   "status": "b"
+  },
+  "gamasutra.com": {
+   "name": "Game Developer",
+   "status": "gr"
+  },
+  "gamedeveloper.com": {
+   "name": "Game Developer",
+   "status": "gr"
+  },
+  "gameinformer.com": {
+   "name": "Game Informer",
+   "status": "gr"
+  },
+  "gamepedia.com": {
+   "name": "Fandom",
+   "status": "gu"
+  },
+  "gamerankings.com": {
+   "name": "Metacritic",
+   "status": "gr"
+  },
+  "gamespot.co.uk": {
+   "name": "GameSpot",
+   "status": "gr"
+  },
+  "gamespot.com": {
+   "name": "GameSpot",
+   "status": "gr"
+  },
+  "gawker.com": {
+   "name": "Gawker",
+   "status": "gu"
+  },
+  "gbnews.com": {
+   "name": "GB News",
+   "status": "gu"
+  },
+  "gbnews.uk": {
+   "name": "GB News",
+   "status": "gu"
+  },
+  "genealogy.eu": {
+   "name": "Genealogy.eu",
+   "status": "d"
+  },
+  "genealogy.euweb.cz": {
+   "name": "Genealogy.eu",
+   "status": "d"
+  },
+  "geni.com": {
+   "name": "Geni.com",
+   "status": "d"
+  },
+  "genius.com": {
+   "name": "Genius",
+   "status": "nc"
+  },
+  "geonames.nga.mil": {
+   "name": "gns-coord",
+   "status": "nc"
+  },
+  "geonames.usgs.gov": {
+   "name": "gnis-coord",
+   "status": "gr"
+  },
+  "gizmodo.com": {
+   "name": "Gizmodo",
+   "status": "gr"
+  },
+  "glaad.org": {
+   "name": "GLAAD",
+   "status": "gr"
+  },
+  "glitchwave.com": {
+   "name": "Rate Your Music",
+   "status": "d"
+  },
+  "globalreligiousfutures.org": {
+   "name": "Association of Religion Data Archives",
+   "status": "nc"
+  },
+  "globalresearch.ca": {
+   "name": "Centre for Research on Globalization",
+   "status": "b"
+  },
+  "globalresearch.org": {
+   "name": "Centre for Research on Globalization",
+   "status": "b"
+  },
+  "globalsecurity.org": {
+   "name": "GlobalSecurity.org",
+   "status": "gu"
+  },
+  "globaltimes.cn": {
+   "name": "Global Times",
+   "status": "d"
+  },
+  "gofundme.com": {
+   "name": "GoFundMe",
+   "status": "b"
+  },
+  "goodreads.com": {
+   "name": "Goodreads",
+   "status": "gu"
+  },
+  "google.com": {
+   "name": "Google Maps",
+   "status": "nc"
+  },
+  "gordonconwell.edu": {
+   "name": "Association of Religion Data Archives",
+   "status": "nc"
+  },
+  "gq-magazine.co.uk": {
+   "name": "GQ",
+   "status": "gr"
+  },
+  "gq.com": {
+   "name": "GQ",
+   "status": "gr"
+  },
+  "grubstreet.com": {
+   "name": "New York",
+   "status": "gr"
+  },
+  "guardian.co.uk": {
+   "name": "The Guardian",
+   "status": "gr"
+  },
+  "guinnessworldrecords.com": {
+   "name": "Guinness World Records",
+   "status": "nc"
+  },
+  "haaretz.co.il": {
+   "name": "Haaretz",
+   "status": "gr"
+  },
+  "haaretz.com": {
+   "name": "Haaretz",
+   "status": "gr"
+  },
+  "hansard.millbanksystems.com": {
+   "name": "Hansard",
+   "status": "nc"
+  },
+  "hansard.parliament.uk": {
+   "name": "Hansard",
+   "status": "nc"
+  },
+  "hardcoregaming101.net": {
+   "name": "Hardcore Gaming 101",
+   "status": "gr"
+  },
+  "healthline.com": {
+   "name": "Healthline",
+   "status": "b"
+  },
+  "heatst.com": {
+   "name": "Heat Street",
+   "status": "gu"
+  },
+  "heavy.com": {
+   "name": "Heavy.com",
+   "status": "nc"
+  },
+  "heritage.org": {
+   "name": "The Heritage Foundation",
+   "status": "b"
+  },
+  "hispantv.com": {
+   "name": "HispanTV",
+   "status": "d"
+  },
+  "hispantv.ir": {
+   "name": "HispanTV",
+   "status": "d"
+  },
+  "history.com": {
+   "name": "History",
+   "status": "gu"
+  },
+  "hk.appledaily.com": {
+   "name": "Apple Daily",
+   "status": "nc"
+  },
+  "hollywoodreporter.com": {
+   "name": "The Hollywood Reporter",
+   "status": "gr"
+  },
+  "hopenothate.org.uk": {
+   "name": "Hope not Hate",
+   "status": "gr"
+  },
+  "huanqiu.com": {
+   "name": "Global Times",
+   "status": "d"
+  },
+  "huffingtonpost.ca": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.co.uk": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.com": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.com.au": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.com.mx": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.de": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.es": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.fr": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.gr": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.in": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.it": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.jp": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffingtonpost.kr": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffpost.com": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffpostbrasil.com": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "huffpostmaghreb.com": {
+   "name": "HuffPost",
+   "status": "gr"
+  },
+  "humanevents.com": {
+   "name": "Human Events",
+   "status": "nc"
+  },
+  "ibtimes.co.in": {
+   "name": "International Business Times",
+   "status": "gu"
+  },
+  "ibtimes.co.uk": {
+   "name": "International Business Times",
+   "status": "gu"
+  },
+  "ibtimes.com": {
+   "name": "International Business Times",
+   "status": "gu"
+  },
+  "ibtimes.com.au": {
+   "name": "International Business Times",
+   "status": "gu"
+  },
+  "ibtimes.com.cn": {
+   "name": "International Business Times",
+   "status": "gu"
+  },
+  "ibtimes.sg": {
+   "name": "International Business Times",
+   "status": "gu"
+  },
+  "idolator.com": {
+   "name": "Idolator",
+   "status": "gr"
+  },
+  "ifcncodeofprinciples.poynter.org": {
+   "name": "International Fact-Checking Network",
+   "status": "gr"
+  },
+  "ign.com": {
+   "name": "IGN",
+   "status": "gr"
+  },
+  "ijr.com": {
+   "name": "Independent Journal Review",
+   "status": "nc"
+  },
+  "imc-africa.mayfirst.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "imdb.com": {
+   "name": "IMDb",
+   "status": "gu"
+  },
+  "inaturalist.org": {
+   "name": "iNaturalist",
+   "status": "gu"
+  },
+  "independent.co.uk": {
+   "name": "The Independent",
+   "status": "gr"
+  },
+  "indianexpress.com": {
+   "name": "The Indian Express",
+   "status": "gr"
+  },
+  "indiegogo.com": {
+   "name": "Indiegogo",
+   "status": "b"
+  },
+  "indybay.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymedia.ie": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymedia.nl": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymedia.no": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymedia.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymedia.org.uk": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymedia.us": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "indymediapr.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "infowars.com": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "infowars.net": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "infowars.tv": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "inquisitr.com": {
+   "name": "Inquisitr",
+   "status": "gu"
+  },
+  "insider.com": {
+   "name": "Business Insider",
+   "status": "nc"
+  },
+  "instagram.com": {
+   "name": "Instagram",
+   "status": "gu"
+  },
+  "investopedia.com": {
+   "name": "Investopedia",
+   "status": "gu"
+  },
+  "ipscuba.net": {
+   "name": "Inter Press Service",
+   "status": "gr"
+  },
+  "ipsnews.net": {
+   "name": "Inter Press Service",
+   "status": "gr"
+  },
+  "ipsnoticias.net": {
+   "name": "Inter Press Service",
+   "status": "gr"
+  },
+  "iranicaonline.org": {
+   "name": "Encyclopædia Iranica",
+   "status": "gr"
+  },
+  "islamqa.info": {
+   "name": "IslamQA.info",
+   "status": "nc"
+  },
+  "jacobinmag.com": {
+   "name": "Jacobin",
+   "status": "nc"
+  },
+  "jamanetwork.com": {
+   "name": "JAMA",
+   "status": "gr"
+  },
+  "jewishvirtuallibrary.org": {
+   "name": "Jewish Virtual Library",
+   "status": "gu"
+  },
+  "jezebel.com": {
+   "name": "Jezebel",
+   "status": "nc"
+  },
+  "jihadwatch.org": {
+   "name": "Jihad Watch",
+   "status": "d"
+  },
+  "joshuaproject.net": {
+   "name": "Joshua Project",
+   "status": "gu"
+  },
+  "journal-neo.org": {
+   "name": "New Eastern Outlook",
+   "status": "d"
+  },
+  "journalism.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "journalofscientificexploration.org": {
+   "name": "Journal of Scientific Exploration",
+   "status": "d"
+  },
+  "jpost.com": {
+   "name": "The Jerusalem Post",
+   "status": "gr"
+  },
+  "jrank.org": {
+   "name": "JRank",
+   "status": "gu"
+  },
+  "kickstarter.com": {
+   "name": "Kickstarter",
+   "status": "b"
+  },
+  "kirkusreviews.com": {
+   "name": "Kirkus Reviews",
+   "status": "gr"
+  },
+  "knowyourmeme.com": {
+   "name": "Know Your Meme",
+   "status": "gu"
+  },
+  "kommersant.com": {
+   "name": "Kommersant",
+   "status": "gr"
+  },
+  "kommersant.ru": {
+   "name": "Kommersant",
+   "status": "gr"
+  },
+  "kommersant.uk": {
+   "name": "Kommersant",
+   "status": "gr"
+  },
+  "ladbible.com": {
+   "name": "LADbible",
+   "status": "gu"
+  },
+  "landtransportguru.net": {
+   "name": "Land Transport Guru",
+   "status": "gu"
+  },
+  "lapatilla.com": {
+   "name": "La Patilla",
+   "status": "nc"
+  },
+  "last.fm": {
+   "name": "Last.fm",
+   "status": "d"
+  },
+  "latamnews.lat": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "latimes.com": {
+   "name": "Los Angeles Times",
+   "status": "gr"
+  },
+  "lenta.ru": {
+   "name": "Lenta.ru",
+   "status": "b"
+  },
+  "lifesite.net": {
+   "name": "LifeSiteNews",
+   "status": "d"
+  },
+  "lifesitenews.com": {
+   "name": "LifeSiteNews",
+   "status": "d"
+  },
+  "lifewire.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "linkedin.com": {
+   "name": "LinkedIn",
+   "status": "gu"
+  },
+  "lionheartv.net": {
+   "name": "LionhearTV",
+   "status": "gu"
+  },
+  "livejournal.com": {
+   "name": "LiveJournal",
+   "status": "gu"
+  },
+  "liveleak.com": {
+   "name": "LiveLeak",
+   "status": "b"
+  },
+  "lulu.com": {
+   "name": "Lulu.com",
+   "status": "b"
+  },
+  "lwn.net": {
+   "name": "LWN.net",
+   "status": "gr"
+  },
+  "mailonline.pressreader.com": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "mailonsunday.co.uk": {
+   "name": "The Mail on Sunday",
+   "status": "d"
+  },
+  "mailonsunday.com": {
+   "name": "The Mail on Sunday",
+   "status": "d"
+  },
+  "mailplus.co.uk": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "maps.google.com": {
+   "name": "Google Maps",
+   "status": "nc"
+  },
+  "marquiswhoswho.com": {
+   "name": "Marquis Who's Who",
+   "status": "gu"
+  },
+  "martinoticias.com": {
+   "name": "Office of Cuba Broadcasting",
+   "status": "d"
+  },
+  "mashable.com": {
+   "name": "Mashable",
+   "status": "nc"
+  },
+  "mathoverflow.net": {
+   "name": "Stack Exchange",
+   "status": "gu"
+  },
+  "mdpi.com": {
+   "name": "MDPI",
+   "status": "nc"
+  },
+  "meaww.com": {
+   "name": "MEAWW",
+   "status": "gu"
+  },
+  "mediabiasfactcheck.com": {
+   "name": "Media Bias/Fact Check",
+   "status": "gu"
+  },
+  "mediaite.com": {
+   "name": "Mediaite",
+   "status": "nc"
+  },
+  "mediamatters.org": {
+   "name": "Media Matters for America",
+   "status": "nc"
+  },
+  "medium.com": {
+   "name": "Medium",
+   "status": "gu"
+  },
+  "medrxiv.org": {
+   "name": "Preprints",
+   "status": "gu"
+  },
+  "meduza.io": {
+   "name": "Meduza",
+   "status": "gr"
+  },
+  "memri.org": {
+   "name": "Middle East Media Research Institute",
+   "status": "nc"
+  },
+  "memritv.org": {
+   "name": "Middle East Media Research Institute",
+   "status": "nc"
+  },
+  "metacritic.com": {
+   "name": "Metacritic",
+   "status": "gr"
+  },
+  "metal-archives.com": {
+   "name": "Encyclopaedia Metallum",
+   "status": "d"
+  },
+  "metal-experience.com": {
+   "name": "metal-experience",
+   "status": "gu"
+  },
+  "metalsucks.net": {
+   "name": "MetalSucks",
+   "status": "nc"
+  },
+  "metro.co.uk": {
+   "name": "Metro",
+   "status": "gu"
+  },
+  "metro.news": {
+   "name": "Metro",
+   "status": "gu"
+  },
+  "mg.co.za": {
+   "name": "Mail & Guardian",
+   "status": "gr"
+  },
+  "michiganimc.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "middleeastmonitor.com": {
+   "name": "Middle East Monitor",
+   "status": "nc"
+  },
+  "midiaindependente.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "mintpressnews.cn": {
+   "name": "MintPress News",
+   "status": "d"
+  },
+  "mintpressnews.com": {
+   "name": "MintPress News",
+   "status": "d"
+  },
+  "mintpressnews.es": {
+   "name": "MintPress News",
+   "status": "d"
+  },
+  "mintpressnews.ru": {
+   "name": "MintPress News",
+   "status": "d"
+  },
+  "mirror.co.uk": {
+   "name": "Daily Mirror",
+   "status": "nc"
+  },
+  "monde-diplomatique.fr": {
+   "name": "Le Monde diplomatique",
+   "status": "gr"
+  },
+  "mondediplo.com": {
+   "name": "Le Monde diplomatique",
+   "status": "gr"
+  },
+  "mondialisation.ca": {
+   "name": "Centre for Research on Globalization",
+   "status": "b"
+  },
+  "mondoweiss.net": {
+   "name": "Mondoweiss",
+   "status": "nc"
+  },
+  "morningstaronline.co.uk": {
+   "name": "Morning Star",
+   "status": "nc"
+  },
+  "motherjones.com": {
+   "name": "Mother Jones",
+   "status": "gr"
+  },
+  "mrc.org": {
+   "name": "Media Research Center",
+   "status": "gu"
+  },
+  "mrctv.org": {
+   "name": "Media Research Center",
+   "status": "gu"
+  },
+  "msnbc.com": {
+   "name": "MS NOW",
+   "status": "gr"
+  },
+  "mylife.com": {
+   "name": "MyLife",
+   "status": "b"
+  },
+  "nationalenquirer.com": {
+   "name": "National Enquirer",
+   "status": "d"
+  },
+  "nationalfile.com": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "nationalgeographic.com": {
+   "name": "National Geographic",
+   "status": "gr"
+  },
+  "nationalpost.com": {
+   "name": "National Post",
+   "status": "gr"
+  },
+  "nationalreview.com": {
+   "name": "National Review",
+   "status": "nc"
+  },
+  "naturalnews.com": {
+   "name": "Natural News",
+   "status": "b"
+  },
+  "navyrecognition.com": {
+   "name": "Army Recognition",
+   "status": "gu"
+  },
+  "nbcnews.com": {
+   "name": "NBC News",
+   "status": "gr"
+  },
+  "newrepublic.com": {
+   "name": "The New Republic",
+   "status": "gr"
+  },
+  "news-front.info": {
+   "name": "NewsFront",
+   "status": "b"
+  },
+  "news-front.su": {
+   "name": "NewsFront",
+   "status": "b"
+  },
+  "news.cn": {
+   "name": "Xinhua News Agency",
+   "status": "nc"
+  },
+  "news.sky.com": {
+   "name": "Sky News UK",
+   "status": "gr"
+  },
+  "news.yahoo.com": {
+   "name": "Yahoo News",
+   "status": "gr"
+  },
+  "newsblaze.com": {
+   "name": "NewsBlaze",
+   "status": "d"
+  },
+  "newsblaze.com.au": {
+   "name": "NewsBlaze",
+   "status": "d"
+  },
+  "newsbreak.com": {
+   "name": "NewsBreak",
+   "status": "d"
+  },
+  "newsbusters.org": {
+   "name": "Media Research Center",
+   "status": "gu"
+  },
+  "newslaundry.com": {
+   "name": "Newslaundry",
+   "status": "gr"
+  },
+  "newsmax.com": {
+   "name": "Newsmax",
+   "status": "d"
+  },
+  "newsmaxtv.com": {
+   "name": "Newsmax",
+   "status": "d"
+  },
+  "newsnationnow.com": {
+   "name": "NewsNation",
+   "status": "gr"
+  },
+  "newsoftheworld.co.uk": {
+   "name": "News of the World",
+   "status": "d"
+  },
+  "newsoftheworld.com": {
+   "name": "News of the World",
+   "status": "d"
+  },
+  "newstarget.com": {
+   "name": "Natural News",
+   "status": "b"
+  },
+  "newswars.com": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "newsweek.com": {
+   "name": "Newsweek (pre–2013)",
+   "status": "gr"
+  },
+  "newyorker.com": {
+   "name": "The New Yorker",
+   "status": "gr"
+  },
+  "ngo-monitor.org": {
+   "name": "NGO Monitor",
+   "status": "gu"
+  },
+  "nme.com": {
+   "name": "NME",
+   "status": "gr"
+  },
+  "nndb.com": {
+   "name": "NNDB",
+   "status": "d"
+  },
+  "npr.org": {
+   "name": "NPR",
+   "status": "gr"
+  },
+  "nspirement.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "ntd.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "ntdtv.ca": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "ntdtv.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "ntdtv.com.tw": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "nydailynews.com": {
+   "name": "New York Daily News",
+   "status": "gr"
+  },
+  "nymag.com": {
+   "name": "New York",
+   "status": "gr"
+  },
+  "nypost.com": {
+   "name": "New York Post",
+   "status": "gu"
+  },
+  "nytimes.com": {
+   "name": "The New York Times",
+   "status": "gr"
+  },
+  "nzherald.co.nz": {
+   "name": "The New Zealand Herald",
+   "status": "gr"
+  },
+  "oann.com": {
+   "name": "One America News Network",
+   "status": "d"
+  },
+  "occupydemocrats.com": {
+   "name": "Occupy Democrats",
+   "status": "d"
+  },
+  "okeefemediagroup.com": {
+   "name": "Project Veritas",
+   "status": "b"
+  },
+  "oko.press": {
+   "name": "OKO.press",
+   "status": "gr"
+  },
+  "opindia.com": {
+   "name": "OpIndia",
+   "status": "b"
+  },
+  "opindia.in": {
+   "name": "OpIndia",
+   "status": "b"
+  },
+  "order-order.com": {
+   "name": "Guido Fawkes",
+   "status": "gu"
+  },
+  "ourcampaigns.com": {
+   "name": "Our Campaigns",
+   "status": "gu"
+  },
+  "page3.com": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "pagesix.com": {
+   "name": "New York Post",
+   "status": "gu"
+  },
+  "panampost.com": {
+   "name": "PanAm Post",
+   "status": "gu"
+  },
+  "parliament.uk": {
+   "name": "Hansard",
+   "status": "nc"
+  },
+  "patheos.com": {
+   "name": "Patheos",
+   "status": "gu"
+  },
+  "pbs.org": {
+   "name": "Public Broadcasting Service",
+   "status": "gr"
+  },
+  "people-press.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "people.com": {
+   "name": "People",
+   "status": "gr"
+  },
+  "pewforum.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "pewglobal.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "pewhispanic.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "pewinternet.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "pewresearch.org": {
+   "name": "Association of Religion Data Archives",
+   "status": "nc"
+  },
+  "pewsocialtrends.org": {
+   "name": "Pew Research Center",
+   "status": "gr"
+  },
+  "phillyimc.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "pinknews.co.uk": {
+   "name": "PinkNews",
+   "status": "gr"
+  },
+  "pinkvilla.com": {
+   "name": "Pinkvilla",
+   "status": "gu"
+  },
+  "planespotters.net": {
+   "name": "Planespotters",
+   "status": "gu"
+  },
+  "playboy.com": {
+   "name": "Playboy",
+   "status": "gr"
+  },
+  "politico.com": {
+   "name": "Politico",
+   "status": "gr"
+  },
+  "politifact.com": {
+   "name": "PolitiFact",
+   "status": "gr"
+  },
+  "polygon.com": {
+   "name": "Polygon (pre–May 2025)",
+   "status": "gr"
+  },
+  "popularmechanics.com": {
+   "name": "Popular Mechanics",
+   "status": "nc"
+  },
+  "pressreader.com": {
+   "name": "Daily Express",
+   "status": "gu"
+  },
+  "presstv.co.uk": {
+   "name": "Press TV",
+   "status": "d"
+  },
+  "presstv.com": {
+   "name": "Press TV",
+   "status": "d"
+  },
+  "presstv.ir": {
+   "name": "Press TV",
+   "status": "d"
+  },
+  "presstv.tv": {
+   "name": "Press TV",
+   "status": "d"
+  },
+  "pride.com": {
+   "name": "Pride.com",
+   "status": "nc"
+  },
+  "prisonplanet.com": {
+   "name": "Infowars",
+   "status": "b"
+  },
+  "prnewswire.co.uk": {
+   "name": "PR Newswire",
+   "status": "gu"
+  },
+  "prnewswire.com": {
+   "name": "PR Newswire",
+   "status": "gu"
+  },
+  "projectveritas.com": {
+   "name": "Project Veritas",
+   "status": "b"
+  },
+  "propublica.org": {
+   "name": "ProPublica",
+   "status": "gr"
+  },
+  "quackwatch.org": {
+   "name": "Quackwatch",
+   "status": "nc"
+  },
+  "quadrant.org.au": {
+   "name": "Quadrant",
+   "status": "gu"
+  },
+  "quillette.com": {
+   "name": "Quillette",
+   "status": "gu"
+  },
+  "quora.com": {
+   "name": "Quora",
+   "status": "gu"
+  },
+  "radiosputnik.ria.ru": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "rapgenius.com": {
+   "name": "Genius",
+   "status": "nc"
+  },
+  "rappler.com": {
+   "name": "Rappler",
+   "status": "gr"
+  },
+  "rateyourmusic.com": {
+   "name": "Rate Your Music",
+   "status": "d"
+  },
+  "rawstory.com": {
+   "name": "Raw Story",
+   "status": "gu"
+  },
+  "realclearinvestigations.com": {
+   "name": "RealClearPolitics",
+   "status": "nc"
+  },
+  "realclearpolitics.com": {
+   "name": "RealClearPolitics",
+   "status": "nc"
+  },
+  "reason.com": {
+   "name": "Reason",
+   "status": "gr"
+  },
+  "reddit.com": {
+   "name": "Reddit",
+   "status": "gu"
+  },
+  "redfish.media": {
+   "name": "RT",
+   "status": "d"
+  },
+  "redstate.com": {
+   "name": "RedState",
+   "status": "gu"
+  },
+  "referenceworks.brillonline.com": {
+   "name": "WCD-WCE-WRD",
+   "status": "nc"
+  },
+  "refinery29.com": {
+   "name": "Vice Media",
+   "status": "nc"
+  },
+  "religjournal.com": {
+   "name": "Joshua Project",
+   "status": "gu"
+  },
+  "republicbharat.com": {
+   "name": "Republic TV",
+   "status": "d"
+  },
+  "republicworld.com": {
+   "name": "Republic TV",
+   "status": "d"
+  },
+  "researchgate.net": {
+   "name": "Academic repositories",
+   "status": "nc"
+  },
+  "reunion.com": {
+   "name": "MyLife",
+   "status": "b"
+  },
+  "reuters.com": {
+   "name": "Reuters",
+   "status": "gr"
+  },
+  "rfa.org": {
+   "name": "Radio Free Asia",
+   "status": "gr"
+  },
+  "rferl.org": {
+   "name": "Radio Free Europe/Radio Liberty",
+   "status": "nc"
+  },
+  "rian.com.ua": {
+   "name": "RIA Novosti",
+   "status": "nc"
+  },
+  "rian.ru": {
+   "name": "RIA Novosti",
+   "status": "nc"
+  },
+  "rogueimc.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "rollingstone.com": {
+   "name": "Rolling Stone",
+   "status": "gr"
+  },
+  "rottentomatoes.com": {
+   "name": "Rotten Tomatoes",
+   "status": "gr"
+  },
+  "royalcentral.co.uk": {
+   "name": "Royal Central",
+   "status": "d"
+  },
+  "rt.com": {
+   "name": "RT",
+   "status": "d"
+  },
+  "rt.rs": {
+   "name": "RT",
+   "status": "d"
+  },
+  "ruptly.tv": {
+   "name": "RT",
+   "status": "d"
+  },
+  "russiatoday.com": {
+   "name": "RT",
+   "status": "d"
+  },
+  "russiatoday.ru": {
+   "name": "RT",
+   "status": "d"
+  },
+  "salon.com": {
+   "name": "Salon",
+   "status": "nc"
+  },
+  "sarabic.ae": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sciencebasedmedicine.org": {
+   "name": "Science-Based Medicine",
+   "status": "nc"
+  },
+  "scienceblogs.com": {
+   "name": "ScienceBlogs",
+   "status": "nc"
+  },
+  "sciencedirect.com": {
+   "name": "ScienceDirect topic",
+   "status": "gu"
+  },
+  "scientificamerican.com": {
+   "name": "Scientific American",
+   "status": "gr"
+  },
+  "scientificexploration.org": {
+   "name": "Journal of Scientific Exploration",
+   "status": "d"
+  },
+  "scmp.com": {
+   "name": "SCMP",
+   "status": "gr"
+  },
+  "scotusblog.com": {
+   "name": "SCOTUSblog",
+   "status": "gr"
+  },
+  "screenrant.com": {
+   "name": "Screen Rant",
+   "status": "nc"
+  },
+  "scribd.com": {
+   "name": "Scribd",
+   "status": "gu"
+  },
+  "searchlightmagazine.com": {
+   "name": "Hope not Hate",
+   "status": "gr"
+  },
+  "secretchina.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "serverfault.com": {
+   "name": "Stack Exchange",
+   "status": "gu"
+  },
+  "sherdog.com": {
+   "name": "Sherdog",
+   "status": "nc"
+  },
+  "si.com": {
+   "name": "Sports Illustrated (pre-June 2019)",
+   "status": "gr"
+  },
+  "simpleflying.com": {
+   "name": "Simple Flying",
+   "status": "d"
+  },
+  "sixthtone.com": {
+   "name": "Sixth Tone",
+   "status": "gr"
+  },
+  "skepdic.com": {
+   "name": "The Skeptic's Dictionary",
+   "status": "nc"
+  },
+  "skepticalinquirer.org": {
+   "name": "Skeptical Inquirer",
+   "status": "gr"
+  },
+  "skwawkbox.org": {
+   "name": "The Skwawkbox",
+   "status": "gu"
+  },
+  "skynews.com.au": {
+   "name": "Sky News Australia",
+   "status": "nc"
+  },
+  "smh.com.au": {
+   "name": "The Sydney Morning Herald",
+   "status": "gr"
+  },
+  "snopes.com": {
+   "name": "Snopes",
+   "status": "gr"
+  },
+  "socialblade.com": {
+   "name": "Social Blade",
+   "status": "nc"
+  },
+  "sonemic.com": {
+   "name": "Rate Your Music",
+   "status": "d"
+  },
+  "sourcewatch.org": {
+   "name": "SourceWatch",
+   "status": "gu"
+  },
+  "southfront.org": {
+   "name": "SouthFront",
+   "status": "b"
+  },
+  "southfront.press": {
+   "name": "SouthFront",
+   "status": "b"
+  },
+  "space.com": {
+   "name": "Space.com",
+   "status": "gr"
+  },
+  "sparknotes.com": {
+   "name": "SparkNotes",
+   "status": "nc"
+  },
+  "spectator.co.uk": {
+   "name": "The Spectator",
+   "status": "nc"
+  },
+  "spectator.us": {
+   "name": "The Spectator",
+   "status": "nc"
+  },
+  "spiegel.de": {
+   "name": "Der Spiegel",
+   "status": "gr"
+  },
+  "spirit-of-metal.com": {
+   "name": "Spirit of Metal",
+   "status": "gu"
+  },
+  "splcenter.org": {
+   "name": "Southern Poverty Law Center",
+   "status": "gr"
+  },
+  "sportskeeda.com": {
+   "name": "Sportskeeda",
+   "status": "gu"
+  },
+  "sputnik-abkhazia.info": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik-abkhazia.ru": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik-georgia.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik-georgia.ru": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik-ossetia.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik-ossetia.ru": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik-tj.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik.az": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik.by": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik.kg": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik.kz": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnik.md": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnikglobe.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnikmediabank.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews-uz.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.africa": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.cn": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.gr": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.in": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.lat": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.lt": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.ru": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknews.uz": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputniknewslv.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "sputnikportal.rs": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "stackexchange.com": {
+   "name": "Stack Exchange",
+   "status": "gu"
+  },
+  "stackoverflow.com": {
+   "name": "Stack Exchange",
+   "status": "gu"
+  },
+  "standard.co.uk": {
+   "name": "Evening Standard",
+   "status": "nc"
+  },
+  "starsunfolded.com": {
+   "name": "starsunfolded.com",
+   "status": "gu"
+  },
+  "statista.com": {
+   "name": "Statista",
+   "status": "gu"
+  },
+  "straitstimes.com": {
+   "name": "The Straits Times",
+   "status": "gr"
+  },
+  "sunnation.co.uk": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "superuser.com": {
+   "name": "Stack Exchange",
+   "status": "gu"
+  },
+  "swarajyamag.com": {
+   "name": "Swarajya",
+   "status": "b"
+  },
+  "swentr.site": {
+   "name": "RT",
+   "status": "d"
+  },
+  "takimag.com": {
+   "name": "Taki's Magazine",
+   "status": "d"
+  },
+  "tasnimnews.com": {
+   "name": "Tasnim News Agency",
+   "status": "d"
+  },
+  "tasnimnews.ir": {
+   "name": "Tasnim News Agency",
+   "status": "d"
+  },
+  "tass.com": {
+   "name": "TASS",
+   "status": "gu"
+  },
+  "tass.ru": {
+   "name": "TASS",
+   "status": "gu"
+  },
+  "techcrunch.com": {
+   "name": "TechCrunch",
+   "status": "nc"
+  },
+  "ted.com": {
+   "name": "TED",
+   "status": "nc"
+  },
+  "telegraph.co.uk": {
+   "name": "The Daily Telegraph",
+   "status": "gr"
+  },
+  "telesurenglish.net": {
+   "name": "Telesur",
+   "status": "d"
+  },
+  "telesurtv.net": {
+   "name": "Telesur",
+   "status": "d"
+  },
+  "the-sun.com": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "theage.com.au": {
+   "name": "The Age",
+   "status": "gr"
+  },
+  "theamericanconservative.com": {
+   "name": "The American Conservative",
+   "status": "nc"
+  },
+  "thearda.com": {
+   "name": "Association of Religion Data Archives",
+   "status": "nc"
+  },
+  "theatlantic.com": {
+   "name": "The Atlantic",
+   "status": "gr"
+  },
+  "theaustralian.com.au": {
+   "name": "The Australian",
+   "status": "gr"
+  },
+  "thebalance.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "theblaze.com": {
+   "name": "Blaze Media",
+   "status": "gu"
+  },
+  "thecanary.co": {
+   "name": "BuzzFeed News",
+   "status": "gr"
+  },
+  "theconversation.com": {
+   "name": "The Conversation",
+   "status": "gr"
+  },
+  "thecradle.co": {
+   "name": "The Cradle",
+   "status": "d"
+  },
+  "thecut.com": {
+   "name": "New York",
+   "status": "gr"
+  },
+  "thedailybeast.com": {
+   "name": "The Daily Beast",
+   "status": "nc"
+  },
+  "thedebrief.org": {
+   "name": "The Debrief",
+   "status": "d"
+  },
+  "thediplomat.com": {
+   "name": "The Diplomat",
+   "status": "gr"
+  },
+  "theepochtimes.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "thefederalist.com": {
+   "name": "The Federalist",
+   "status": "gu"
+  },
+  "thefp.com": {
+   "name": "The Free Press (Bari Weiss)",
+   "status": "nc"
+  },
+  "thegatewaypundit.com": {
+   "name": "The Gateway Pundit",
+   "status": "d"
+  },
+  "theglobeandmail.com": {
+   "name": "The Globe and Mail",
+   "status": "gr"
+  },
+  "thegrayzone.com": {
+   "name": "The Grayzone",
+   "status": "d"
+  },
+  "thegreenpapers.com": {
+   "name": "The Green Papers",
+   "status": "nc"
+  },
+  "theguardian.co.uk": {
+   "name": "The Guardian",
+   "status": "gr"
+  },
+  "theguardian.com": {
+   "name": "The Guardian",
+   "status": "gr"
+  },
+  "thehill.com": {
+   "name": "The Hill",
+   "status": "gr"
+  },
+  "thehindu.com": {
+   "name": "The Hindu",
+   "status": "gr"
+  },
+  "theintercept.com": {
+   "name": "The Intercept",
+   "status": "gr"
+  },
+  "thejc.com": {
+   "name": "The Jewish Chronicle",
+   "status": "nc"
+  },
+  "themarysue.com": {
+   "name": "The Mary Sue",
+   "status": "gr"
+  },
+  "thenation.com": {
+   "name": "The Nation",
+   "status": "gr"
+  },
+  "theneedledrop.com": {
+   "name": "The Needle Drop",
+   "status": "nc"
+  },
+  "thenewamerican.com": {
+   "name": "The New American",
+   "status": "gu"
+  },
+  "thenextweb.com": {
+   "name": "The Next Web",
+   "status": "nc"
+  },
+  "theonion.com": {
+   "name": "The Onion",
+   "status": "gu"
+  },
+  "thepointsguy.com": {
+   "name": "The Points Guy",
+   "status": "d"
+  },
+  "thepostmillennial.com": {
+   "name": "The Post Millennial",
+   "status": "gu"
+  },
+  "theregister.co.uk": {
+   "name": "The Register",
+   "status": "gr"
+  },
+  "theregister.com": {
+   "name": "The Register",
+   "status": "gr"
+  },
+  "thescottishsun.co.uk": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "thesouthafrican.com": {
+   "name": "The South African",
+   "status": "nc"
+  },
+  "thespruce.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "thestar.ie": {
+   "name": "Daily Star",
+   "status": "d"
+  },
+  "thesun.co.uk": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "thesun.ie": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "thesun.mobi": {
+   "name": "The Sun",
+   "status": "d"
+  },
+  "thesundaytimes.co.uk": {
+   "name": "The Times",
+   "status": "gr"
+  },
+  "thetimes.co.uk": {
+   "name": "The Times",
+   "status": "gr"
+  },
+  "thetimes.com": {
+   "name": "The Times",
+   "status": "gr"
+  },
+  "thetruthaboutguns.com": {
+   "name": "The Truth About Guns",
+   "status": "gu"
+  },
+  "theverge.com": {
+   "name": "The Verge",
+   "status": "gr"
+  },
+  "thewire.in": {
+   "name": "The Wire India",
+   "status": "gr"
+  },
+  "thewirehindi.com": {
+   "name": "The Wire India",
+   "status": "gr"
+  },
+  "thewireurdu.com": {
+   "name": "The Wire India",
+   "status": "gr"
+  },
+  "thewrap.com": {
+   "name": "TheWrap",
+   "status": "gr"
+  },
+  "thinkprogress.org": {
+   "name": "ThinkProgress",
+   "status": "nc"
+  },
+  "thisisinsider.com": {
+   "name": "Business Insider",
+   "status": "nc"
+  },
+  "thisismoney.co.uk": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "thoughtco.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "tiktok.com": {
+   "name": "TikTok",
+   "status": "gu"
+  },
+  "time.com": {
+   "name": "Time",
+   "status": "gr"
+  },
+  "timesnow.com": {
+   "name": "Times Now",
+   "status": "nc"
+  },
+  "timesofindia.com": {
+   "name": "The Times of India",
+   "status": "nc"
+  },
+  "timesofindia.indiatimes.com": {
+   "name": "The Times of India",
+   "status": "nc"
+  },
+  "timesofisrael.com": {
+   "name": "The Times of Israel",
+   "status": "gr"
+  },
+  "timesonline.co.uk": {
+   "name": "The Times",
+   "status": "gr"
+  },
+  "tmz.com": {
+   "name": "TMZ",
+   "status": "nc"
+  },
+  "tn.ai": {
+   "name": "Tasnim News Agency",
+   "status": "d"
+  },
+  "tnimc.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "torrentfreak.com": {
+   "name": "TorrentFreak",
+   "status": "gr"
+  },
+  "townhall.com": {
+   "name": "Townhall",
+   "status": "nc"
+  },
+  "travelmail.co.uk": {
+   "name": "Daily Mail",
+   "status": "d"
+  },
+  "tripsavvy.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "trithucvn.net": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "trtworld.com": {
+   "name": "TRT World",
+   "status": "nc"
+  },
+  "tv.com": {
+   "name": "TV.com",
+   "status": "gu"
+  },
+  "tvguide.com": {
+   "name": "TV Guide",
+   "status": "gr"
+  },
+  "tvguidemagazine.com": {
+   "name": "TV Guide",
+   "status": "gr"
+  },
+  "tvtropes.org": {
+   "name": "TV Tropes",
+   "status": "gu"
+  },
+  "twitter.com": {
+   "name": "X",
+   "status": "gu"
+  },
+  "ucimc.org": {
+   "name": "Indymedia",
+   "status": "gu"
+  },
+  "ukwhoswho.com": {
+   "name": "Who's Who (UK)",
+   "status": "gu"
+  },
+  "universeguide.com": {
+   "name": "Universe Guide",
+   "status": "d"
+  },
+  "unz.com": {
+   "name": "The Unz Review",
+   "status": "d"
+  },
+  "unz.org": {
+   "name": "The Unz Review",
+   "status": "d"
+  },
+  "urbandictionary.com": {
+   "name": "Urban Dictionary",
+   "status": "gu"
+  },
+  "usatoday.com": {
+   "name": "USA Today",
+   "status": "gr"
+  },
+  "usgamer.net": {
+   "name": "Eurogamer",
+   "status": "gr"
+  },
+  "usmagazine.com": {
+   "name": "US Weekly",
+   "status": "nc"
+  },
+  "usnews.com": {
+   "name": "U.S. News & World Report",
+   "status": "gr"
+  },
+  "vanityfair.com": {
+   "name": "Vanity Fair",
+   "status": "gr"
+  },
+  "variety.com": {
+   "name": "Variety",
+   "status": "gr"
+  },
+  "vdare.com": {
+   "name": "VDARE",
+   "status": "d"
+  },
+  "venezuelanalysis.com": {
+   "name": "Venezuelanalysis",
+   "status": "gu"
+  },
+  "venturebeat.com": {
+   "name": "VentureBeat",
+   "status": "nc"
+  },
+  "verywell.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "verywellfamily.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "verywellhealth.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "verywellmind.com": {
+   "name": "Dotdash Meredith",
+   "status": "nc"
+  },
+  "veteranstoday.com": {
+   "name": "Veterans Today",
+   "status": "b"
+  },
+  "vgchartz.com": {
+   "name": "VGChartz",
+   "status": "gu"
+  },
+  "vibrantdot.co": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "vice.com": {
+   "name": "Vice Media",
+   "status": "nc"
+  },
+  "vicetv.com": {
+   "name": "Vice Media",
+   "status": "nc"
+  },
+  "victimsofcommunism.org": {
+   "name": "VoC",
+   "status": "gu"
+  },
+  "villagevoice.com": {
+   "name": "The Village Voice",
+   "status": "gr"
+  },
+  "viory.video": {
+   "name": "RT",
+   "status": "d"
+  },
+  "visiontimes.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "visiontimes.com.au": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "visiontimes.fr": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "visiontimesjp.com": {
+   "name": "The Epoch Times",
+   "status": "d"
+  },
+  "voanews.com": {
+   "name": "Voice of America",
+   "status": "gr"
+  },
+  "vogue.com": {
+   "name": "Vogue",
+   "status": "gr"
+  },
+  "voiceofrussia.com": {
+   "name": "Sputnik",
+   "status": "d"
+  },
+  "voltairenet.org": {
+   "name": "Voltaire Network",
+   "status": "d"
+  },
+  "vox.com": {
+   "name": "Vox",
+   "status": "gr"
+  },
+  "vtforeignpolicy.com": {
+   "name": "Veterans Today",
+   "status": "b"
+  },
+  "vulture.com": {
+   "name": "New York",
+   "status": "gr"
+  },
+  "wapbaike.baidu.com": {
+   "name": "Baidu Baike",
+   "status": "d"
+  },
+  "washingtonexaminer.com": {
+   "name": "Washington Examiner",
+   "status": "nc"
+  },
+  "washingtonpost.com": {
+   "name": "The Washington Post",
+   "status": "gr"
+  },
+  "washingtonpress.com": {
+   "name": "Occupy Democrats",
+   "status": "d"
+  },
+  "washingtontimes.com": {
+   "name": "The Washington Times",
+   "status": "nc"
+  },
+  "watchmojo.com": {
+   "name": "WatchMojo",
+   "status": "gu"
+  },
+  "weather2travel.com": {
+   "name": "Weather2Travel",
+   "status": "gu"
+  },
+  "weeklystandard.com": {
+   "name": "The Weekly Standard",
+   "status": "gr"
+  },
+  "wegotthiscovered.com": {
+   "name": "We Got This Covered",
+   "status": "gu"
+  },
+  "wenweipo.com": {
+   "name": "Wen Wei Po",
+   "status": "d"
+  },
+  "westernjournal.com": {
+   "name": "The Western Journal",
+   "status": "gu"
+  },
+  "whatculture.com": {
+   "name": "WhatCulture",
+   "status": "gu"
+  },
+  "whosampled.com": {
+   "name": "WhoSampled",
+   "status": "gu"
+  },
+  "whoswhoinamerica.com": {
+   "name": "Marquis Who's Who",
+   "status": "gu"
+  },
+  "wikia.com": {
+   "name": "Fandom",
+   "status": "gu"
+  },
+  "wikia.org": {
+   "name": "Fandom",
+   "status": "gu"
+  },
+  "wikicities.com": {
+   "name": "Fandom",
+   "status": "gu"
+  },
+  "wikidata.org": {
+   "name": "Wikidata",
+   "status": "gu"
+  },
+  "wikileaks.org": {
+   "name": "WikiLeaks",
+   "status": "gu"
+  },
+  "wikinews.org": {
+   "name": "Wikinews",
+   "status": "gu"
+  },
+  "wikipedia.org": {
+   "name": "Wikipedia",
+   "status": "gu"
+  },
+  "wired.co.uk": {
+   "name": "Wired",
+   "status": "gr"
+  },
+  "wired.com": {
+   "name": "Wired",
+   "status": "gr"
+  },
+  "wnd.com": {
+   "name": "WorldNetDaily",
+   "status": "d"
+  },
+  "wordpress.com": {
+   "name": "WordPress.com",
+   "status": "gu"
+  },
+  "worldchristiandatabase.org": {
+   "name": "WCD-WCE-WRD",
+   "status": "nc"
+  },
+  "worldnetdaily.com": {
+   "name": "WorldNetDaily",
+   "status": "d"
+  },
+  "worldometers.info": {
+   "name": "Worldometer",
+   "status": "gu"
+  },
+  "worldreligiondatabase.org": {
+   "name": "WCD-WCE-WRD",
+   "status": "nc"
+  },
+  "wsj.com": {
+   "name": "The Wall Street Journal",
+   "status": "gr"
+  },
+  "wsws.org": {
+   "name": "World Socialist Web Site",
+   "status": "nc"
+  },
+  "wyborcza.pl": {
+   "name": "Gazeta Wyborcza",
+   "status": "gr"
+  },
+  "x.com": {
+   "name": "X",
+   "status": "gu"
+  },
+  "xbiz.com": {
+   "name": "XBIZ",
+   "status": "nc"
+  },
+  "xinhuanet.com": {
+   "name": "Xinhua News Agency",
+   "status": "nc"
+  },
+  "youcaring.com": {
+   "name": "GoFundMe",
+   "status": "b"
+  },
+  "youtube.com": {
+   "name": "YouTube",
+   "status": "gu"
+  },
+  "zdnet.com": {
+   "name": "ZDNet (pre–October 2020)",
+   "status": "gr"
+  },
+  "zenodo.org": {
+   "name": "Academic repositories",
+   "status": "nc"
+  },
+  "zerohedge.com": {
+   "name": "Zero Hedge",
+   "status": "d"
+  },
+  "zoominfo.com": {
+   "name": "ZoomInfo",
+   "status": "b"
+  }
+ }
+}

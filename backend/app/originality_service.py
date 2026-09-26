@@ -136,68 +136,75 @@ def _aware(dt: datetime | None) -> datetime | None:
     return dt
 
 
-def _fetch_one(url: str) -> tuple[str, str | None, str | None]:
-    """(url, text, error). Runs in a worker thread: no database access here."""
+def _fetch_one(url: str) -> tuple[str, str | None, str | None, str]:
+    """(url, text, error, status). Runs in a worker thread: no database access here."""
     try:
         page = fetch(url)
     except SourceUnavailable as e:
-        return url, None, str(e)
+        return url, None, str(e), e.kind
     except Exception:  # noqa: BLE001 - a broken page must not break the check
-        return url, None, "The page could not be read."
+        return url, None, "The page could not be read.", "unreachable"
     html = "html" in page.content_type
     text = engine.parse(page.body, html=html).text
-    return url, text, None
+    return url, text, None, "ok"
 
 
-def source_documents(article: Article, now: datetime, *, fetch_sources: bool):
-    """Cited pages as parsed documents, plus a status line for every source."""
-    sources = [s for s in article.sources if s.is_valid][:MAX_SOURCES_CHECKED]
-    skipped = [s for s in article.sources if s.is_valid][MAX_SOURCES_CHECKED:]
-    statuses: dict[str, dict] = {}
-    texts: dict[str, str] = {}
-    to_fetch: list[str] = []
+def fetch_pages(urls: list[str], now: datetime, *, fetch_sources: bool) -> dict:
+    """SourceSnapshot rows for these URLs: cached if fresh, otherwise fetched in parallel.
 
-    for s in sources:
-        snap = SourceSnapshot.query.filter_by(url_hash=_url_key(s.url)).first()
-        fresh = snap is not None and _aware(snap.fetched_at) > now - SNAPSHOT_TTL
-        if fresh and snap.status == "ok":
-            texts[s.url] = snap.text or ""
-            statuses[s.url] = {"status": "checked"}
-        elif fresh:
-            statuses[s.url] = {"status": "unavailable", "reason": snap.error}
+    Shared by the originality check, which compares text, and source rating,
+    which needs to know whether a page exists. A snapshot's status is "ok" or
+    one of the kinds SourceUnavailable reports. A URL that is not cached, while
+    fetching is off, is absent from the result.
+    """
+    found = {}
+    to_fetch = []
+    for url in dict.fromkeys(urls):
+        snap = SourceSnapshot.query.filter_by(url_hash=_url_key(url)).first()
+        if snap is not None and _aware(snap.fetched_at) > now - SNAPSHOT_TTL:
+            found[url] = snap
         elif fetch_sources:
-            to_fetch.append(s.url)
-        else:
-            statuses[s.url] = {"status": "skipped", "reason": "Source checking is switched off."}
-
+            to_fetch.append(url)
     if to_fetch:
-        # Fetched in parallel so ten slow sources cost one timeout, not ten.
+        # In parallel, so ten slow sources cost one timeout, not ten.
         with ThreadPoolExecutor(max_workers=min(6, len(to_fetch))) as pool:
             results = list(pool.map(_fetch_one, to_fetch))
-        for url, text, error in results:
+        for url, text, error, status in results:
             snap = SourceSnapshot.query.filter_by(url_hash=_url_key(url)).first()
             if snap is None:
                 snap = SourceSnapshot(url_hash=_url_key(url), url=url[:1000])
                 db.session.add(snap)
-            snap.status = "ok" if error is None else "unavailable"
+            snap.status = status
             snap.error = error
             snap.text = text
             snap.fetched_at = now
-            if error is None:
-                texts[url] = text
-                statuses[url] = {"status": "checked"}
-            else:
-                statuses[url] = {"status": "unavailable", "reason": error}
+            found[url] = snap
+    return found
 
-    lines = [
-        {"url": s.url, "label": s.label, **statuses.get(s.url, {"status": "skipped"})}
-        for s in sources
-    ] + [
+
+def source_documents(article: Article, now: datetime, *, fetch_sources: bool):
+    """Cited pages as parsed documents, plus a status line for every source."""
+    valid = [s for s in article.sources if s.is_valid]
+    sources, skipped = valid[:MAX_SOURCES_CHECKED], valid[MAX_SOURCES_CHECKED:]
+    pages = fetch_pages([s.url for s in sources], now, fetch_sources=fetch_sources)
+
+    lines, docs = [], {}
+    for s in sources:
+        snap = pages.get(s.url)
+        if snap is None:
+            lines.append({"url": s.url, "label": s.label, "status": "skipped",
+                          "reason": "Source checking is switched off."})
+        elif snap.status == "ok":
+            docs[s.url] = engine.parse(snap.text or "", html=False)
+            lines.append({"url": s.url, "label": s.label, "status": "checked"})
+        else:
+            lines.append({"url": s.url, "label": s.label, "status": "unavailable",
+                          "reason": snap.error})
+    lines += [
         {"url": s.url, "label": s.label, "status": "skipped",
          "reason": f"Only the first {MAX_SOURCES_CHECKED} sources are checked."}
         for s in skipped
     ]
-    docs = {url: engine.parse(text, html=False) for url, text in texts.items()}
     return docs, lines
 
 

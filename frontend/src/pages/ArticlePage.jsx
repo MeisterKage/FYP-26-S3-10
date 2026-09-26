@@ -22,6 +22,7 @@ import {
 import ArticleExtras from "../components/ArticleExtras";
 import { CoverFigure } from "../components/CoverImage";
 import Corrections from "../components/Corrections";
+import { SourceList } from "../components/Sources";
 import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
@@ -192,24 +193,11 @@ export default function ArticlePage() {
                 Sources
                 <span className="sources-count">{article.sources.length}</span>
               </h2>
-              <ol className="sources-list">
-                {article.sources.map((source, i) => (
-                  <li key={source.url}>
-                    <span className="sources-num">{i + 1}</span>
-                    <a
-                      className="link-quiet"
-                      href={source.url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                    >
-                      {source.label || source.url}
-                    </a>
-                  </li>
-                ))}
-              </ol>
+              <SourceList sources={article.sources} />
               <p className="meta mt-4">
                 <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
-                Each verified source raises this article&rsquo;s score.
+                Each source adds to the score by what kind of source it is.{" "}
+                <Link className="link-quiet" to="/about#sources">How sources are graded</Link>
               </p>
             </section>
           )}

@@ -25,6 +25,7 @@ import {
 } from "../components/Credibility";
 import { CoverFigure } from "../components/CoverImage";
 import { StoredOriginality } from "../components/Originality";
+import { SourceList } from "../components/Sources";
 import { SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
 
@@ -173,6 +174,14 @@ function AwaitingConfirmation({ articles, onDone, onError }) {
 function Submission({ article, selected, onToggle, onDone, onError }) {
   const [rejecting, setRejecting] = useState(false);
   const [busy, setBusy] = useState(false);
+  // A verdict on a source changes the projected score, so both are local.
+  const [sources, setSources] = useState(article.sources);
+  const [credibility, setCredibility] = useState(article.credibility);
+
+  function onVerdict({ source, credibility: next }) {
+    setSources((list) => list.map((s) => (s.id === source.id ? source : s)));
+    setCredibility((c) => ({ ...c, ...next, prospective: true }));
+  }
 
   async function approve() {
     setBusy(true);
@@ -189,7 +198,8 @@ function Submission({ article, selected, onToggle, onDone, onError }) {
     }
   }
 
-  const validSources = article.sources.filter((s) => s.isValid).length;
+  const validSources = sources.filter((s) => s.isValid).length;
+  const flagged = sources.filter((s) => s.rating?.flagged && !s.rating?.editorVerdict).length;
 
   return (
     <article className={selected ? "submission submission--selected" : "submission"}>
@@ -237,24 +247,17 @@ function Submission({ article, selected, onToggle, onDone, onError }) {
         <div className="review-sources mt-5">
           <p className="label">
             <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
-            {validSources} verified source{validSources === 1 ? "" : "s"}
+            {validSources} source{validSources === 1 ? "" : "s"} counting towards the score
           </p>
-          {article.sources.length > 0 ? (
-            <ol className="sources-list mt-3">
-              {article.sources.map((source, i) => (
-                <li key={source.url}>
-                  <span className="sources-num">{i + 1}</span>
-                  <a
-                    className="link-quiet"
-                    href={source.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >
-                    {source.label || source.url}
-                  </a>
-                </li>
-              ))}
-            </ol>
+          {flagged > 0 && (
+            <p className="source-flag-note mt-2">
+              {flagged} flagged source{flagged === 1 ? "" : "s"}: check {flagged === 1 ? "it" : "them"} before approving.
+            </p>
+          )}
+          {sources.length > 0 ? (
+            <div className="mt-3">
+              <SourceList sources={sources} articleId={article.id} reviewable onChange={onVerdict} />
+            </div>
           ) : (
             <p className="meta mt-3">
               No sources were tagged. This article will score lower for it.
@@ -283,10 +286,10 @@ function Submission({ article, selected, onToggle, onDone, onError }) {
       <aside className="submission-aside">
         <p className="label">Score on publication</p>
         <div className="mt-4">
-          <CredibilityMeter credibility={article.credibility} />
+          <CredibilityMeter credibility={credibility} />
         </div>
         {/* The editor sees the same ledger the reader will, before deciding. */}
-        <CredibilityLedger credibility={article.credibility} />
+        <CredibilityLedger credibility={credibility} />
         <p className="meta mt-4">
           Provisional until you approve. It becomes visible to readers the moment
           you do.

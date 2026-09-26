@@ -27,6 +27,7 @@ from ..extensions import db
 from ..countries import country_name, normalise as normalise_country
 from .images import find_attachable, image_urls
 from ..originality_service import check as check_originality, index_article, summary as originality_summary
+from ..source_service import rate_sources, serialize as serialize_source
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
 from ..scoring_service import load_settings, rescore_article
@@ -196,9 +197,9 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
             "name": article.contributor.byline,
             "accuracyRate": article.contributor.accuracy_rate,
         },
-        "sources": [
-            {"url": s.url, "label": s.label, "isValid": s.is_valid} for s in article.sources
-        ],
+        # Each source carries its rating and the reason for it, so a reader
+        # can see why one link counts for more than another.
+        "sources": [serialize_source(s) for s in article.sources],
         # Public. A correction is why a score fell, and the product's claim is
         # that a reader can trace that. It is also how the writer finds the
         # correction they want to dispute.
@@ -349,8 +350,13 @@ def update_article(article_id: int):
         _require_image_provenance(article)
     if "sources" in data:
         _replace_sources(article, require_list(data, "sources", max_items=MAX_SOURCES))
-        # Source count is a scoring input, so the score moves with it.
+        # Sources are a scoring input, so a live article's new sources are
+        # rated at once and the score moves with them. A draft's are rated
+        # when it is submitted.
         if article.status == ArticleStatus.PUBLISHED:
+            db.session.flush()
+            db.session.expire(article, ["sources"])
+            rate_sources(article)
             rescore_article(article)
 
     db.session.commit()
@@ -371,9 +377,11 @@ def submit_article(article_id: int):
         raise ApiError("Add some content before submitting.", status=422, field="body")
     _require_image_provenance(article)
 
-    # Every submission reaches the editor with its originality report. It
-    # informs the review; it never blocks the submission, because quoting
-    # heavily or updating one's own earlier story can be entirely proper.
+    # Every submission reaches the editor with its sources rated and its
+    # originality report. Both inform the review; neither blocks submission.
+    # Sources are rated first: the originality check compares only with the
+    # sources that count.
+    rate_sources(article)
     check_originality(article, settings=load_settings())
 
     article.status = ArticleStatus.PENDING

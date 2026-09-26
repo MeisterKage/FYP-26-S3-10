@@ -86,6 +86,36 @@ def register_cli(app) -> None:
         for key in result["created"]:
             click.echo(f"  new  {key}")
 
+    @app.cli.command("rate-sources")
+    @click.option("--all-statuses", is_flag=True, help="Also rate drafts and rejected articles.")
+    def rate_all_sources(all_statuses):
+        """Rate every cited source (source_rating.py) and rescore the articles.
+
+        Needed once after the source-ratings migration, and whenever the
+        Perennial Sources list is refreshed. Fetches each cited page and asks
+        Crossref about any DOI, so it takes a while and needs internet access.
+        """
+        from .source_service import rate_sources
+        from .scoring_service import rescore_contributor_articles
+
+        query = Article.query
+        if not all_statuses:
+            query = query.filter(Article.status.notin_([ArticleStatus.DRAFT,
+                                                        ArticleStatus.REJECTED]))
+        articles = query.all()
+        writers = set()
+        tiers: dict[str, int] = {}
+        for article in articles:
+            for source in rate_sources(article):
+                tiers[source.tier] = tiers.get(source.tier, 0) + 1
+            writers.add(article.contributor)
+        db.session.flush()
+        for writer in writers:
+            rescore_contributor_articles(writer)
+        db.session.commit()
+        click.echo(f"Rated the sources of {len(articles)} article(s): "
+                   + ", ".join(f"{k} {v}" for k, v in sorted(tiers.items())))
+
     @app.cli.command("index-originality")
     def index_originality():
         """Rebuild every article's originality fingerprints.

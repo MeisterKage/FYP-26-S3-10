@@ -22,6 +22,22 @@ from ..models import (
 from ..countries import COUNTRIES, DEFAULT_COUNTRY, codes_matching
 from ..credibility import DEFAULTS, credibility_score
 from ..scoring_service import explain_article, load_settings
+from ..source_rating import TIER_LABELS, TIER_POINTS, perennial
+
+#: Plain descriptions of each source tier for the About page, in order.
+SOURCE_TIER_DESCRIPTIONS = (
+    ("official", "Government, parliament, courts, and bodies such as the UN and WHO."),
+    ("research", "A published paper, identified by its DOI, that has not been retracted."),
+    ("institution", "A university or research institute."),
+    ("reliable", "An outlet Wikipedia's editors rate \u201cgenerally reliable\u201d after "
+                 "public discussion."),
+    ("unrated", "On no list, or rated \u201cno consensus\u201d. An editor can accept it."),
+    ("unreliable", "Rated \u201cgenerally unreliable\u201d, or a platform where anyone "
+                   "can publish, such as social media."),
+    ("deprecated", "Deprecated or blacklisted by Wikipedia's editors. Flagged to the editor."),
+    ("retracted", "A paper Crossref and Retraction Watch record as retracted. Flagged."),
+    ("invalid", "A placeholder address, a page that does not exist, or a link cited twice."),
+)
 from ..security import current_user
 from .articles import serialize
 
@@ -343,11 +359,12 @@ def scoring_formula():
                                    "the largest single influence on a score.",
                 },
                 {
-                    "name": "Verifiable sources",
+                    "name": "Sources",
                     "effect": "raises",
-                    "description": "Each source link an editor can check raises the "
-                                   "score, up to a fixed ceiling, so an article "
-                                   "cannot be padded with links.",
+                    "description": "Each source raises the score by what kind of source "
+                                   "it is, up to a fixed ceiling. Placeholders, social "
+                                   "media and deprecated sites add nothing, so an "
+                                   "article cannot be padded with links.",
                 },
                 {
                     "name": "Logged corrections",
@@ -369,6 +386,25 @@ def scoring_formula():
                                    "editorial review.",
                 },
             ],
+            # How each source is graded (app/source_rating.py). Served from the
+            # rules themselves, so this page cannot drift from what they do.
+            "sourceTiers": [
+                {"tier": tier, "label": TIER_LABELS[tier], "points": TIER_POINTS[tier],
+                 "description": description}
+                for tier, description in SOURCE_TIER_DESCRIPTIONS
+            ],
+            "sourceLists": {
+                "perennial": {
+                    "name": "Wikipedia: Reliable sources/Perennial sources",
+                    "url": perennial()["source"],
+                    "license": perennial()["license"],
+                    "retrieved": perennial()["retrieved"],
+                },
+                "retractions": {
+                    "name": "Crossref, including the Retraction Watch database",
+                    "url": "https://www.crossref.org/documentation/retrieve-metadata/retraction-watch/",
+                },
+            },
             "newContributor": (
                 "A writer's accuracy rate is withheld until they have published a "
                 "minimum number of articles. Until then their profile reads "

@@ -417,8 +417,22 @@ class ArticleSource(db.Model):
     )
     url: Mapped[str] = mapped_column(String(1000))
     label: Mapped[str | None] = mapped_column(String(255))
-    #: Set by the rule-based source-validity check (PDD Section 2.2, Moderation).
+    #: True when the source currently earns points. Kept in step with the
+    #: rating below; the review queue and auto-publish rules read it.
     is_valid: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    #: The source's rating (app/source_rating.py). NULL tier means it has not
+    #: been rated yet; every submission rates its sources before review.
+    tier: Mapped[str | None] = mapped_column(String(20))
+    points: Mapped[float | None] = mapped_column(Float)
+    rating_reason: Mapped[str | None] = mapped_column(String(400))
+    flagged: Mapped[bool] = mapped_column(Boolean, default=False)
+    rated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: An editor's final word: "accepted" or "rejected", with the reason.
+    editor_verdict: Mapped[str | None] = mapped_column(String(20))
+    editor_reason: Mapped[str | None] = mapped_column(String(500))
+    editor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    verdict_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     article: Mapped[Article] = relationship(back_populates="sources")
 

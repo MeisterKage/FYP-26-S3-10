@@ -165,6 +165,7 @@ def credibility_score(
     upheld_report_count: int,
     settings: dict | None = None,
     accuracy_withheld: bool = False,
+    source_points: float | None = None,
 ) -> ScoreBreakdown:
     """Score one article. Pure: no database access, no clock, no randomness.
 
@@ -185,7 +186,15 @@ def credibility_score(
     used_provisional = accuracy_withheld or contributor_accuracy is None
 
     accuracy_component = cfg["accuracy_weight"] * accuracy
-    source_component = min(max(0, source_count) * cfg["source_points"], cfg["source_cap"])
+    # `source_points` is the sum of each cited source's rating
+    # (source_rating.py): a government page or a reliable outlet is worth more
+    # than an unrated site, and a placeholder or retracted paper nothing. Without
+    # it, every source counts the flat `source_points`, as it always did.
+    raw_sources = (
+        max(0, source_count) * cfg["source_points"] if source_points is None
+        else max(0.0, source_points)
+    )
+    source_component = min(raw_sources, cfg["source_cap"])
 
     corrections = max(0, correction_count) * cfg["correction_penalty"]
     retraction = cfg["retraction_penalty"] if is_retracted else 0.0

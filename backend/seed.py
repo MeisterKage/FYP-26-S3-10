@@ -10,6 +10,7 @@ corrections, and reports.
     py seed.py --reset   # empty the tables and reload
     py seed.py --countries   # tag countries and add samples to existing data
     py seed.py --originality # distinct demo bodies, index, and a planted copy
+    flask rate-sources       # then grade every cited source (needs internet)
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
 deployment anyone else can reach.
@@ -33,6 +34,7 @@ from app.modules.articles import slugify
 from app.scoring_service import rescore_contributor_articles
 from app.security import hash_password
 from demo_bodies import body_for
+from demo_sources import sources_for
 
 DEMO_PASSWORD = "DemoPassword123!"
 
@@ -175,7 +177,8 @@ COUNTRY_OF_HEADLINE = {
 
 # Stories written for one country, so each country page has something that could
 # only be about that country. Fictional demo reporting: no real person is named,
-# and every source is an example.org placeholder, like the rest of the seed.
+# and every source is a real institution's page (demo_sources.py), not a
+# document supporting the story.
 # (country, section, writer email, title, summary, paragraphs)
 COUNTRY_SAMPLES = [
     ("AU", "Politics", "veteran@newsrelease.test",
@@ -357,9 +360,6 @@ COUNTRY_SAMPLES = [
       "Hospitals will report how many in-person transfers the links avoid."]),
 ]
 
-#: Sources per sample, matching each writer's habit in the main seed, so their
-#: scores differ for a reason a reader can inspect.
-SAMPLE_SOURCES = {"veteran@newsrelease.test": 5, "contributor@newsrelease.test": 3}
 
 
 def seed_countries() -> None:
@@ -414,12 +414,8 @@ def seed_countries() -> None:
         db.session.add(article)
         db.session.flush()
         article.slug = slugify(title, article.id)
-        for i in range(SAMPLE_SOURCES.get(email, 1)):
-            db.session.add(ArticleSource(
-                article_id=article.id,
-                url=f"https://example.org/source/{article.id}/{i}",
-                label=f"Primary source {i + 1}",
-            ))
+        for url, label in sources_for(title, code, section, email):
+            db.session.add(ArticleSource(article_id=article.id, url=url, label=label))
         writers.add(writer)
         added += 1
 
@@ -681,17 +677,15 @@ def seed() -> None:
 
     # ---- scoring inputs --------------------------------------------------- #
     for index, article in enumerate(articles):
-        # Marcus sources heavily, Sam barely at all -- so their scores differ for
-        # a reason a reader can inspect.
-        source_count = {veteran.id: 5, mixed.id: 3, newcomer.id: 1}[article.contributor_id]
-        for n in range(source_count):
-            db.session.add(
-                ArticleSource(
-                    article_id=article.id,
-                    url=f"https://example.org/source/{article.id}/{n}",
-                    label=f"Primary source {n + 1}",
-                )
-            )
+        # Marcus sources heavily, Sam barely at all, so their scores differ for
+        # a reason a reader can inspect. Real institutions and outlets
+        # (demo_sources.py); `flask rate-sources` grades them after seeding.
+        email = {veteran.id: veteran.email, mixed.id: mixed.email,
+                 newcomer.id: newcomer.email}[article.contributor_id]
+        section = next(c.name for c in categories if c.id == article.category_id)
+        for url, label in sources_for(article.title, COUNTRY_OF_HEADLINE.get(article.title),
+                                      section, email):
+            db.session.add(ArticleSource(article_id=article.id, url=url, label=label))
 
     published = [a for a in articles if a.status == ArticleStatus.PUBLISHED]
 

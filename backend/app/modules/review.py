@@ -21,6 +21,7 @@ from ..sanitize import clean_plain_text
 from ..scoring_service import explain_article, load_settings
 from ..security import editor_owns_category, roles_required
 from ..validation import json_body, require_choice, require_list, require_str
+from ..source_service import apply_verdict, serialize as serialize_source
 from .articles import serialize
 
 bp = Blueprint("review", __name__)
@@ -104,6 +105,46 @@ def review_queue():
             ],
         }
     )
+
+
+@bp.post("/review/<int:article_id>/sources/<int:source_id>/verdict")
+@roles_required(*REVIEW_ROLES)
+def source_verdict(article_id: int, source_id: int):
+    """An editor accepts a source, rejects it, or clears their earlier verdict.
+
+    The automatic rating is where review starts. The editor, who can read the
+    page, has the final word, and must say why: the reason is shown to the
+    writer and kept in the log.
+    """
+    article = db.session.get(Article, article_id)
+    if article is None or not editor_owns_category(article.category_id):
+        raise ApiError("Article not found.", status=404)
+    if article.status not in (ArticleStatus.PENDING, ArticleStatus.PUBLISHED,
+                              ArticleStatus.SCHEDULED):
+        raise ApiError(f"Sources on a {article.status.value} article cannot be reviewed.",
+                       status=409)
+    source = next((s for s in article.sources if s.id == source_id), None)
+    if source is None:
+        raise ApiError("Source not found.", status=404)
+
+    data = json_body()
+    verdict = data.get("verdict")
+    if verdict not in ("accepted", "rejected", None):
+        raise ApiError("'verdict' must be 'accepted', 'rejected' or null.", status=422,
+                       field="verdict")
+    reason = None
+    if verdict:
+        reason = clean_plain_text(require_str(data, "reason", max_length=500))
+        if len(reason) < 5:
+            raise ApiError("Say why, in a few words.", status=422, field="reason")
+
+    apply_verdict(source, verdict=verdict, reason=reason, editor_id=g.current_user.id)
+    if article.status == ArticleStatus.PUBLISHED:
+        from ..scoring_service import rescore_article
+        rescore_article(article)
+    db.session.commit()
+    return jsonify({"source": serialize_source(source),
+                    "credibility": explain_article(article).as_dict()})
 
 
 @bp.post("/review/<int:article_id>/approve")

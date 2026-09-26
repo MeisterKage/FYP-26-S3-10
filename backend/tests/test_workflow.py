@@ -184,8 +184,8 @@ def test_draft_to_published_journey(client, category):
             "summary": "What the figures show.",
             "body": "<p>The operator published quarterly figures this week.</p>",
             "sources": [
-                {"url": "https://example.org/a", "label": "Operator statement"},
-                {"url": "https://example.org/b", "label": "Regulator filing"},
+                {"url": "https://www.abs.gov.au/a", "label": "Operator statement"},
+                {"url": "https://www.reuters.com/b", "label": "Regulator filing"},
             ],
         },
         headers=auth(author_token),
@@ -417,7 +417,7 @@ def test_what_counts_is_public(client):
     assert len(payload["bands"]) == 4
     names = {i["name"] for i in payload["inputs"]}
     assert "Contributor accuracy" in names
-    assert "Verifiable sources" in names
+    assert "Sources" in names
     assert {i["effect"] for i in payload["inputs"]} == {"raises", "lowers"}
     # "New contributor" is otherwise an unexplained state on a profile.
     assert "New contributor" in payload["newContributor"]

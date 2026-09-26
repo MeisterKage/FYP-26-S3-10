@@ -76,8 +76,8 @@ export default function AboutPage() {
 
           <Term name="Credibility Score">
             A single article, rated out of 100. It combines the writer&rsquo;s
-            track record with what that specific article did: how many verifiable
-            sources it cited, whether it was later corrected, and whether enough
+            track record with what that specific article did: how well sourced it
+            is, whether it was later corrected, and whether enough
             readers reported it to trigger review.
           </Term>
         </dl>
@@ -115,6 +115,48 @@ export default function AboutPage() {
             not published. Every article carries its own ledger showing what each
             of these contributed to that article&rsquo;s score, so you can always
             see why a particular number is what it is.
+          </p>
+        </section>
+      )}
+
+      {v?.sourceTiers && (
+        <section className="section read mt-9" id="sources">
+          <h2 className="title">How sources are graded</h2>
+          <p className="lead mt-5">
+            Not every link is evidence. Each source an article cites is graded by what
+            kind of source it is, and the grade decides what it adds to the score.
+            Every grade comes from a rule or a public list, never from this site&rsquo;s
+            opinion, and an editor who has read the source has the final word.
+          </p>
+          <div className="table-scroll mt-6">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Grade</th>
+                  <th scope="col">What it means</th>
+                  <th scope="col" className="tabular">Adds</th>
+                </tr>
+              </thead>
+              <tbody>
+                {v.sourceTiers.map((t) => (
+                  <tr key={t.tier}>
+                    <td><strong>{t.label}</strong></td>
+                    <td>{t.description}</td>
+                    <td className="tabular">{t.points}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="meta mt-5">
+            Outlet ratings come from{" "}
+            <a className="link-quiet" href={v.sourceLists.perennial.url} target="_blank"
+              rel="noreferrer noopener">{v.sourceLists.perennial.name}</a>
+            , used under {v.sourceLists.perennial.license} (copy of{" "}
+            {v.sourceLists.perennial.retrieved}). Retractions come from{" "}
+            <a className="link-quiet" href={v.sourceLists.retractions.url} target="_blank"
+              rel="noreferrer noopener">{v.sourceLists.retractions.name}</a>
+            . Many smaller sites are on neither list and show as unrated.
           </p>
         </section>
       )}

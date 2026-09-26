@@ -1167,3 +1167,73 @@
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
+
+/* --- source ratings --------------------------------------------------------
+   The tier is a word, never only a colour: the product's rule for every
+   judgement it shows. Weight and a rule carry the difference. */
+
+.source-body {
+  min-width: 0;
+}
+.source-rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-3);
+  margin-top: var(--s-1);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+}
+.source-tier {
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  font-size: var(--t-micro);
+  color: var(--quiet);
+}
+.source-tier--strong {
+  color: var(--ink);
+}
+.source-tier--weak {
+  color: var(--mute);
+  text-decoration: line-through;
+  text-decoration-color: var(--rule);
+}
+.source-tier--flag {
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 0.1rem 0.35rem;
+}
+.source-points {
+  font-variant-numeric: tabular-nums;
+  color: var(--mute);
+}
+.source-editor {
+  color: var(--ink);
+}
+.source-reason {
+  margin-top: var(--s-1);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+  line-height: 1.45;
+}
+.source-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+}
+.source-verdict .input {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.source-flag-note {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--ink);
+  border-left: 2px solid var(--ink);
+  padding-left: var(--s-3);
+}

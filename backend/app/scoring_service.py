@@ -88,6 +88,14 @@ def _accuracy_input(article: Article, cfg: dict) -> float:
     return credibility.smoothed_accuracy(published, blemished, cfg)
 
 
+def _rated_source_points(article: Article, cfg: dict) -> float:
+    """Sum of each source's points (source_service.source_points)."""
+    from .source_service import source_points
+
+    per_source = float({**credibility.DEFAULTS, **cfg}["source_points"])
+    return sum(source_points(s, per_source) for s in article.sources)
+
+
 def recalculate_accuracy(contributor: User, settings: dict | None = None) -> float | None:
     """Recompute and persist a contributor's Accuracy Rate. Returns it (or None)."""
     cfg = settings if settings is not None else load_settings()
@@ -114,6 +122,7 @@ def rescore_article(article: Article, settings: dict | None = None):
     accuracy = _accuracy_input(article, cfg)
 
     valid_sources = sum(1 for s in article.sources if s.is_valid)
+    rated_points = _rated_source_points(article, cfg)
     corrections = sum(1 for c in article.corrections if c.overturned_at is None)
     upheld_reports = (
         db.session.query(func.count(Report.id))
@@ -130,6 +139,7 @@ def rescore_article(article: Article, settings: dict | None = None):
         upheld_report_count=upheld_reports,
         settings=cfg,
         accuracy_withheld=published_rate is None,
+        source_points=rated_points,
     )
 
     article.credibility_score = result.score
@@ -165,6 +175,7 @@ def explain_article(article: Article, settings: dict | None = None):
         upheld_report_count=upheld,
         settings=cfg,
         accuracy_withheld=credibility.accuracy_rate(published, blemished, cfg) is None,
+        source_points=_rated_source_points(article, cfg),
     )
 
 

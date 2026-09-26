@@ -490,8 +490,10 @@ export default function ArticleEditor() {
             </p>
           </SectionHead>
           <p className="field-hint">
-            Each verifiable link raises this article&rsquo;s credibility score, up to a
-            fixed cap. Links must start with http:// or https:// to count.
+            Each source raises the credibility score by what kind of source it is: an
+            official body, published research or an established outlet counts for most;
+            placeholders, social media and deprecated sites count for nothing. Your
+            editor sees the rating for each one.
           </p>
           <div className="mt-4">
             <SourceRows sources={sources} onChange={setSources} disabled={!editable} />

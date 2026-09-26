@@ -35,7 +35,23 @@ ALLOWED_TYPES = ("text/html", "text/plain", "application/xhtml+xml")
 
 
 class SourceUnavailable(Exception):
-    """Why a source could not be checked. The message is shown to editors."""
+    """Why a source could not be checked. The message is shown to editors.
+
+    `kind` separates "this page does not exist" from "this site would not let
+    a script read it", which matter differently. A missing page is not a
+    source. A site that refuses automated requests (many large outlets do)
+    still exists, and its link keeps its value:
+
+        missing       no such host, or 404 / 410
+        refused       not a public web address (private network, odd port...)
+        blocked       the site answered but refused us (401, 403, 429, 451)
+        not_page      it exists but is a file, such as a PDF report
+        unreachable   timed out, or the server failed (5xx); try again later
+    """
+
+    def __init__(self, message: str, kind: str = "unreachable"):
+        super().__init__(message)
+        self.kind = kind
 
 
 @dataclass(frozen=True)
@@ -49,26 +65,26 @@ def _public_host(host: str) -> None:
     try:
         infos = socket.getaddrinfo(host, None)
     except (socket.gaierror, UnicodeError):
-        raise SourceUnavailable("The address does not resolve.")
+        raise SourceUnavailable("The address does not resolve.", "missing")
     if not infos:
-        raise SourceUnavailable("The address does not resolve.")
+        raise SourceUnavailable("The address does not resolve.", "missing")
     for info in infos:
         address = ipaddress.ip_address(info[4][0].split("%")[0])
         if not address.is_global or address.is_multicast:
-            raise SourceUnavailable("The address is not on the public internet.")
+            raise SourceUnavailable("The address is not on the public internet.", "refused")
 
 
 def check_url(url: str) -> urllib.parse.ParseResult:
     """Validate a URL before any request. Raises SourceUnavailable."""
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme not in ("http", "https"):
-        raise SourceUnavailable("Only web (http or https) links can be checked.")
+        raise SourceUnavailable("Only web (http or https) links can be checked.", "refused")
     if not parsed.hostname:
-        raise SourceUnavailable("The link has no host.")
+        raise SourceUnavailable("The link has no host.", "refused")
     if parsed.username or parsed.password:
-        raise SourceUnavailable("Links with embedded credentials are not fetched.")
+        raise SourceUnavailable("Links with embedded credentials are not fetched.", "refused")
     if parsed.port not in (None, 80, 443):
-        raise SourceUnavailable("Only standard web ports are fetched.")
+        raise SourceUnavailable("Only standard web ports are fetched.", "refused")
     _public_host(parsed.hostname)
     return parsed
 
@@ -92,6 +108,11 @@ def fetch(url: str) -> Fetched:
             if e.code in (301, 302, 303, 307, 308) and e.headers.get("Location"):
                 current = urllib.parse.urljoin(current, e.headers["Location"])
                 continue
+            if e.code in (404, 410):
+                raise SourceUnavailable(f"The page does not exist ({e.code}).", "missing")
+            if e.code in (401, 403, 429, 451):
+                raise SourceUnavailable(
+                    f"The site does not allow automated checks ({e.code}).", "blocked")
             raise SourceUnavailable(f"The page returned an error ({e.code}).")
         except (urllib.error.URLError, TimeoutError, OSError):
             raise SourceUnavailable("The page could not be reached.")
@@ -99,7 +120,8 @@ def fetch(url: str) -> Fetched:
         with response:
             content_type = (response.headers.get("Content-Type") or "").lower()
             if not content_type.startswith(ALLOWED_TYPES):
-                raise SourceUnavailable("The link is not a web page (it may be a PDF or file).")
+                raise SourceUnavailable(
+                    "The link is not a web page (it may be a PDF or file).", "not_page")
             data = response.read(MAX_BYTES + 1)
             charset = response.headers.get_content_charset() or "utf-8"
         return Fetched(

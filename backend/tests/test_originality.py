@@ -330,10 +330,10 @@ def test_an_unreachable_source_is_reported_not_fatal(client, world, app, monkeyp
     app.config["ORIGINALITY_FETCH_SOURCES"] = True
 
     headers = auth(client, "copier@example.com")
-    article_id = submit(client, headers, world, UNRELATED, sources=["https://gone.example.org/"])
+    article_id = submit(client, headers, world, UNRELATED, sources=["https://gone-news-site.com.au/"])
     report = client.get(f"/api/articles/{article_id}/originality", headers=headers).get_json()["report"]
     assert report["sources"][0] == {
-        "url": "https://gone.example.org/", "label": "Source",
+        "url": "https://gone-news-site.com.au/", "label": "Source",
         "status": "unavailable", "reason": "The page could not be reached.",
     }
 
