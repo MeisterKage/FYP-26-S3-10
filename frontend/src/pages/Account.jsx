@@ -18,6 +18,7 @@ import { EntryThumb } from "../components/CoverImage";
 import { CAN_AUTHOR, ROLES, useAuth } from "../auth";
 import { CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Field, Notice, SectionHead, formatDate } from "../components/UI";
+import { PaymentHistory } from "./Checkout";
 import { DigestSubscriptions } from "./Digests";
 
 const EVENT_LABELS = {
@@ -448,6 +449,11 @@ function Subscriptions({ onNotice }) {
           </table>
         </div>
       )}
+
+      <div className="mt-7">
+        <SectionHead title="Payments" />
+        <PaymentHistory />
+      </div>
     </>
   );
 }

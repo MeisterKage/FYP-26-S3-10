@@ -10,7 +10,7 @@
  * renders whatever it was given.
  */
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../api";
 import { useAuth } from "../auth";
@@ -26,6 +26,7 @@ import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
+import { startSubscription } from "./Checkout";
 
 /**
  * Who vouched for this article. Absent while it awaits review: the meter
@@ -52,6 +53,9 @@ function ApprovedBy({ review }) {
 export default function ArticlePage() {
   const { slug } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  // Separate from `error`, which replaces the whole article with a not-found state.
+  const [subscribeError, setSubscribeError] = useState(null);
 
   const [article, setArticle] = useState(null);
   const [error, setError] = useState(null);
@@ -145,7 +149,16 @@ export default function ArticlePage() {
                 </p>
                 <div className="row gap-4 mt-5">
                   {user ? (
-                    <Button variant="primary">Subscribe to read</Button>
+                    <Button
+                      variant="primary"
+                      onClick={() =>
+                        startSubscription(article.contributor.id, navigate).catch((e) =>
+                          setSubscribeError(e.message),
+                        )
+                      }
+                    >
+                      Subscribe to read
+                    </Button>
                   ) : (
                     <>
                       <Button variant="primary" as={Link} to="/register">
@@ -157,6 +170,11 @@ export default function ArticlePage() {
                     </>
                   )}
                 </div>
+                {subscribeError && (
+                  <div className="mt-4">
+                    <Notice>{subscribeError}</Notice>
+                  </div>
+                )}
               </div>
             </>
           ) : (

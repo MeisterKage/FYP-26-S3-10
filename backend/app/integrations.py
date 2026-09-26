@@ -1,4 +1,8 @@
-"""The three external services in PDD Section 2.1, stubbed behind interfaces.
+"""External services in PDD Section 2.1, stubbed behind interfaces.
+
+Payments moved to `payments.py`, which models a real provider's checkout and
+webhook flow rather than a single charge call. The revenue-share tiers stay
+here because they are platform policy, not a provider concern.
 
 v1 ships the interfaces and logs what *would* have happened. An examiner can see the call site
 and the recorded intent, and swapping in a real provider later replaces one
@@ -10,8 +14,6 @@ these objects so the seam stays visible in the component diagram.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
-from datetime import datetime, timezone
 from urllib.parse import quote
 
 log = logging.getLogger(__name__)
@@ -33,13 +35,6 @@ class EmailDeliveryService:
 #  Payment gateway
 # --------------------------------------------------------------------------- #
 
-@dataclass(frozen=True)
-class ChargeResult:
-    ok: bool
-    reference: str
-    message: str = ""
-
-
 #: Platform cut shrinks as a contributor's subscriber base grows (PRD 1.4.5).
 REVENUE_TIERS: tuple[tuple[int, str, float], ...] = (
     (0, "tier_1", 0.30),
@@ -55,18 +50,6 @@ def revenue_tier_for(subscriber_count: int) -> tuple[str, float]:
         if subscriber_count >= threshold:
             name, share = tier_name, tier_share
     return name, share
-
-
-class PaymentGateway:
-    def charge(self, *, user_id: int, amount_cents: int, description: str) -> ChargeResult:
-        ref = f"stub_{user_id}_{int(datetime.now(timezone.utc).timestamp())}"
-        log.info("[payment:stub] charge user=%s amount=%s %r", user_id, amount_cents, description)
-        return ChargeResult(ok=True, reference=ref)
-
-    def payout(self, *, contributor_id: int, amount_cents: int) -> ChargeResult:
-        ref = f"stub_payout_{contributor_id}_{int(datetime.now(timezone.utc).timestamp())}"
-        log.info("[payment:stub] payout contributor=%s amount=%s", contributor_id, amount_cents)
-        return ChargeResult(ok=True, reference=ref)
 
 
 # --------------------------------------------------------------------------- #
@@ -100,5 +83,4 @@ class SocialShareService:
 
 
 email_service = EmailDeliveryService()
-payment_gateway = PaymentGateway()
 social_share = SocialShareService()

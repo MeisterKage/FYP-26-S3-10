@@ -7,17 +7,19 @@
  * as one would say the opposite of what it means.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../api";
 import { EntryThumb } from "../components/CoverImage";
 import { useAuth } from "../auth";
 import { AccuracyRate, CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
+import { startSubscription } from "./Checkout";
 
 export default function ContributorProfile() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -59,9 +61,8 @@ export default function ContributorProfile() {
     setBusy("subscribe");
     setError(null);
     try {
-      await api.post(`/contributors/${id}/subscribe`);
-      setNotice("Subscribed. Their subscriber-only articles are now open to you.");
-      load();
+      // Goes to checkout. Access starts when the payment is confirmed.
+      await startSubscription(id, navigate);
     } catch (e) {
       setError(e.message);
     } finally {

@@ -3,6 +3,8 @@
 No secret has a default. A missing value fails loudly at boot rather than
 silently running with a guessable key.
 """
+import hashlib
+import hmac
 import os
 
 from dotenv import load_dotenv
@@ -44,6 +46,17 @@ class Config:
     # Whether originality checks fetch the pages an article cites. On in every
     # real deployment; off in tests, which must not depend on the network.
     ORIGINALITY_FETCH_SOURCES = True
+
+    # Payments (app/payments.py). "sandbox" works end to end with no money;
+    # "stripe" needs the skeleton completed and the two Stripe keys set.
+    PAYMENT_PROVIDER = os.environ.get("PAYMENT_PROVIDER", "sandbox")
+    # Signs sandbox webhooks. Derived from SECRET_KEY unless set, so it is never
+    # a value committed to the repository.
+    PAYMENT_WEBHOOK_SECRET = os.environ.get("PAYMENT_WEBHOOK_SECRET") or hmac.new(
+        SECRET_KEY.encode(), b"sandbox-payment-webhooks", hashlib.sha256
+    ).hexdigest()
+    STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+    STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
     # Rate-limit counters. In-process memory is correct for development and a
     # single-process demo, but it resets on restart and is not shared between

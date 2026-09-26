@@ -607,6 +607,53 @@ class Subscription(TimestampMixin, db.Model):
     )
 
 
+class Payment(db.Model):
+    """One order, from checkout to outcome (app/payments.py).
+
+    The amount is set here by the server when the order is created. A webhook
+    only moves the status on, and only if its amount and currency match.
+    """
+
+    __tablename__ = "payments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    #: What was bought. "subscription" is the only purpose so far.
+    purpose: Mapped[str] = mapped_column(String(40))
+    contributor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    amount_cents: Mapped[int] = mapped_column(Integer)
+    currency: Mapped[str] = mapped_column(String(3))
+    #: pending -> succeeded | failed; succeeded -> refunded
+    status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+    provider: Mapped[str] = mapped_column(String(20))
+    #: The provider's checkout id: how its webhook refers back to this row.
+    provider_ref: Mapped[str | None] = mapped_column(String(255), unique=True)
+    failure_reason: Mapped[str | None] = mapped_column(String(300))
+    subscription_id: Mapped[int | None] = mapped_column(
+        ForeignKey("subscriptions.id", ondelete="SET NULL")
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class PaymentWebhookEvent(db.Model):
+    """Every provider event acted on, so a resent event is recognised and ignored.
+
+    Providers deliver webhooks at least once, and resend on any timeout. Without
+    this, one payment delivered twice would grant two months for one charge.
+    """
+
+    __tablename__ = "payment_webhook_events"
+    __table_args__ = (UniqueConstraint("provider", "event_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    provider: Mapped[str] = mapped_column(String(20))
+    event_id: Mapped[str] = mapped_column(String(255))
+    kind: Mapped[str] = mapped_column(String(40))
+    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payments.id", ondelete="SET NULL"))
+    received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Payout(TimestampMixin, db.Model):
     __tablename__ = "payouts"
 
