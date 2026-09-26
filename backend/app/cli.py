@@ -5,12 +5,14 @@ Three things happen on a clock rather than on a request:
   * scheduled publication (Figure 5.44)
   * email dispatch within 60 seconds of a trigger (PRD 5.1 Performance)
   * the auto-publish sweep, which only acts when the review queue is overloaded
+  * monthly digests, compiled on the first of each month
 
 They run from the CLI:
 
     flask publish-due
     flask dispatch-notifications
     flask autopublish-backlog
+    flask compile-digests          # monthly, on the 1st
 
 For the deployed system, point cron (or the host's scheduler) at these every
 minute. Nothing in the application code needs to change to do that.
@@ -65,6 +67,24 @@ def register_cli(app) -> None:
 
         sent = dispatch_pending(limit=limit)
         click.echo(f"Dispatched {sent} notification(s).")
+
+    @app.cli.command("compile-digests")
+    @click.option("--month", default=None, help="YYYY-MM. Defaults to last month.")
+    @click.option("--force", is_flag=True, help="Recompile editions that already exist.")
+    def compile_digests(month, force):
+        """Compile the monthly digests and notify subscribers of new editions."""
+        from .digest import previous_month
+        from .digest_service import compile_month
+
+        month = month or previous_month(utcnow())
+        result = compile_month(month, force=force)
+        click.echo(
+            f"{month}: {len(result['created'])} new edition(s), "
+            f"{len(result['recompiled'])} recompiled, {len(result['unchanged'])} unchanged, "
+            f"{result['notified']} subscriber notification(s)."
+        )
+        for key in result["created"]:
+            click.echo(f"  new  {key}")
 
     @app.cli.command("index-originality")
     def index_originality():

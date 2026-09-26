@@ -25,7 +25,8 @@ NOTIFICATION_EVENTS = (
     "breaking_news",
     "comment_reply",
     "followed_contributor_article",
-    "weekly_digest",
+    # Was "weekly_digest", which nothing ever sent. Monthly digests replaced it.
+    "monthly_digest",
     "account_security",
 )
 

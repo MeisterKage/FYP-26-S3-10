@@ -30,6 +30,7 @@ const TABS = [
   ["disputes", "Disputes"],
   ["categories", "Categories"],
   ["scoring", "Scoring"],
+  ["digests", "Digests"],
   ["logs", "Logs"],
 ];
 
@@ -752,6 +753,69 @@ function SettingsTable({ settings, draft, setDraft, label }) {
   );
 }
 
+/**
+ * Compile a month's digests on demand. Normally `flask compile-digests` runs on
+ * the 1st; this is for re-running a month or showing a month still in progress.
+ */
+function DigestCompile({ onNotice }) {
+  const thisMonth = new Date().toISOString().slice(0, 7);
+  const lastMonth = (() => {
+    const d = new Date();
+    d.setUTCDate(1);
+    d.setUTCMonth(d.getUTCMonth() - 1);
+    return d.toISOString().slice(0, 7);
+  })();
+  const [month, setMonth] = useState(lastMonth);
+  const [force, setForce] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  async function compile(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await api.post("/admin/digests/compile", { month, force });
+      setResult(r);
+      onNotice(`Compiled ${month}: ${r.created.length} new, ${r.recompiled.length} updated.`);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div>
+      <p className="meta">
+        Digests compile automatically on the first of each month, for the month before. A
+        month still in progress can be compiled early: its editions are marked in progress
+        and completed by the first run after the month ends. Subscribers are notified once,
+        when an edition is final.
+      </p>
+      <form className="row gap-4 mt-5 digest-add" onSubmit={compile}>
+        <label className="sr-only" htmlFor="digest-month">Month</label>
+        <input id="digest-month" className="input input-sm" type="month" value={month}
+          max={thisMonth} onChange={(e) => setMonth(e.target.value)} required />
+        <label className="checkbox">
+          <input type="checkbox" checked={force} onChange={() => setForce(!force)} />
+          <span>Recompile finished editions</span>
+        </label>
+        <Button type="submit" variant="primary" size="sm" busy={busy}>Compile</Button>
+        <Link className="link-quiet meta" to="/digests">View digests</Link>
+      </form>
+      {error && <div className="mt-4"><Notice>{error}</Notice></div>}
+      {result && (
+        <p className="meta mt-4">
+          {result.month}: {result.created.length} new, {result.recompiled.length} recompiled,{" "}
+          {result.unchanged.length} unchanged, {result.notified} subscriber notification(s).
+        </p>
+      )}
+    </div>
+  );
+}
+
 function Scoring({ onNotice }) {
   const state = useResource("/admin/settings");
   const [draft, setDraft] = useState({});
@@ -1144,6 +1208,7 @@ export default function AdminConsole() {
     disputes: <Disputes onNotice={onNotice} />,
     categories: <Categories onNotice={onNotice} />,
     scoring: <Scoring onNotice={onNotice} />,
+    digests: <DigestCompile onNotice={onNotice} />,
     logs: <Logs />,
   };
 

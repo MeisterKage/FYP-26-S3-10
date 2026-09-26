@@ -18,12 +18,13 @@ import { EntryThumb } from "../components/CoverImage";
 import { CAN_AUTHOR, ROLES, useAuth } from "../auth";
 import { CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Field, Notice, SectionHead, formatDate } from "../components/UI";
+import { DigestSubscriptions } from "./Digests";
 
 const EVENT_LABELS = {
   breaking_news: "Breaking news",
   comment_reply: "Replies to my comments",
   followed_contributor_article: "New articles from writers I follow",
-  weekly_digest: "Weekly digest",
+  monthly_digest: "Monthly digests I subscribe to",
   account_security: "Account and security",
 };
 
@@ -559,6 +560,7 @@ export default function Account() {
     ["profile", "Profile"],
     ["reading", "Reading list"],
     ["alerts", "Email alerts"],
+    ["digests", "Digests"],
     ...(canApply ? [["apply", "Become a contributor"]] : []),
     ["subs", "Subscriptions"],
     ...(canWrite ? [["earnings", "Earnings"]] : []),
@@ -570,6 +572,7 @@ export default function Account() {
     profile: <Profile onNotice={setNotice} />,
     reading: <ReadingList />,
     alerts: <NotificationSettings onNotice={setNotice} />,
+    digests: <DigestSubscriptions onNotice={setNotice} />,
     apply: <Application onNotice={setNotice} />,
     subs: <Subscriptions onNotice={setNotice} />,
     earnings: <Earnings />,

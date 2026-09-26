@@ -18,6 +18,7 @@ import ContributorDashboard from "./pages/ContributorDashboard";
 import CategoryPage from "./pages/CategoryPage";
 import ContributorProfile from "./pages/ContributorProfile";
 import { CountryIndex, CountryPage } from "./pages/CountryPages";
+import { DigestArchive, DigestEdition } from "./pages/Digests";
 import { EditorPanel, EditorProfile } from "./pages/EditorPanel";
 import ResetPassword from "./pages/ResetPassword";
 import HomePage from "./pages/HomePage";
@@ -90,6 +91,8 @@ export default function App() {
             <Route path="/contributors/:id" element={<ContributorProfile />} />
             <Route path="/countries" element={<CountryIndex />} />
             <Route path="/countries/:code" element={<CountryPage />} />
+            <Route path="/digests" element={<DigestArchive />} />
+            <Route path="/digests/:month/:key" element={<DigestEdition />} />
             <Route path="/editors" element={<EditorPanel />} />
             <Route path="/editors/:id" element={<EditorProfile />} />
             <Route path="/reset-password" element={<ResetPassword />} />

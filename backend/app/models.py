@@ -272,6 +272,62 @@ class Article(TimestampMixin, db.Model):
         return self.auto_published_at is not None and self.review_confirmed_at is None
 
 
+class DigestEdition(db.Model):
+    """One monthly digest: a topic, optionally narrowed to a country.
+
+    Fixed once compiled, like a printed issue. The ranked article list is kept
+    in DigestEntry rows and never re-ranked; what later happens to an article
+    (a correction, a retraction) is shown against it when the edition is read.
+    """
+
+    __tablename__ = "digest_editions"
+    __table_args__ = (UniqueConstraint("month", "key"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    #: "2026-09"
+    month: Mapped[str] = mapped_column(String(7), index=True)
+    #: "technology" or "politics-au": the section slug, plus the country if any.
+    key: Mapped[str] = mapped_column(String(100))
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"))
+    #: ISO code, or "" for every country. Not NULL, so the uniqueness of
+    #: (month, key) and subscription matching need no NULL special cases.
+    country_code: Mapped[str] = mapped_column(String(2), default="")
+    #: Month statistics and the corrections logged that month, as compiled.
+    data: Mapped[str] = mapped_column(Text)
+    compiled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    entries: Mapped[list["DigestEntry"]] = relationship(
+        cascade="all, delete-orphan", order_by="DigestEntry.rank"
+    )
+
+
+class DigestEntry(db.Model):
+    __tablename__ = "digest_entries"
+    __table_args__ = (UniqueConstraint("edition_id", "article_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    edition_id: Mapped[int] = mapped_column(
+        ForeignKey("digest_editions.id", ondelete="CASCADE"), index=True
+    )
+    article_id: Mapped[int] = mapped_column(ForeignKey("articles.id", ondelete="CASCADE"))
+    rank: Mapped[int] = mapped_column(Integer)
+    #: The score the ranking used, kept so a reader can see it moved since.
+    score_at_compile: Mapped[float] = mapped_column(Float)
+
+    article: Mapped["Article"] = relationship()
+
+
+class DigestSubscription(db.Model):
+    __tablename__ = "digest_subscriptions"
+    __table_args__ = (UniqueConstraint("user_id", "category_id", "country_code"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"))
+    country_code: Mapped[str] = mapped_column(String(2), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class ArticleFingerprint(db.Model):
     """One winnowed fingerprint of an article's text (app/originality.py).
 

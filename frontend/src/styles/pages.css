@@ -992,3 +992,144 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- monthly digests -------------------------------------------------------
+   An edition reads like a ranked list in print: the rank is a real order, so
+   it is set in the display face, and the corrections close the page where a
+   newspaper runs its corrections column. */
+
+.digest-month + .digest-month {
+  margin-top: var(--s-8);
+}
+.digest-grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  list-style: none;
+  padding: 0;
+}
+.digest-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  height: 100%;
+  padding: var(--s-5);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  text-decoration: none;
+  transition: border-color var(--fast) var(--ease);
+}
+.digest-card:hover,
+.digest-card:focus-visible {
+  border-color: var(--quiet);
+}
+.digest-card-topic {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.digest-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--s-5);
+  padding-block: var(--s-5);
+  border-block: 1px solid var(--hair);
+}
+.digest-stats dd {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-display);
+  font-size: var(--t-heading);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* Prefixed with .digest-list so these outrank the generic .entry--media
+   placement rules, which would otherwise pull the rank into the text column. */
+.digest-list {
+  list-style: none;
+  padding: 0;
+}
+.digest-list .digest-entry {
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+}
+.digest-list .digest-entry > .digest-rank {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--quiet);
+  font-variant-numeric: tabular-nums;
+}
+.digest-list .digest-entry > .entry-main {
+  grid-column: 2;
+}
+.digest-list .digest-entry > .entry-aside {
+  grid-column: 3;
+}
+.digest-list .digest-entry.entry--media {
+  grid-template-columns: 2.5rem 9rem minmax(0, 1fr) auto;
+}
+.digest-list .digest-entry.entry--media > .entry-thumb {
+  grid-column: 2;
+}
+.digest-list .digest-entry.entry--media > .entry-main {
+  grid-column: 3;
+}
+.digest-list .digest-entry.entry--media > .entry-aside {
+  grid-column: 4;
+}
+.digest-since {
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  font-weight: 600;
+  color: var(--ink);
+  border-left: 2px solid var(--ink);
+  padding-left: var(--s-3);
+}
+
+.digest-corrections {
+  list-style: none;
+  padding: 0;
+}
+.digest-corrections > li {
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--hair);
+}
+.digest-overturned {
+  margin-left: var(--s-3);
+}
+
+.digest-subs {
+  list-style: none;
+  padding: 0;
+}
+.digest-subs > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-4);
+  padding-block: var(--s-3);
+  border-bottom: 1px solid var(--hair);
+}
+.digest-add {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 40rem) {
+  .digest-list .digest-entry,
+  .digest-list .digest-entry.entry--media {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+  .digest-list .digest-entry > .entry-main,
+  .digest-list .digest-entry > .entry-aside,
+  .digest-list .digest-entry.entry--media > .entry-thumb,
+  .digest-list .digest-entry.entry--media > .entry-main,
+  .digest-list .digest-entry.entry--media > .entry-aside {
+    grid-column: 2;
+    grid-row: auto;
+    text-align: left;
+  }
+}
