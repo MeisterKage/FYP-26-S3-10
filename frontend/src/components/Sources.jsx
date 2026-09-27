@@ -92,7 +92,8 @@ export function SourceList({ sources, articleId, reviewable = false, onChange })
                   <span className={`source-tier source-tier--${verdict === "rejected" ? "weak" : verdict === "accepted" ? "strong" : TONE[r.tier]}`}>
                     {r.label}
                   </span>
-                  <span className="source-points">+{r.points}</span>
+                  {/* Points are for editors weighing a source; a reader sees the grade and why. */}
+                  {reviewable && <span className="source-points">+{r.points}</span>}
                   {verdict && (
                     <span className="source-editor">
                       {verdict === "accepted" ? "Accepted" : "Rejected"} by an editor: {r.editorReason}
