@@ -186,10 +186,14 @@ export function BrowseMenu() {
                     </Row>
                   </ul>
                   <ul className="browse-list browse-list--secondary">
-                    <Row to="/">Front page</Row>
+                    {/* How scoring works lives here rather than in the masthead,
+                        which could not fit it beside Browse for the
+                        administrator. It is also in the footer and on every
+                        article, beside the score it explains. */}
+                    <Row to="/about">How scoring works</Row>
                     <Row to="/digests">Monthly digests</Row>
                     <Row to="/editors">Our editors</Row>
-                    <Row to="/about">How scoring works</Row>
+                    <Row to="/">Front page</Row>
                   </ul>
                   <Link className="browse-feature" to="/digests">
                     <span className="browse-feature-label">Featured</span>

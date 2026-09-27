@@ -27,9 +27,6 @@ export function Masthead() {
           <NavLink className="nav-link" to="/search">
             Search
           </NavLink>
-          <NavLink className="nav-link" to="/about">
-            How scoring works
-          </NavLink>
 
           {has(...CAN_AUTHOR) && (
             <NavLink className="nav-link" to="/dashboard">

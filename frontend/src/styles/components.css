@@ -1361,6 +1361,19 @@
 .browse-trigger[aria-expanded="true"] {
   background: var(--sunken);
 }
+/* Flex shrinks an svg before it shrinks text: the same fault that once
+   crushed the notification bell to a dot. */
+.browse-trigger svg {
+  flex-shrink: 0;
+}
+/* On a phone the panel is the screen; a 6px sliver of page beside it reads
+   as a mistake, not as a backdrop. */
+@media (max-width: 30rem) {
+  .browse-drawer {
+    width: 100vw;
+    border-right: 0;
+  }
+}
 
 .browse-layer {
   position: fixed;
