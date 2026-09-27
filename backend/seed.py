@@ -10,6 +10,7 @@ corrections, and reports.
     py seed.py --reset   # empty the tables and reload
     py seed.py --countries   # tag countries and add samples to existing data
     py seed.py --originality # distinct demo bodies, index, and a planted copy
+    py seed.py --long-bodies # full-length bodies for articles already seeded
     flask rate-sources       # then grade every cited source (needs internet)
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
@@ -403,7 +404,7 @@ def seed_countries() -> None:
             title=title,
             slug=slugify(title),
             summary=summary,
-            body="".join(f"<p>{p}</p>" for p in paragraphs),
+            body=body_for(title, paragraphs),
             tags="regional,analysis",
             status=ArticleStatus.PUBLISHED,
             published_at=published_at,
@@ -433,6 +434,39 @@ def seed_countries() -> None:
     )
     for code, count in sorted(rows, key=lambda r: -r[1]):
         print(f"  {code or 'international':<14} {count} published")
+
+
+def seed_long_bodies() -> None:
+    """Swap the short demo bodies on an existing database for the long ones.
+
+    Safe to run more than once and on the live database: only demo articles
+    whose body differs from the long version change, republished articles are
+    never touched, and the originality index and pending checks are refreshed.
+    """
+    import re
+    from demo_bodies import LONG
+    from app.originality_service import check, index_article
+    from app.scoring_service import load_settings
+
+    changed = []
+    for article in Article.query.filter(Article.republication.is_(None)):
+        title = re.sub(r" \(\d+\)$", "", article.title)
+        if title in LONG:
+            body = body_for(title)
+            if article.body != body:
+                article.body = body
+                changed.append(article)
+    db.session.flush()
+    for article in changed:
+        index_article(article)
+    db.session.flush()
+
+    settings = load_settings()
+    for article in Article.query.filter_by(status=ArticleStatus.PENDING):
+        report = check(article, settings=settings)
+        print(f"  checked {report['percent']:5.1f}% {report['level']:<10} {article.title[:60]}")
+    db.session.commit()
+    print(f"Long bodies: rewrote {len(changed)} article(s).")
 
 
 # ---- originality ------------------------------------------------------------ #
@@ -788,6 +822,9 @@ if __name__ == "__main__":
             sys.exit(0)
         if "--originality" in sys.argv:
             seed_originality()
+            sys.exit(0)
+        if "--long-bodies" in sys.argv:
+            seed_long_bodies()
             sys.exit(0)
         if "--reset" in sys.argv:
             reset()

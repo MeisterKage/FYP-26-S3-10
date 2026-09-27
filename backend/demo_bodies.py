@@ -3,7 +3,26 @@
 The seed used to give every article the same template text. That made every
 demo article a near-total copy of every other, which the originality checker
 correctly reports. Fictional demo reporting: no real person is named.
+
+Most live headlines now have a full-length version (demo_long_*.py) of 400 to
+700 words with subheadings; BODIES stays as the short fallback.
 """
+from demo_long_apac import LONG_APAC
+from demo_long_au import LONG_AU
+from demo_long_extra import EXTRA
+from demo_long_west import LONG_WEST
+
+
+def _with_extra(title: str, paragraphs: list[str]) -> list[str]:
+    """Insert the extra sections before the last subheading."""
+    extra = EXTRA.get(title)
+    if not extra:
+        return paragraphs
+    last = max(i for i, p in enumerate(paragraphs) if p.startswith("## "))
+    return paragraphs[:last] + extra + paragraphs[last:]
+
+
+LONG = {t: _with_extra(t, ps) for t, ps in {**LONG_AU, **LONG_APAC, **LONG_WEST}.items()}
 
 BODIES = {
     "Parliament passes revised data protection framework": [
@@ -310,5 +329,14 @@ BODIES = {
 }
 
 
-def body_for(headline: str) -> str:
-    return "".join(f"<p>{p}</p>" for p in BODIES[headline])
+def render(paragraphs: list[str]) -> str:
+    """Paragraphs to HTML; an entry starting "## " is a subheading."""
+    return "".join(f"<h3>{p[3:]}</h3>" if p.startswith("## ") else f"<p>{p}</p>"
+                   for p in paragraphs)
+
+
+def body_for(headline: str, short: list[str] | None = None) -> str:
+    """The long version of a headline's body if there is one, else the short one."""
+    if headline in LONG:
+        return render(LONG[headline])
+    return render(short if short is not None else BODIES[headline])
