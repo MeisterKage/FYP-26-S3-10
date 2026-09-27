@@ -347,6 +347,47 @@ class ArticleFingerprint(db.Model):
     position: Mapped[int] = mapped_column(Integer)
 
 
+class SourceDomainRule(db.Model):
+    """An administrator's grade for a domain, overriding the automatic rules.
+
+    For the cases no rule or list gets right: an official body on a plain
+    .com address, a reputable local outlet no list covers, or a site the lists
+    rate more kindly than this platform should. Every change is logged, and
+    articles citing the domain are re-graded when it changes.
+    """
+
+    __tablename__ = "source_domain_rules"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    #: A bare domain, e.g. "bankofengland.co.uk". Covers its subdomains.
+    domain: Mapped[str] = mapped_column(String(253), unique=True, index=True)
+    tier: Mapped[str] = mapped_column(String(20))
+    reason: Mapped[str] = mapped_column(String(400))
+    created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+    )
+
+
+class DomainLookup(db.Model):
+    """Who owns a domain, according to Wikidata. A cache: one lookup per domain.
+
+    `status` is "official" (owned by a government body that is not a media
+    organisation), "none" (no such owner found) or "error" (Wikidata could not
+    be asked; retried sooner).
+    """
+
+    __tablename__ = "domain_lookups"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    domain: Mapped[str] = mapped_column(String(253), unique=True, index=True)
+    status: Mapped[str] = mapped_column(String(20))
+    owner: Mapped[str | None] = mapped_column(String(300))
+    wikidata_id: Mapped[str | None] = mapped_column(String(20))
+    checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class SourceSnapshot(db.Model):
     """The text of a cited page as it was when last checked.
 

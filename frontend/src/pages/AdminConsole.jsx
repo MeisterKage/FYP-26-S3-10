@@ -31,6 +31,7 @@ const TABS = [
   ["categories", "Categories"],
   ["scoring", "Scoring"],
   ["digests", "Digests"],
+  ["sources", "Sources"],
   ["logs", "Logs"],
 ];
 
@@ -754,6 +755,151 @@ function SettingsTable({ settings, draft, setDraft, label }) {
 }
 
 /**
+ * The administrators' source grades: the last word on a domain the automatic
+ * rules get wrong. Also lists what Wikidata graded official, because anyone can
+ * edit Wikidata and an administrator is the check on it.
+ */
+function SourceRules({ onNotice }) {
+  const state = useResource("/admin/source-rules");
+  const [form, setForm] = useState({ domain: "", tier: "official", reason: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function save(event, override) {
+    event?.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const body = override || form;
+      const r = await api.put("/admin/source-rules", body);
+      onNotice(`Graded ${r.rule.domain} as ${r.rule.label}. Re-graded ${r.regraded} article(s).`);
+      setForm({ domain: "", tier: "official", reason: "" });
+      state.reload();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(rule) {
+    if (!window.confirm(`Remove your grade for ${rule.domain}? Articles citing it go back to the automatic grade.`)) return;
+    const r = await api.del(`/admin/source-rules/${rule.id}`);
+    onNotice(`Removed the grade for ${r.deleted}. Re-graded ${r.regraded} article(s).`);
+    state.reload();
+  }
+
+  return (
+    <Panel state={state}>
+      {(d) => (
+        <div>
+          <p className="meta">
+            Grade a domain the automatic rules get wrong: an official body on a plain
+            .com address, a reputable local outlet no list covers, or a site rated too
+            kindly. Your grade comes before every list, readers see your reason beside
+            the source, and articles citing the domain are re-graded at once.
+          </p>
+
+          <form className="panel-profile mt-5" onSubmit={save}>
+            <Field label="Domain" id="rule-domain" hint="e.g. bankofengland.co.uk. Covers its subdomains." error={null}>
+              {(props) => (
+                <input {...props} className="input" value={form.domain} required
+                  onChange={(e) => setForm((f) => ({ ...f, domain: e.target.value }))} />
+              )}
+            </Field>
+            <Field label="Grade" id="rule-tier">
+              {(props) => (
+                <select {...props} className="input" value={form.tier}
+                  onChange={(e) => setForm((f) => ({ ...f, tier: e.target.value }))}>
+                  {d.tiers.map((t) => <option key={t.tier} value={t.tier}>{t.label}</option>)}
+                </select>
+              )}
+            </Field>
+            <Field label="Reason" id="rule-reason" hint="Shown to readers. Say why, in a few words.">
+              {(props) => (
+                <input {...props} className="input" value={form.reason} maxLength={400} required
+                  onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))} />
+              )}
+            </Field>
+            <div className="row gap-4">
+              <Button type="submit" variant="primary" size="sm" busy={busy}>Save grade</Button>
+            </div>
+            {error && <Notice>{error}</Notice>}
+          </form>
+
+          <div className="mt-7">
+            <SectionHead title="Your grades" />
+            {d.rules.length === 0 ? (
+              <p className="meta">None yet. Every source is graded automatically.</p>
+            ) : (
+              <div className="table-scroll">
+                <table className="table">
+                  <thead>
+                    <tr><th scope="col">Domain</th><th scope="col">Grade</th><th scope="col">Reason</th>
+                      <th scope="col"><span className="sr-only">Actions</span></th></tr>
+                  </thead>
+                  <tbody>
+                    {d.rules.map((r) => (
+                      <tr key={r.id}>
+                        <td><code>{r.domain}</code></td>
+                        <td>{r.label}</td>
+                        <td className="meta">{r.reason}</td>
+                        <td><Button size="sm" variant="quiet" onClick={() => remove(r)}>Remove</Button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-7">
+            <SectionHead title="Graded official by Wikidata" />
+            <p className="meta">
+              Domains Wikidata records as owned by a government body. Anyone can edit
+              Wikidata, so check these; a wrong one is corrected by grading the domain.
+            </p>
+            {d.wikidataOfficial.length === 0 ? (
+              <p className="meta mt-3">None yet.</p>
+            ) : (
+              <div className="table-scroll mt-3">
+                <table className="table">
+                  <thead>
+                    <tr><th scope="col">Domain</th><th scope="col">Owner, per Wikidata</th>
+                      <th scope="col"><span className="sr-only">Actions</span></th></tr>
+                  </thead>
+                  <tbody>
+                    {d.wikidataOfficial.map((w) => (
+                      <tr key={w.domain}>
+                        <td><code>{w.domain}</code></td>
+                        <td>
+                          <a className="link-quiet" href={`https://www.wikidata.org/wiki/${w.wikidataId}`}
+                            target="_blank" rel="noreferrer noopener">{w.owner}</a>
+                        </td>
+                        <td>
+                          {w.overridden ? (
+                            <span className="meta">You have graded this domain</span>
+                          ) : (
+                            <Button size="sm" variant="quiet"
+                              onClick={() => setForm({ domain: w.domain, tier: "unrated", reason: "" })}>
+                              Override
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+/**
  * Compile a month's digests on demand. Normally `flask compile-digests` runs on
  * the 1st; this is for re-running a month or showing a month still in progress.
  */
@@ -1209,6 +1355,7 @@ export default function AdminConsole() {
     categories: <Categories onNotice={onNotice} />,
     scoring: <Scoring onNotice={onNotice} />,
     digests: <DigestCompile onNotice={onNotice} />,
+    sources: <SourceRules onNotice={onNotice} />,
     logs: <Logs />,
   };
 

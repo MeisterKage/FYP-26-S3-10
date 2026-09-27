@@ -20,6 +20,18 @@ anyone can check, never from this system's opinion:
     invalid         a placeholder or reserved domain, or a page that        0
                     does not exist
 
+The order they are checked in:
+
+    1. placeholder addresses and pages that do not exist (never a source)
+    2. papers, by DOI, checked for retraction
+    3. an administrator's grade for the domain (source_domain_rules)
+    4. government, parliamentary and academic address endings
+    5. Wikipedia's Perennial Sources list
+    6. who owns the domain, per Wikidata: a government body that is not a
+       media organisation counts as official
+    7. self-published platforms
+    8. otherwise unrated
+
 An editor has the final word: "accepted" gives a source full points, "not
 credible" gives it none, and either needs a reason, which is logged. The tier
 is where review starts, not where it ends.
@@ -63,15 +75,14 @@ OFFICIAL_SUFFIXES = (
     ".gov.ie", ".gouv.fr", ".bund.de", ".europa.eu", ".mil", ".int", ".parliament.uk",
     ".nsw.gov.au", ".vic.gov.au",
 )
-#: Intergovernmental bodies, central banks, regulators and other statutory
-#: bodies whose domains do not use a government suffix. Kept short and
-#: deliberate: anything missing shows as unrated, which an editor can accept.
+#: Major intergovernmental and parliamentary bodies, so the most common
+#: official sources need no lookup. Other official bodies on ordinary addresses
+#: (central banks, regulators, research agencies) are found through Wikidata,
+#: and anything Wikidata misses an administrator can grade.
 OFFICIAL_DOMAINS = {
     "un.org", "who.int", "oecd.org", "imf.org", "worldbank.org", "wto.org", "ilo.org",
     "parliament.uk", "parliament.nz", "aph.gov.au", "legislation.gov.au", "bis.org",
-    "nhs.uk", "ecb.europa.eu", "unesco.org", "unicef.org", "ipcc.ch", "csiro.au",
-    "bankofengland.co.uk", "boj.or.jp", "ofcom.org.uk", "ukri.org", "niwa.co.nz",
-    "sportnz.org.nz", "a-star.edu.sg", "jst.go.jp",
+    "nhs.uk", "ecb.europa.eu", "unesco.org", "unicef.org", "ipcc.ch",
 }
 ACADEMIC_SUFFIXES = (
     ".edu", ".edu.au", ".ac.uk", ".ac.nz", ".edu.sg", ".ac.jp", ".edu.cn", ".ac.in",
@@ -137,8 +148,37 @@ def perennial_entry(host: str) -> tuple[str, dict] | None:
     return None
 
 
+#: Grades an administrator may give a domain. Research, retracted and invalid
+#: are facts about a particular link, not judgements about a domain.
+ADMIN_TIERS = ("official", "institution", "reliable", "unrated", "unreliable", "deprecated")
+
+
+def normalise_domain(value: str) -> str | None:
+    """A bare lower-case domain from whatever an administrator typed, or None."""
+    value = (value or "").strip().lower()
+    if "://" in value:
+        value = urlparse(value).hostname or ""
+    value = value.split("/")[0].rstrip(".")
+    if value.startswith("www."):
+        value = value[4:]
+    if not re.fullmatch(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}", value):
+        return None
+    return value
+
+
+def rule_for(host: str, rules: dict[str, tuple[str, str]]) -> tuple[str, str, str] | None:
+    """The most specific administrator rule covering a host: (domain, tier, reason)."""
+    parts = host.split(".")
+    for i in range(len(parts) - 1):
+        candidate = ".".join(parts[i:])
+        if candidate in rules:
+            return (candidate, *rules[candidate])
+    return None
+
+
 def classify(url: str, *, exists: bool | None = True, doi_status: str | None = None,
-             list_date: str | None = None) -> Rating:
+             list_date: str | None = None, admin_rules: dict | None = None,
+             official_owner: str | None = None) -> Rating:
     """Rate one source link.
 
     `exists` is False when the page could not be found at all (no such host, or
@@ -147,6 +187,9 @@ def classify(url: str, *, exists: bool | None = True, doi_status: str | None = N
 
     `doi_status` is what Crossref said about the link's DOI: "ok", "retracted",
     "unknown" (Crossref has no such paper), or None (no DOI, or not checked).
+
+    `admin_rules` maps domain to (tier, reason). `official_owner` is the name
+    of the government body Wikidata says owns the domain, if any.
     """
     host = host_of(url)
     if not host or any(host == r.lstrip(".") or host.endswith(r) for r in RESERVED):
@@ -169,6 +212,12 @@ def classify(url: str, *, exists: bool | None = True, doi_status: str | None = N
         return Rating("research", FULL, f"A published paper (DOI {doi}). Not yet checked "
                                         "for retraction.", doi=doi)
 
+    ruled = rule_for(host, admin_rules or {})
+    if ruled:
+        domain, tier, reason = ruled
+        return Rating(tier, TIER_POINTS[tier], f"Graded by this site's administrators: {reason}",
+                      flagged=tier in FLAGGED_TIERS)
+
     if any(_matches(host, d) for d in OFFICIAL_DOMAINS) or any(
             host.endswith(s) or host == s[1:] for s in OFFICIAL_SUFFIXES):
         return Rating("official", FULL, "A government, parliamentary or intergovernmental source.")
@@ -188,6 +237,11 @@ def classify(url: str, *, exists: bool | None = True, doi_status: str | None = N
         if status == "gu":
             return Rating("unreliable", NONE, said)
         return Rating("deprecated", NONE, said, flagged=True)
+
+    if official_owner:
+        return Rating("official", FULL,
+                      f"The official website of {official_owner}, a government body, "
+                      "according to Wikidata.")
 
     if any(_matches(host, d) for d in SELF_PUBLISHED):
         return Rating("unreliable", NONE, "A platform where anyone can publish.")

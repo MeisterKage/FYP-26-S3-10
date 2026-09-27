@@ -19,8 +19,11 @@ from ..errors import ApiError
 from ..extensions import db
 from ..models import (
     Article, AuditLog, Category, Comment, ContributorApplication, CorrectionDispute,
-    EditorCategory, Like, Notification, PlatformSetting, Report, User, utcnow,
+    DomainLookup, EditorCategory, Like, Notification, PlatformSetting, Report,
+    SourceDomainRule, User, utcnow,
 )
+from ..source_rating import ADMIN_TIERS, TIER_LABELS, normalise_domain
+from ..source_service import regrade_domain
 from ..sanitize import clean_plain_text
 from ..scoring_service import rescore_contributor_articles
 from ..security import roles_required
@@ -406,6 +409,85 @@ def set_editor_profile(editor_id: int):
             "credentials": editor.editor_credentials,
         }
     )
+
+
+# --------------------------------------------------------------------------- #
+#  Source grades: the administrators' list (source_rating.py, step 3)
+# --------------------------------------------------------------------------- #
+
+def _rule_view(rule: SourceDomainRule) -> dict:
+    return {
+        "id": rule.id,
+        "domain": rule.domain,
+        "tier": rule.tier,
+        "label": TIER_LABELS[rule.tier],
+        "reason": rule.reason,
+        "updatedAt": rule.updated_at.isoformat() if rule.updated_at else None,
+    }
+
+
+@bp.get("/admin/source-rules")
+@admin_only
+def list_source_rules():
+    """The administrators' grades, and every domain Wikidata graded official.
+
+    The Wikidata list is here so an administrator can check it: anyone can edit
+    Wikidata, and a wrong entry is corrected by adding a rule for that domain.
+    """
+    rules = SourceDomainRule.query.order_by(SourceDomainRule.domain).all()
+    ruled = {r.domain for r in rules}
+    found = DomainLookup.query.filter_by(status="official").order_by(DomainLookup.domain).all()
+    return jsonify({
+        "rules": [_rule_view(r) for r in rules],
+        "tiers": [{"tier": t, "label": TIER_LABELS[t]} for t in ADMIN_TIERS],
+        "wikidataOfficial": [
+            {"domain": d.domain, "owner": d.owner, "wikidataId": d.wikidata_id,
+             "overridden": d.domain in ruled}
+            for d in found
+        ],
+    })
+
+
+@bp.put("/admin/source-rules")
+@admin_only
+def set_source_rule():
+    """Add or change the grade for a domain, then re-grade articles citing it."""
+    data = json_body()
+    domain = normalise_domain(require_str(data, "domain", max_length=253))
+    if not domain:
+        raise ApiError("Enter a domain such as bankofengland.co.uk.", status=422, field="domain")
+    tier = require_choice(data, "tier", ADMIN_TIERS)
+    reason = clean_plain_text(require_str(data, "reason", max_length=400))
+    if len(reason) < 5:
+        raise ApiError("Say why, in a few words. Readers see this reason.", status=422,
+                       field="reason")
+
+    rule = SourceDomainRule.query.filter_by(domain=domain).first()
+    created = rule is None
+    if created:
+        rule = SourceDomainRule(domain=domain, created_by_id=g.current_user.id)
+        db.session.add(rule)
+    rule.tier, rule.reason = tier, reason
+    db.session.flush()
+    regraded = regrade_domain(domain)
+    _audit("source_rule.set", "source_domain_rule", rule.id, f"{domain} -> {tier}: {reason}")
+    db.session.commit()
+    return jsonify({"rule": _rule_view(rule), "regraded": regraded}), 201 if created else 200
+
+
+@bp.delete("/admin/source-rules/<int:rule_id>")
+@admin_only
+def delete_source_rule(rule_id: int):
+    rule = db.session.get(SourceDomainRule, rule_id)
+    if rule is None:
+        raise ApiError("Rule not found.", status=404)
+    domain = rule.domain
+    db.session.delete(rule)
+    db.session.flush()
+    regraded = regrade_domain(domain)
+    _audit("source_rule.delete", "source_domain_rule", rule_id, domain)
+    db.session.commit()
+    return jsonify({"deleted": domain, "regraded": regraded})
 
 
 # --------------------------------------------------------------------------- #

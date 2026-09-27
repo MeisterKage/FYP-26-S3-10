@@ -156,7 +156,12 @@ export default function AboutPage() {
             {v.sourceLists.perennial.retrieved}). Retractions come from{" "}
             <a className="link-quiet" href={v.sourceLists.retractions.url} target="_blank"
               rel="noreferrer noopener">{v.sourceLists.retractions.name}</a>
-            . Many smaller sites are on neither list and show as unrated.
+            . Who owns a domain comes from{" "}
+            <a className="link-quiet" href={v.sourceLists.ownership.url} target="_blank"
+              rel="noreferrer noopener">{v.sourceLists.ownership.name}</a>
+            . This site&rsquo;s administrators can also grade a domain directly, with a
+            reason readers see beside the source. Many smaller sites are on no list and
+            show as unrated.
           </p>
         </section>
       )}

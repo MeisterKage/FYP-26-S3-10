@@ -27,7 +27,9 @@ PASSWORD = "SourceRating123!"
     ("https://www.aph.gov.au/Parliamentary_Business", "official"),
     ("https://www.stats.govt.nz/", "official"),
     ("https://www.gov.uk/government/organisations/environment-agency", "official"),
-    ("https://www.bankofengland.co.uk/", "official"),
+    # Official bodies on ordinary addresses are found through Wikidata; see
+    # test_a_domain_owned_by_a_government_body_counts_as_official.
+    ("https://www.bankofengland.co.uk/", "unrated"),
     ("https://data.un.org/", "official"),
     ("https://www.who.int/news", "official"),
     ("https://www.uow.edu.au/research", "institution"),
@@ -226,3 +228,139 @@ def test_sources_rated_before_this_system_score_as_they_did(app, world):
         _db.session.add(ArticleSource(article_id=article.id, url=f"https://example.org/{i}"))
     _db.session.commit()
     assert explain_article(article).source_component == 15
+
+
+# =========================================================================== #
+#  The administrators' list, and Wikidata ownership
+# =========================================================================== #
+
+@pytest.mark.parametrize("typed,expected", [
+    ("https://www.BankOfEngland.co.uk/monetary-policy", "bankofengland.co.uk"),
+    ("ofcom.org.uk", "ofcom.org.uk"),
+    ("www.niwa.co.nz/", "niwa.co.nz"),
+    ("not a domain", None),
+    ("localhost", None),
+    ("evil.com; DROP TABLE", None),
+])
+def test_domains_are_normalised(typed, expected):
+    assert sr.normalise_domain(typed) == expected
+
+
+def test_an_admin_rule_overrides_the_lists_and_covers_subdomains():
+    rules = {"smh.com.au": ("unreliable", "Testing an override.")}
+    rating = sr.classify("https://amp.smh.com.au/story", admin_rules=rules)
+    assert rating.tier == "unreliable"
+    assert "administrators" in rating.reason
+    assert sr.classify("https://www.smh.com.au/").tier == "reliable"  # untouched without it
+
+
+def test_an_admin_rule_cannot_launder_a_retracted_paper():
+    rules = {"doi.org": ("official", "Nope.")}
+    rating = sr.classify("https://doi.org/10.1016/x", doi_status="retracted", admin_rules=rules)
+    assert rating.tier == "retracted"
+
+
+def test_a_domain_owned_by_a_government_body_counts_as_official():
+    rating = sr.classify("https://www.some-regulator.com/", official_owner="Some Regulator")
+    assert rating.tier == "official"
+    assert "Some Regulator" in rating.reason and "Wikidata" in rating.reason
+
+
+def _binding(qid, label, kind):
+    return {"item": {"value": f"http://www.wikidata.org/entity/{qid}"},
+            "itemLabel": {"value": label}, "kind": {"value": kind}}
+
+
+def test_wikidata_official_but_not_media(app, monkeypatch):
+    from app.models import DomainLookup, utcnow
+    answers = {
+        "bankofengland.co.uk": [_binding("Q1", "Bank of England", "official")],
+        "abc.net.au": [_binding("Q2", "Australian Broadcasting Corporation", "official"),
+                       _binding("Q2", "Australian Broadcasting Corporation", "media")],
+        "niwa.co.nz": [_binding("Q3", "NIWA information series", "media"),
+                       _binding("Q4", "National Institute of Water and Atmospheric Research", "official")],
+        "smh.com.au": [_binding("Q5", "The Sydney Morning Herald", "media")],
+    }
+    calls = []
+    monkeypatch.setattr(source_service, "_wikidata_query",
+                        lambda d: calls.append(d) or answers.get(d, []))
+    now = utcnow()
+    assert source_service.official_owner("bankofengland.co.uk", now, fetch=True) == "Bank of England"
+    assert source_service.official_owner("abc.net.au", now, fetch=True) is None
+    assert source_service.official_owner("niwa.co.nz", now, fetch=True).startswith("National Institute")
+    assert source_service.official_owner("smh.com.au", now, fetch=True) is None
+    # Cached: asking again does not ask Wikidata again.
+    source_service.official_owner("bankofengland.co.uk", now, fetch=True)
+    assert calls.count("bankofengland.co.uk") == 1
+    assert DomainLookup.query.count() == 4
+
+
+def test_a_wikidata_outage_is_retried_sooner(app, monkeypatch):
+    from datetime import timedelta
+    from app.models import utcnow
+    def down(d):
+        raise OSError("unreachable")
+    monkeypatch.setattr(source_service, "_wikidata_query", down)
+    now = utcnow()
+    assert source_service.official_owner("ofcom.org.uk", now, fetch=True) is None
+    monkeypatch.setattr(source_service, "_wikidata_query",
+                        lambda d: [_binding("Q9", "Ofcom", "official")])
+    assert source_service.official_owner("ofcom.org.uk", now + timedelta(hours=2), fetch=True) is None
+    assert source_service.official_owner("ofcom.org.uk", now + timedelta(days=2), fetch=True) == "Ofcom"
+
+
+def test_wikidata_is_only_asked_when_nothing_else_decides(client, world, app, monkeypatch):
+    asked = []
+    monkeypatch.setattr(source_service, "official_owner",
+                        lambda domain, now, fetch: asked.append(domain) or None)
+    submit_with(client, world, ["https://www.abs.gov.au/", "https://www.reuters.com/",
+                                "https://a-small-local-site.com.au/"])
+    assert asked == ["a-small-local-site.com.au"]
+
+
+@pytest.fixture()
+def admin(app):
+    return make_user("admin@example.com", Role.SYSTEM_ADMIN)
+
+
+def test_an_admin_grade_regrades_articles_citing_the_domain(client, world, admin):
+    article = submit_with(client, world, ["https://a-small-local-site.com.au/news"])
+    assert article.sources[0].tier == "unrated"
+    headers = auth(client, "admin@example.com")
+
+    made = client.put("/api/admin/source-rules", json={
+        "domain": "https://www.a-small-local-site.com.au/", "tier": "official",
+        "reason": "The local council's official news site.",
+    }, headers=headers)
+    assert made.status_code == 201
+    assert made.get_json()["regraded"] == 1
+    _db.session.refresh(article.sources[0])
+    assert article.sources[0].tier == "official"
+    assert AuditLog.query.filter_by(action="source_rule.set").count() == 1
+
+    listing = client.get("/api/admin/source-rules", headers=headers).get_json()
+    assert listing["rules"][0]["domain"] == "a-small-local-site.com.au"
+
+    removed = client.delete(f"/api/admin/source-rules/{listing['rules'][0]['id']}", headers=headers)
+    assert removed.status_code == 200
+    _db.session.refresh(article.sources[0])
+    assert article.sources[0].tier == "unrated"
+
+
+@pytest.mark.parametrize("body,field", [
+    ({"domain": "not a domain", "tier": "official", "reason": "A good reason."}, "domain"),
+    ({"domain": "ok.com.au", "tier": "research", "reason": "A good reason."}, "tier"),
+    ({"domain": "ok.com.au", "tier": "official", "reason": "no"}, "reason"),
+])
+def test_admin_grades_are_validated(client, world, admin, body, field):
+    response = client.put("/api/admin/source-rules", json=body,
+                          headers=auth(client, "admin@example.com"))
+    assert response.status_code == 422
+    assert response.get_json()["error"]["field"] == field
+
+
+def test_only_administrators_grade_domains(client, world):
+    response = client.put("/api/admin/source-rules", json={
+        "domain": "ok.com.au", "tier": "official", "reason": "Editors cannot do this."},
+        headers=auth(client, "editor@example.com"))
+    assert response.status_code == 403

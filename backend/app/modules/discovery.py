@@ -26,7 +26,9 @@ from ..source_rating import TIER_LABELS, TIER_POINTS, perennial
 
 #: Plain descriptions of each source tier for the About page, in order.
 SOURCE_TIER_DESCRIPTIONS = (
-    ("official", "Government, parliament, courts, and bodies such as the UN and WHO."),
+    ("official", "Government, parliament, courts, and bodies such as the UN and WHO, "
+                 "including any organisation Wikidata records as a government body that "
+                 "is not a media organisation."),
     ("research", "A published paper, identified by its DOI, that has not been retracted."),
     ("institution", "A university or research institute."),
     ("reliable", "An outlet Wikipedia's editors rate \u201cgenerally reliable\u201d after "
@@ -399,6 +401,11 @@ def scoring_formula():
                     "url": perennial()["source"],
                     "license": perennial()["license"],
                     "retrieved": perennial()["retrieved"],
+                },
+                "ownership": {
+                    "name": "Wikidata",
+                    "url": "https://www.wikidata.org/",
+                    "license": "CC0",
                 },
                 "retractions": {
                     "name": "Crossref, including the Retraction Watch database",
