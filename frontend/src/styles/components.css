@@ -1563,3 +1563,9 @@
     border-right: 0;
   }
 }
+
+/* How many sources the ledger's sourcing line counted: "best 5 of 8". */
+.ledger-note {
+  color: var(--mute);
+  font-variant-numeric: tabular-nums;
+}

@@ -88,12 +88,36 @@ def _accuracy_input(article: Article, cfg: dict) -> float:
     return credibility.smoothed_accuracy(published, blemished, cfg)
 
 
+def _scored_sources(article: Article) -> list:
+    """The sources that may earn points.
+
+    A republished article lists its original for attribution, but an article
+    cannot verify itself, so that link earns nothing.
+    """
+    import json
+
+    original = None
+    if article.republication:
+        original = (json.loads(article.republication).get("url") or "").rstrip("/")
+    return [s for s in article.sources if not (original and s.url.rstrip("/") == original)]
+
+
+def _source_count(article: Article) -> int:
+    return sum(1 for s in _scored_sources(article) if s.is_valid)
+
+
 def _rated_source_points(article: Article, cfg: dict) -> float:
-    """Sum of each source's points (source_service.source_points)."""
+    """Points from the best `sources_counted` sources (source_service.source_points).
+
+    Taking the best few, not the sum of all, means a long list of weak links
+    cannot reach the cap: only better sources raise a score.
+    """
     from .source_service import source_points
 
-    per_source = float({**credibility.DEFAULTS, **cfg}["source_points"])
-    return sum(source_points(s, per_source) for s in article.sources)
+    merged = {**credibility.DEFAULTS, **cfg}
+    per_source = float(merged["source_points"])
+    points = sorted((source_points(s, per_source) for s in _scored_sources(article)), reverse=True)
+    return sum(points[: int(merged["sources_counted"])])
 
 
 def recalculate_accuracy(contributor: User, settings: dict | None = None) -> float | None:
@@ -121,7 +145,7 @@ def rescore_article(article: Article, settings: dict | None = None):
     published_rate = recalculate_accuracy(article.contributor, cfg)
     accuracy = _accuracy_input(article, cfg)
 
-    valid_sources = sum(1 for s in article.sources if s.is_valid)
+    valid_sources = _source_count(article)
     rated_points = _rated_source_points(article, cfg)
     corrections = sum(1 for c in article.corrections if c.overturned_at is None)
     upheld_reports = (
@@ -169,7 +193,7 @@ def explain_article(article: Article, settings: dict | None = None):
 
     return credibility.credibility_score(
         contributor_accuracy=accuracy,
-        source_count=sum(1 for s in article.sources if s.is_valid),
+        source_count=_source_count(article),
         correction_count=sum(1 for c in article.corrections if c.overturned_at is None),
         is_retracted=article.is_retracted,
         upheld_report_count=upheld,

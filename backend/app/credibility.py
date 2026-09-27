@@ -23,15 +23,20 @@ CREDIBILITY SCORE  (per article, 0-100)
 --------------------------------------------------------------------------------
 
     score =   accuracy_weight * accuracy_rate            # contributor track record
-            + min(sources * source_points, source_cap)   # verifiable sourcing
+            + min(best sources_counted sources, source_cap)  # verifiable sourcing
             - corrections * correction_penalty           # each logged correction
             - retraction_penalty   if retracted
             - report_penalty       if upheld_reports >= report_threshold
 
     clamped to [0, 100].
 
+Only the best `sources_counted` sources (five) earn points, each worth up to
+`source_points` (five) by its rating. Adding more links cannot raise a score;
+adding better ones can. So five strong sources earn the full 25, and three
+strong ones padded with five unrated sites earn 5+5+5+2+2 = 19.
+
 With shipped defaults the ceiling is exactly 100: a contributor at 100% accuracy
-(0.75 * 100 = 75) who tags five or more sources (capped at 25) scores 100.
+(0.75 * 100 = 75) who cites five well-rated sources (25) scores 100.
 
 Every constant is a row in PlatformSetting, editable by a System Administrator
 (PRD Section 1.3.2, administrator power 5). Defaults live in DEFAULTS below and
@@ -53,6 +58,7 @@ DEFAULTS: dict[str, float] = {
     "accuracy_weight": 0.75,            # accuracy 0-100 contributes 0-75
     "source_points": 5.0,               # points per verifiable source link
     "source_cap": 25.0,                 # sourcing cannot contribute more than this
+    "sources_counted": 5,               # only the best this many sources earn points
     "correction_penalty": 15.0,         # per logged correction
     "retraction_penalty": 40.0,         # one-off, if retracted
     "report_threshold": 10,             # upheld reports needed to trigger penalty
@@ -85,6 +91,10 @@ class ScoreBreakdown:
     retraction_penalty: float
     report_penalty: float
     used_provisional_accuracy: bool
+    #: How many sources were eligible and how many earned points, so the
+    #: ledger can say "best 5 of 8" instead of an unexplained figure.
+    sources_cited: int = 0
+    sources_counted: int = 0
 
     def as_dict(self) -> dict:
         return {
@@ -98,6 +108,7 @@ class ScoreBreakdown:
                 "reports": -self.report_penalty,
             },
             "provisional": self.used_provisional_accuracy,
+            "sourcing": {"cited": self.sources_cited, "counted": self.sources_counted},
         }
 
 
@@ -189,9 +200,12 @@ def credibility_score(
     # `source_points` is the sum of each cited source's rating
     # (source_rating.py): a government page or a reliable outlet is worth more
     # than an unrated site, and a placeholder or retracted paper nothing. Without
-    # it, every source counts the flat `source_points`, as it always did.
+    # it, every source counts the flat `source_points`. Either way only the best
+    # `sources_counted` sources count (the caller picks them for rated sources).
+    limit = int(cfg["sources_counted"])
+    counted = min(max(0, source_count), limit)
     raw_sources = (
-        max(0, source_count) * cfg["source_points"] if source_points is None
+        counted * cfg["source_points"] if source_points is None
         else max(0.0, source_points)
     )
     source_component = min(raw_sources, cfg["source_cap"])
@@ -216,4 +230,6 @@ def credibility_score(
         retraction_penalty=round(retraction, 2),
         report_penalty=round(reports, 2),
         used_provisional_accuracy=used_provisional,
+        sources_cited=max(0, source_count),
+        sources_counted=counted,
     )

@@ -122,9 +122,19 @@ export function CredibilityLedger({ credibility }) {
         {LEDGER_ROWS.map(([label, key]) => {
           const value = breakdown[key];
           if (value == null || value === 0) return null;
+          const sourcing = key === "sources" ? credibility.sourcing : null;
           return (
             <div className="ledger-row" key={key}>
-              <dt>{label}</dt>
+              <dt>
+                {label}
+                {sourcing && sourcing.cited > 0 && (
+                  <span className="ledger-note">
+                    {sourcing.cited > sourcing.counted
+                      ? ` · best ${sourcing.counted} of ${sourcing.cited}`
+                      : ` · ${sourcing.cited}`}
+                  </span>
+                )}
+              </dt>
               <dd>{fmt(value)}</dd>
             </div>
           );

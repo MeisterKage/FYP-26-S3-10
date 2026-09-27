@@ -262,7 +262,7 @@ export default function ArticlePage() {
               <SourceList sources={article.sources} />
               <p className="meta mt-4">
                 <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
-                Each source adds to the score by what kind of source it is.{" "}
+                The five best sources add to the score, by what kind of source each is.{" "}
                 <Link className="link-quiet" to="/about#sources">How sources are graded</Link>
               </p>
             </section>
