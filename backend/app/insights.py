@@ -205,7 +205,7 @@ def writing_signals(body_html: str) -> dict:
     rhythm = _cv(lengths)
     signals = [Signal(
         "rhythm", "Sentence rhythm", round(rhythm, 2),
-        f"{rhythm:.2f} variation", "0.40 or more in most edited news",
+        f"{rhythm:.2f} variation", "0.30 or more (edited news is usually 0.40 or more)",
         rhythm < 0.30,
         "How much sentence length varies. Very even sentence lengths are common in "
         "generated text; human writers mix short and long sentences.",
@@ -240,11 +240,12 @@ def writing_signals(body_html: str) -> dict:
         "produces blocks of near-identical length.",
     ))
 
-    # 4. Repeated sentence openings.
+    # 4. Repeated sentence openings. "The" and "A" are left out: news copy
+    #    opens with them constantly, whoever writes it.
     openers: dict[str, int] = {}
     for s in sents:
         first = words(s)[:1]
-        if first:
+        if first and first[0].lower() not in {"the", "a", "an"}:
             key = first[0].lower()
             openers[key] = openers.get(key, 0) + 1
     common, count = max(openers.items(), key=lambda kv: kv[1]) if openers else ("", 0)
@@ -252,8 +253,8 @@ def writing_signals(body_html: str) -> dict:
     signals.append(Signal(
         "openings", "Sentence openings", round(share, 2),
         f"{share:.0%} start with “{common}”" if common else "n/a",
-        "under 25% sharing one opening word",
-        len(sents) >= 8 and share >= 0.25 and common not in {"the", "a"},
+        "under 25% sharing one opening word, not counting “the” and “a”",
+        len(sents) >= 8 and share >= 0.25,
         "Whether many sentences begin the same way, a pattern typical of templated "
         "or generated prose.",
     ))
