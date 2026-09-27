@@ -65,9 +65,22 @@
   }
 }
 
+/* The article uses the full page. The headline, standfirst and byline span it;
+   below them the main column takes everything the score panel does not, so
+   the cover photograph runs wide. Running text alone is held to a readable
+   measure (--w-article, about 75 characters of body serif): past that, lines
+   get long enough to lose your place on the way back. */
+.article {
+  --w-article: 44rem;
+}
 .article-head {
-  max-width: var(--w-read);
   padding-bottom: var(--s-6);
+}
+.article-head .title {
+  max-width: 48rem;
+}
+.article-head .lead {
+  max-width: var(--w-article);
 }
 
 .article-byline {
@@ -85,9 +98,15 @@
 
 .article-grid {
   display: grid;
-  grid-template-columns: minmax(0, var(--w-read)) 16rem;
+  grid-template-columns: minmax(0, 1fr) 18rem;
   gap: var(--s-8);
   align-items: start;
+}
+.article-body .prose,
+.article-body > .sources,
+.article-body > .paywall,
+.article-body > .article-foot {
+  max-width: var(--w-article);
 }
 
 .article-body {

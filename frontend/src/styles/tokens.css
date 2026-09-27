@@ -75,8 +75,8 @@
   --s-10: 8rem;
 
   /* --- measure & shell ----------------------------------------------------- */
-  --w-page: 1200px; /* outer shell */
-  --w-wide: 960px; /* listings, dashboards */
+  --w-page: 1360px; /* outer shell: wide enough that a large screen is not two-fifths margin */
+  --w-wide: 1120px; /* listings, dashboards */
   --w-read: 40rem; /* ~68ch of body serif -- the reading column */
   --w-form: 26rem;
 
