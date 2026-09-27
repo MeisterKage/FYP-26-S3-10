@@ -34,7 +34,7 @@ from app.models import (
 from app.modules.articles import slugify
 from app.scoring_service import rescore_contributor_articles
 from app.security import hash_password
-from demo_bodies import body_for
+from demo_bodies import STANDFIRSTS, body_for
 from demo_sources import sources_for
 
 DEMO_PASSWORD = "DemoPassword123!"
@@ -449,8 +449,14 @@ def seed_long_bodies() -> None:
     from app.scoring_service import load_settings
 
     changed = []
+    summaries = 0
     for article in Article.query.filter(Article.republication.is_(None)):
         title = re.sub(r" \(\d+\)$", "", article.title)
+        # The first demo headlines were seeded with a placeholder summary that
+        # only repeated the headline; give them their real standfirst.
+        if title in STANDFIRSTS and "What the change means" in (article.summary or ""):
+            article.summary = STANDFIRSTS[title]
+            summaries += 1
         if title in LONG:
             body = body_for(title)
             if article.body != body:
@@ -466,7 +472,7 @@ def seed_long_bodies() -> None:
         report = check(article, settings=settings)
         print(f"  checked {report['percent']:5.1f}% {report['level']:<10} {article.title[:60]}")
     db.session.commit()
-    print(f"Long bodies: rewrote {len(changed)} article(s).")
+    print(f"Long bodies: rewrote {len(changed)} article(s) and {summaries} summaries.")
 
 
 # ---- originality ------------------------------------------------------------ #
@@ -687,7 +693,7 @@ def seed() -> None:
             category_id=category.id,
             title=headline,
             slug=slugify(headline, index + 1),
-            summary=f"{headline}. What the change means and who it affects.",
+            summary=STANDFIRSTS.get(headline, f"{headline}. What the change means and who it affects."),
             body=body_for(headline),
             tags=",".join(random.sample(
                 ["policy", "analysis", "explainer", "data", "regional", "industry"], 3

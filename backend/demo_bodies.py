@@ -10,12 +10,13 @@ Most live headlines now have a full-length version (demo_long_*.py) of 400 to
 from demo_long_apac import LONG_APAC
 from demo_long_au import LONG_AU
 from demo_long_extra import EXTRA
+from demo_long_extra2 import EXTRA2, STANDFIRSTS  # noqa: F401  (STANDFIRSTS is used by seed.py)
 from demo_long_west import LONG_WEST
 
 
 def _with_extra(title: str, paragraphs: list[str]) -> list[str]:
     """Insert the extra sections before the last subheading."""
-    extra = EXTRA.get(title)
+    extra = EXTRA.get(title, []) + EXTRA2.get(title, [])
     if not extra:
         return paragraphs
     last = max(i for i, p in enumerate(paragraphs) if p.startswith("## "))
