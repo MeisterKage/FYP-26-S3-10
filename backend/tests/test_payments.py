@@ -104,7 +104,7 @@ def test_declining_grants_nothing_and_records_why(client, people):
     done = client.post(f"/api/payments/sandbox/{ref_of(started)}/complete",
                        json={"outcome": "decline"}, headers=headers).get_json()
     assert done["payment"]["status"] == "failed"
-    assert done["payment"]["failureReason"] == "Card declined (test)."
+    assert done["payment"]["failureReason"] == "Card declined."
     assert Subscription.query.count() == 0
     assert _db.session.get(User, people["reader"].id).role == Role.FREE_REGISTERED
 

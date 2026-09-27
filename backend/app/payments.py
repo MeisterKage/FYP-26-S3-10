@@ -167,7 +167,7 @@ class SandboxProvider(PaymentProvider):
             "checkout": provider_ref,
             "amount": amount_cents,
             "currency": currency,
-            "failure_reason": None if succeeded else "Card declined (test).",
+            "failure_reason": None if succeeded else "Card declined.",
         }).encode()
         return body, {SIGNATURE_HEADER: sign(body, self.secret, int(time.time()))}
 

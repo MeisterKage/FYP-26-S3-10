@@ -16,7 +16,7 @@ A declined payment grants nothing. A refund ends access immediately. If the prov
 
 ## The sandbox provider
 
-`PAYMENT_PROVIDER=sandbox` (the default). The checkout page is part of the site (`/checkout/test/<ref>`), is labelled as a test, and has no card fields. Its **Pay (test)** and **Decline (test)** buttons create the event the provider would send, sign it, and pass it through the same webhook verification as a real provider's request. The sandbox routes return "not found" whenever a real provider is configured.
+`PAYMENT_PROVIDER=sandbox` (the default). The checkout page is part of the site (`/checkout/test/<ref>`), is labelled as a test, and has no card fields. Its **Pay** and **Decline** buttons create the event the provider would send, sign it, and pass it through the same webhook verification as a real provider's request. The sandbox routes return "not found" whenever a real provider is configured.
 
 ## Connecting Stripe
 

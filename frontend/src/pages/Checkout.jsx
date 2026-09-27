@@ -77,11 +77,11 @@ export function CheckoutTest() {
           <div className="row gap-4 mt-6">
             <Button variant="primary" busy={busy === "pay"} disabled={!!busy}
               onClick={() => complete("pay")}>
-              Pay {money(p.amountCents, p.currency)} (test)
+              Pay {money(p.amountCents, p.currency)}
             </Button>
             <Button variant="outline" busy={busy === "decline"} disabled={!!busy}
               onClick={() => complete("decline")}>
-              Decline (test)
+              Decline
             </Button>
             <Link className="link-quiet meta" to={`/contributors/${p.contributorId}`}>
               Cancel
