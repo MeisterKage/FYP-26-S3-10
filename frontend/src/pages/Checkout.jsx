@@ -66,8 +66,8 @@ export function CheckoutTest() {
       <div className="checkout-card">
         <p className="label">{order.merchant}</p>
         <h1 className="heading mt-3">{order.item}</h1>
-        <p className="checkout-amount mt-4">{money(p.amountCents, p.currency)}</p>
-        <p className="meta mt-1">Billed monthly. Cancel any time from your account.</p>
+        <p className="checkout-amount mt-5">{money(p.amountCents, p.currency)}</p>
+        <p className="meta mt-3">Billed monthly. Cancel any time from your account.</p>
 
         {done ? (
           <div className="mt-6">

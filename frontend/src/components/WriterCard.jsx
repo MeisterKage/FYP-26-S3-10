@@ -18,10 +18,6 @@ import { startSubscription } from "../pages/Checkout";
 import { AccuracyRate } from "./Credibility";
 import { Button, Notice } from "./UI";
 
-function price(cents) {
-  return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(cents / 100);
-}
-
 export function WriterCard({ writer }) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -98,7 +94,7 @@ export function WriterCard({ writer }) {
                 ) : (
                   <Button variant="primary" size="sm" busy={busy === "subscribe"}
                     onClick={subscribe}>
-                    Subscribe · {price(writer.monthlyPriceCents)} a month
+                    Subscribe
                   </Button>
                 )
               )}

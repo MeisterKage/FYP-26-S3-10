@@ -1023,6 +1023,8 @@
 .gap-2 { gap: var(--s-2); }
 .gap-4 { gap: var(--s-4); }
 .gap-5 { gap: var(--s-5); }
+.mt-1 { margin-top: var(--s-1); }
+.mt-2 { margin-top: var(--s-2); }
 .mt-3 { margin-top: var(--s-3); }
 .mt-4 { margin-top: var(--s-4); }
 .mt-5 { margin-top: var(--s-5); }
