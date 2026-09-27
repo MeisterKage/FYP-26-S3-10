@@ -242,6 +242,11 @@ class Article(TimestampMixin, db.Model):
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     like_count: Mapped[int] = mapped_column(Integer, default=0)
 
+    #: Set when the article is republished from another publisher under a
+    #: licence that allows it (JSON: publisher, authors, url, publishedAt,
+    #: licence, licenceUrl, counterUrl). NULL for original reporting.
+    republication: Mapped[str | None] = mapped_column(Text)
+
     #: Latest originality check (app/originality_service.py). The percentage is
     #: kept as a column because review ordering and auto-publish read it; the
     #: full report with matched passages is JSON, read only by the report view.

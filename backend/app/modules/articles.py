@@ -16,6 +16,7 @@ Approval lives in `review.py` because it is an editor action, not an author one.
 """
 from __future__ import annotations
 
+import json
 import re
 from datetime import datetime, timezone
 
@@ -170,6 +171,9 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         ),
         "coverImageUrl": article.cover_image_url,
         "coverImage": _cover(article),
+        # Republished under licence: who really wrote it and where it first
+        # appeared. Readers are told on the page; the byline is not the author.
+        "republication": json.loads(article.republication) if article.republication else None,
         "tags": [t for t in (article.tags or "").split(",") if t],
         "publishedAt": article.published_at.isoformat() if article.published_at else None,
         "submittedAt": article.submitted_at.isoformat() if article.submitted_at else None,

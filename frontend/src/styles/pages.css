@@ -1323,3 +1323,38 @@
     width: 100%;
   }
 }
+
+/* --- republished articles --------------------------------------------------
+   Credit where the licence asks for it: the original, above the article, and
+   the publisher's own credit line at the end. */
+
+.republished-note {
+  margin-top: var(--s-5);
+  padding: var(--s-3) var(--s-4);
+  border-left: 2px solid var(--ink);
+  background: var(--sunken);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+  max-width: var(--w-article, var(--w-read));
+}
+.republished-counter {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.republished-authors {
+  color: var(--ink);
+}
+.republished-footer {
+  max-width: var(--w-article, var(--w-read));
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  font-style: italic;
+}

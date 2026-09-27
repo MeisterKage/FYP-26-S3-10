@@ -52,6 +52,49 @@ function ApprovedBy({ review }) {
   );
 }
 
+/**
+ * Where a republished article came from, above it. The licence requires the
+ * link to the original (preferably at the top) and The Conversation asks for
+ * its invisible page-view counter, loaded here rather than stored in the body.
+ */
+function Republished({ info }) {
+  return (
+    <p className="republished-note">
+      Republished from{" "}
+      <a className="link-quiet" href={info.url} target="_blank" rel="noopener">
+        {info.publisher}
+      </a>{" "}
+      under a{" "}
+      <a className="link-quiet" href={info.licenceUrl} target="_blank" rel="noopener license">
+        Creative Commons licence ({info.licence})
+      </a>
+      .{" "}
+      <a className="link-quiet" href={info.url} target="_blank" rel="noopener">
+        Read the original
+      </a>
+      {info.counterUrl && (
+        <img src={info.counterUrl} alt="" width="1" height="1" className="republished-counter"
+          referrerPolicy="no-referrer-when-downgrade" />
+      )}
+    </p>
+  );
+}
+
+/** The credit line republishers are asked to place at the end. */
+function RepublishedFooter({ info }) {
+  return (
+    <p className="republished-footer">
+      This article is republished from{" "}
+      <a className="link-quiet" href={info.url} target="_blank" rel="noopener">{info.publisher}</a>{" "}
+      under a Creative Commons license.{" "}
+      <a className="link-quiet" href={info.url} target="_blank" rel="noopener">
+        Read the original article
+      </a>
+      .
+    </p>
+  );
+}
+
 export default function ArticlePage() {
   const { slug } = useParams();
   const { user } = useAuth();
@@ -116,15 +159,26 @@ export default function ArticlePage() {
 
         {article.summary && <p className="lead mt-5">{article.summary}</p>}
 
+        {article.republication && <Republished info={article.republication} />}
+
         <div className="article-byline">
-          <Link
-            className="link-quiet"
-            style={{ color: "var(--ink)" }}
-            to={`/contributors/${article.contributor.id}`}
-          >
-            {article.contributor.name}
-          </Link>
-          <AccuracyRate rate={article.contributor.accuracyRate} />
+          {article.republication ? (
+            // The authors, with their institutions, as the licence asks.
+            <span className="republished-authors">
+              By {article.republication.authors.join("; ")}
+            </span>
+          ) : (
+            <>
+              <Link
+                className="link-quiet"
+                style={{ color: "var(--ink)" }}
+                to={`/contributors/${article.contributor.id}`}
+              >
+                {article.contributor.name}
+              </Link>
+              <AccuracyRate rate={article.contributor.accuracyRate} />
+            </>
+          )}
           {date && <span>{date}</span>}
           {article.country && (
             <Link className="link-quiet" to={`/countries/${article.country.code.toLowerCase()}`}>
@@ -190,7 +244,10 @@ export default function ArticlePage() {
 
           {/* Where a reader who liked it decides to follow or subscribe. Left out
               behind a paywall, which has its own subscribe button in place. */}
-          {!article.paywalled && article.writer && <WriterCard writer={article.writer} />}
+          {!article.paywalled && article.writer && !article.republication && (
+            <WriterCard writer={article.writer} />
+          )}
+          {article.republication && <RepublishedFooter info={article.republication} />}
 
           {article.sources?.length > 0 && (
             <section className="sources">

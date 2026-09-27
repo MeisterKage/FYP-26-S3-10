@@ -279,7 +279,14 @@ def check(article: Article, *, settings: dict | None = None, now: datetime | Non
     # ---- the article's own cited sources ----
     source_docs, source_lines = source_documents(article, now, fetch_sources=fetch_sources)
     labels = {s.url: s.label for s in article.sources}
+    # A licensed republication matches its original word for word, by design.
+    # That is the one source it is allowed to copy, so it is reported as the
+    # original rather than counted as copying.
+    republished = json.loads(article.republication) if article.republication else None
+    original_url = republished.get("url") if republished else None
     for url, src in source_docs.items():
+        if original_url and url.rstrip("/") == original_url.rstrip("/"):
+            continue
         positions = engine.matched_positions(doc, set(engine.kgrams(src.tokens)))
         percent = engine.coverage(doc, positions)
         if percent < MIN_MATCH_PERCENT:
@@ -300,6 +307,10 @@ def check(article: Article, *, settings: dict | None = None, now: datetime | Non
         "matches": sorted(matches, key=lambda m: -m["percent"]),
         "sources": source_lines,
         "quotes": engine.verify_quotes(doc, source_docs),
+        "republishedFrom": (
+            {"publisher": republished.get("publisher"), "url": original_url,
+             "licence": republished.get("licence")} if republished else None
+        ),
         "scope": "Compared with every article submitted to Wollongong News and with the "
                  "pages this article cites. The wider web is not searched.",
     }

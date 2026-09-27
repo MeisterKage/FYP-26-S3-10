@@ -362,7 +362,9 @@ def read_article(slug: str):
         "bio": writer.bio if not writer.deleted_at else None,
         "accuracyRate": writer.accuracy_rate,
         "followerCount": Follow.query.filter_by(contributor_id=writer.id).count(),
-        "offersSubscription": writer.role in AUTHORING_ROLES and not writer.deleted_at,
+        # A republishing account is not a writer anyone can subscribe to.
+        "offersSubscription": (writer.role in AUTHORING_ROLES and not writer.deleted_at
+                               and not article.republication),
         "monthlyPriceCents": SUBSCRIPTION_PRICE_CENTS,
         **_relation(viewer, writer.id),
     }

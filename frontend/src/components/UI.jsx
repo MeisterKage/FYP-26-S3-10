@@ -158,7 +158,11 @@ export function ArticleEntry({ article, aside }) {
       <p className="entry-meta">
         {/* Not a link: contributor profiles are a later surface, and a dead
             link is worse than a plain byline. */}
-        <span>{article.contributor.name}</span>
+        <span>
+          {article.republication
+            ? `${article.republication.authors[0].split(",")[0]}${article.republication.authors.length > 1 ? " and others" : ""}, ${article.republication.publisher}`
+            : article.contributor.name}
+        </span>
         {date && <span className="dot">{date}</span>}
         {article.isPremium && (
           <>
