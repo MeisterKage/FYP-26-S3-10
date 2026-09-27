@@ -59,6 +59,8 @@ def create_app(config_object=Config) -> Flask:
         app.register_blueprint(blueprint, url_prefix="/api")
 
     register_security_headers(app)
+    from .response_cache import register_response_cache
+    register_response_cache(app)
 
     register_error_handlers(app)
     # Registered after the generic handlers so the 429 keeps the API's error

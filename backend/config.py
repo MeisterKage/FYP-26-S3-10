@@ -77,6 +77,10 @@ class Config:
     WRITING_SIGNALS_API_URL = os.environ.get("WRITING_SIGNALS_API_URL")
     WRITING_SIGNALS_API_KEY = os.environ.get("WRITING_SIGNALS_API_KEY")
 
+    # How long a public page is remembered for signed-out visitors
+    # (app/response_cache.py). 0 turns the cache off.
+    RESPONSE_CACHE_SECONDS = int(os.environ.get("RESPONSE_CACHE_SECONDS", "60"))
+
     # Rate-limit counters. In-process memory is correct for development and a
     # single-process demo, but it resets on restart and is not shared between
     # workers -- so a multi-worker deployment gives each worker its own budget.
@@ -86,6 +90,9 @@ class Config:
 
 class TestConfig(Config):
     TESTING = True
+    # Tests change the database directly between requests; a cached page
+    # would hide that. The cache has its own tests, which switch it on.
+    RESPONSE_CACHE_SECONDS = 0
     ORIGINALITY_FETCH_SOURCES = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:")
     SQLALCHEMY_ENGINE_OPTIONS = {}

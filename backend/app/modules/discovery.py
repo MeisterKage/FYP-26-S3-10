@@ -9,6 +9,8 @@ matching, because the ranking has to stay inspectable.
 """
 from __future__ import annotations
 
+import copy
+
 from flask import Blueprint, current_app, g, jsonify, request
 from sqlalchemy import func, or_, update
 from sqlalchemy.exc import SQLAlchemyError
@@ -42,6 +44,7 @@ SOURCE_TIER_DESCRIPTIONS = (
     ("retracted", "A paper Crossref and Retraction Watch record as retracted. Flagged."),
     ("invalid", "A placeholder address, a page that does not exist, or a link cited twice."),
 )
+from .. import response_cache
 from ..security import current_user
 from .articles import list_loads, serialize
 
@@ -305,14 +308,43 @@ def _aware(dt):
     return dt.replace(tzinfo=timezone.utc) if dt is not None and dt.tzinfo is None else dt
 
 
+def _count_view(article_id: int) -> None:
+    """A view counter is the least important thing on the page.
+
+    If the write fails on a dropped pooled connection or a lock, the reader
+    should still get the article, so the failure is logged and swallowed. A
+    single UPDATE, so two readers at once cannot lose a view.
+    """
+    try:
+        db.session.execute(
+            update(Article).where(Article.id == article_id)
+            .values(view_count=Article.view_count + 1)
+        )
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        current_app.logger.warning("Could not record a view for article %s", article_id)
+
+
 @bp.get("/articles/<slug>")
 def read_article(slug: str):
     """PDD Figure 5.6. Byline, publish time, credibility score, accuracy rate, body."""
+    viewer = current_user()
+
+    # A signed-out reader gets the same page as every other signed-out reader,
+    # so it is remembered for a minute (app/response_cache.py). The view is
+    # still counted every time.
+    cache_key = f"article:{slug}"
+    if viewer is None:
+        cached = response_cache.cached_copy(cache_key)
+        if cached is not None:
+            _count_view(cached["id"])
+            return jsonify({"article": cached})
+
     article = Article.query.options(*list_loads()).filter_by(slug=slug).first()
     if article is None:
         raise ApiError("Article not found.", status=404)
 
-    viewer = current_user()
     is_author = viewer is not None and viewer.id == article.contributor_id
     if article.status != ArticleStatus.PUBLISHED and not is_author:
         raise ApiError("Article not found.", status=404)
@@ -366,19 +398,9 @@ def read_article(slug: str):
     # reader who cannot open the article: the points are its own sentences.
     payload["inBrief"] = None if payload.get("paywalled") else in_brief(article)
 
-    # A view counter is the least important thing on this page. If the write
-    # fails on a dropped pooled connection or a lock, the reader should still
-    # get the article, so this failure is logged and swallowed rather than
-    # raised. A single UPDATE, so two readers at once cannot lose a view.
-    try:
-        db.session.execute(
-            update(Article).where(Article.id == article.id)
-            .values(view_count=Article.view_count + 1)
-        )
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        current_app.logger.warning("Could not record a view for article %s", article.id)
+    if viewer is None and article.status == ArticleStatus.PUBLISHED:
+        response_cache.put(cache_key, copy.deepcopy(payload))
+    _count_view(article.id)
 
     return jsonify({"article": payload})
 

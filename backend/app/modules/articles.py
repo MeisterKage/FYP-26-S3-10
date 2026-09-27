@@ -21,7 +21,7 @@ import re
 from datetime import datetime, timezone
 
 from flask import Blueprint, g, jsonify, request
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import joinedload
 
 from ..enums import AUTHORING_ROLES, ArticleStatus, Role
 from ..errors import ApiError
@@ -158,14 +158,16 @@ def list_loads() -> tuple:
     cover image, sources and corrections one at a time: over fifty round trips
     to the database for one list. Image bytes stay deferred; only the row is read.
     """
+    # All joined into the one article query. The database is a long way from
+    # the API server, so each round trip costs far more than the few duplicate
+    # rows the joined collections add (a page is twenty articles, each with a
+    # handful of sources and rarely more than one correction).
     return (
-        # One row each, so they join into the article query itself.
         joinedload(Article.contributor),
         joinedload(Article.reviewer),
         joinedload(Article.cover_image),
-        # Many rows each: one extra query apiece for the whole list.
-        selectinload(Article.sources),
-        selectinload(Article.corrections),
+        joinedload(Article.sources),
+        joinedload(Article.corrections),
     )
 
 
