@@ -7,6 +7,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { api } from "../api";
 import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, useAuth } from "../auth";
+import { BrowseMenu } from "./BrowseMenu";
 import Notifications from "./Notifications";
 import { Button, Notice } from "./UI";
 
@@ -22,6 +23,7 @@ export function Masthead() {
         </Link>
 
         <nav className="nav" aria-label="Main">
+          <BrowseMenu />
           <NavLink className="nav-link" to="/search">
             Search
           </NavLink>

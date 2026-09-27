@@ -1341,3 +1341,208 @@
   padding: 0.1em 0.5em;
   font-size: var(--t-micro);
 }
+
+/* --- browse menu -----------------------------------------------------------
+   A retail-style side panel (Kith's "Mens" menu): one tab opens it, a list
+   slides into the same panel, a back arrow returns. No shadow, as everywhere
+   in this system: the panel is set apart by a rule and a tinted page behind. */
+
+.browse-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--t-small);
+  cursor: pointer;
+  color: var(--ink);
+}
+.browse-trigger[aria-expanded="true"] {
+  background: var(--sunken);
+}
+
+.browse-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.browse-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--deep) 38%, transparent);
+  animation: browse-fade var(--mid) var(--ease);
+}
+.browse-drawer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(24rem, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border-right: 1px solid var(--hair);
+  animation: browse-in var(--mid) var(--ease);
+}
+
+.browse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: 4.25rem;
+  padding: 0 var(--s-4) 0 var(--s-5);
+  border-bottom: 1px solid var(--hair);
+}
+.browse-title {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.browse-back,
+.browse-close {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  padding: var(--s-2);
+  margin-left: calc(-1 * var(--s-2));
+  border-radius: var(--r-pill);
+  font: inherit;
+}
+.browse-close {
+  margin-left: 0;
+  color: var(--quiet);
+}
+.browse-back:hover,
+.browse-close:hover {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.browse-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--s-3) 0 var(--s-6);
+}
+.browse-body[data-panel="topics"],
+.browse-body[data-panel="countries"] {
+  animation: browse-slide var(--mid) var(--ease);
+}
+
+.browse-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.browse-list--secondary {
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--hair);
+}
+.browse-list--secondary .browse-row {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  padding-block: var(--s-2);
+}
+.browse-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  padding: var(--s-3) var(--s-5);
+  border: 0;
+  background: none;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--fast) var(--ease);
+}
+.browse-row:hover,
+.browse-row:focus-visible {
+  background: var(--sunken);
+  text-decoration: none;
+}
+.browse-row-label {
+  flex: 1;
+  min-width: 0;
+}
+.browse-row-count {
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--mute);
+}
+.browse-row-chevron {
+  flex: none;
+  color: var(--mute);
+}
+.browse-skeleton {
+  height: 1.4rem;
+  margin: var(--s-3) var(--s-5);
+  width: 60%;
+}
+.browse-error {
+  padding: var(--s-4) var(--s-5);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+}
+
+.browse-feature {
+  display: block;
+  margin: var(--s-5) var(--s-5) 0;
+  padding: var(--s-5);
+  background: var(--sunken);
+  text-decoration: none;
+}
+.browse-feature:hover {
+  text-decoration: none;
+  background: var(--hair);
+}
+.browse-feature-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.browse-feature-title {
+  display: block;
+  margin-top: var(--s-2);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.browse-feature-note {
+  display: block;
+  margin-top: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--quiet);
+}
+
+@keyframes browse-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+@keyframes browse-slide {
+  from { transform: translateX(1.5rem); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes browse-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -112,3 +112,21 @@ export const BellIcon = (p) => (
     <path d="M8.4 16.4a1.8 1.8 0 0 0 3.2 0" />
   </Svg>
 );
+
+export const MenuIcon = (p) => (
+  <Svg {...p}>
+    <path d="M3.5 6h13M3.5 10h13M3.5 14h13" />
+  </Svg>
+);
+
+export const ChevronIcon = (p) => (
+  <Svg {...p}>
+    <path d="m8 5 5 5-5 5" />
+  </Svg>
+);
+
+export const BackIcon = (p) => (
+  <Svg {...p}>
+    <path d="m12 5-5 5 5 5" />
+  </Svg>
+);
