@@ -101,27 +101,35 @@ export function BrowseMenu() {
     requestAnimationFrame(() => drawer.current?.querySelector(FOCUSABLE)?.focus());
   }, [open, panel]);
 
-  function onKeyDown(event) {
-    if (event.key === "Escape") {
-      event.stopPropagation();
-      if (panel !== "main") setPanel("main");
-      else close();
-      return;
+  // Keys are handled on the document, not the panel, so Escape works wherever
+  // focus happens to be (including in the instant before it moves inside).
+  useEffect(() => {
+    if (!open) return undefined;
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        if (panel !== "main") setPanel("main");
+        else close();
+        return;
+      }
+      if (event.key !== "Tab" || !drawer.current) return;
+      // Keep focus inside the dialog.
+      const items = [...drawer.current.querySelectorAll(FOCUSABLE)];
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = drawer.current.contains(document.activeElement);
+      if (event.shiftKey && (document.activeElement === first || !inside)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !inside)) {
+        event.preventDefault();
+        first.focus();
+      }
     }
-    if (event.key !== "Tab") return;
-    // Keep focus inside the dialog.
-    const items = [...drawer.current.querySelectorAll(FOCUSABLE)];
-    if (!items.length) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, panel, close]);
 
   const title = { main: "Browse", topics: "Topics", countries: "Countries" }[panel];
 
@@ -141,7 +149,7 @@ export function BrowseMenu() {
       </button>
 
       {open && createPortal(
-        <div className="browse-layer" onKeyDown={onKeyDown}>
+        <div className="browse-layer">
           <div className="browse-backdrop" onClick={close} aria-hidden="true" />
           <div
             ref={drawer}
