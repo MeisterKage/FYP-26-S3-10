@@ -25,6 +25,7 @@ import {
 } from "../components/Credibility";
 import { CoverFigure } from "../components/CoverImage";
 import { StoredOriginality } from "../components/Originality";
+import { WritingSignals } from "../components/WritingSignals";
 import { SourceList } from "../components/Sources";
 import { SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
@@ -235,6 +236,7 @@ function Submission({ article, selected, onToggle, onDone, onError }) {
         )}
 
         <StoredOriginality articleId={article.id} summary={article.originality} />
+        <WritingSignals articleId={article.id} />
 
         <details className="review-body mt-5">
           <summary>Read the full submission</summary>

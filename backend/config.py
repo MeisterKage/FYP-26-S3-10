@@ -58,6 +58,19 @@ class Config:
     STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
     STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
+    # Reading aids and writing signals (app/insights_service.py). The built-in
+    # providers need no account; the others are skeletons until completed.
+    SUMMARY_PROVIDER = os.environ.get("SUMMARY_PROVIDER", "extractive")
+    NARRATION_PROVIDER = os.environ.get("NARRATION_PROVIDER", "browser")
+    WRITING_SIGNALS_PROVIDER = os.environ.get("WRITING_SIGNALS_PROVIDER", "stylometric")
+    IN_BRIEF_MIN_WORDS = int(os.environ.get("IN_BRIEF_MIN_WORDS", "350"))
+    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+    SUMMARY_MODEL = os.environ.get("SUMMARY_MODEL", "claude-sonnet-5")
+    NARRATION_API_KEY = os.environ.get("NARRATION_API_KEY")
+    NARRATION_VOICE = os.environ.get("NARRATION_VOICE")
+    WRITING_SIGNALS_API_URL = os.environ.get("WRITING_SIGNALS_API_URL")
+    WRITING_SIGNALS_API_KEY = os.environ.get("WRITING_SIGNALS_API_KEY")
+
     # Rate-limit counters. In-process memory is correct for development and a
     # single-process demo, but it resets on restart and is not shared between
     # workers -- so a multi-worker deployment gives each worker its own budget.

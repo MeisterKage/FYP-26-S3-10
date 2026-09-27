@@ -15,6 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from ..enums import AUTHORING_ROLES, ArticleStatus, SubscriptionStatus
 from ..payment_service import SUBSCRIPTION_PRICE_CENTS
+from ..insights_service import in_brief
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
@@ -368,6 +369,10 @@ def read_article(slug: str):
         "monthlyPriceCents": SUBSCRIPTION_PRICE_CENTS,
         **_relation(viewer, writer.id),
     }
+
+    # "In brief" key points, with narration, for long articles. Not for a
+    # reader who cannot open the article: the points are its own sentences.
+    payload["inBrief"] = None if payload.get("paywalled") else in_brief(article)
 
     return jsonify({"article": payload})
 

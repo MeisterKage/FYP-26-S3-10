@@ -1358,3 +1358,155 @@
   color: var(--quiet);
   font-style: italic;
 }
+
+/* --- in brief ----------------------------------------------------------------
+   The article's own key sentences, set apart like a standfirst box: a rule on
+   top, not a card. The point being read aloud gets the proof-mark tint used
+   for matched text elsewhere. */
+
+.brief {
+  margin-block: var(--s-6);
+  padding-block: var(--s-4) var(--s-5);
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--hair);
+  max-width: var(--w-article, var(--w-read));
+}
+.brief-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+.brief-time {
+  color: var(--mute);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.brief-controls {
+  display: flex;
+  gap: var(--s-2);
+}
+.brief-listen,
+.brief-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 2.25rem;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  cursor: pointer;
+}
+.brief-stop {
+  padding: 0;
+  width: 2.25rem;
+  justify-content: center;
+}
+.brief-listen:hover,
+.brief-stop:hover {
+  background: var(--sunken);
+}
+.brief-listen:focus-visible,
+.brief-stop:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.brief-listen svg,
+.brief-stop svg {
+  flex-shrink: 0;
+}
+.brief-points {
+  margin: var(--s-4) 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.brief-points li {
+  transition: background-color 0.2s ease;
+}
+.brief-points li.is-reading {
+  background: var(--sunken);
+  box-shadow: 0 0 0 4px var(--sunken);
+}
+.brief-audio {
+  margin-top: var(--s-4);
+  width: 100%;
+}
+.brief-method {
+  margin-top: var(--s-4);
+  font-family: var(--font-ui);
+  font-size: var(--t-micro);
+  color: var(--mute);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brief-points li {
+    transition: none;
+  }
+}
+
+/* --- writing signals (review queue) ---------------------------------------- */
+
+.signals-badge {
+  margin-left: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+}
+.signals-badge--some,
+.signals-badge--many {
+  color: var(--ink);
+  font-weight: 600;
+}
+.signals-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s-4);
+}
+.signals-list li {
+  padding-left: var(--s-3);
+  border-left: 1px solid var(--hair);
+}
+.signals-list li.is-flagged {
+  border-left: 3px solid var(--ink);
+}
+.signals-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  align-items: baseline;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+}
+.signals-label {
+  font-weight: 600;
+  color: var(--ink);
+}
+.signals-value {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.signals-flag {
+  margin-left: auto;
+  color: var(--mute);
+}
+.is-flagged .signals-flag {
+  color: var(--ink);
+  font-weight: 600;
+}
+.signals-disclaimer {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  font-style: italic;
+}

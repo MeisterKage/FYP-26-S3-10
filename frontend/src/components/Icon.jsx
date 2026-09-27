@@ -130,3 +130,22 @@ export const BackIcon = (p) => (
     <path d="m12 5-5 5 5 5" />
   </Svg>
 );
+
+export const SpeakerIcon = (p) => (
+  <Svg {...p}>
+    <path d="M3.5 7.75h2.75L10 4.5v11l-3.75-3.25H3.5z" />
+    <path d="M13 7.25a3.75 3.75 0 0 1 0 5.5M15.25 5a7 7 0 0 1 0 10" />
+  </Svg>
+);
+
+export const PauseIcon = (p) => (
+  <Svg {...p}>
+    <path d="M7 5v10M13 5v10" />
+  </Svg>
+);
+
+export const StopIcon = (p) => (
+  <Svg {...p}>
+    <rect x="5.5" y="5.5" width="9" height="9" rx="1" />
+  </Svg>
+);

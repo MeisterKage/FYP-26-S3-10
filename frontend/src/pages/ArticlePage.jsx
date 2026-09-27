@@ -21,6 +21,7 @@ import {
 } from "../components/Credibility";
 import ArticleExtras from "../components/ArticleExtras";
 import { CoverFigure } from "../components/CoverImage";
+import { InBrief } from "../components/InBrief";
 import Corrections from "../components/Corrections";
 import { SourceList } from "../components/Sources";
 import { WriterCard } from "../components/WriterCard";
@@ -192,6 +193,9 @@ export default function ArticlePage() {
       <div className="article-grid">
         <div className="article-body">
           <CoverFigure image={article.coverImage} priority />
+          {!article.paywalled && article.inBrief && (
+            <InBrief title={article.title} brief={article.inBrief} />
+          )}
           {article.paywalled ? (
             <>
               <div className="prose">
