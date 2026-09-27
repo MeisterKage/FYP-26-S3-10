@@ -152,6 +152,10 @@ class Narrator:
     def narrate(self, title: str, points: list[str]) -> Narration:
         raise NotImplementedError
 
+    def narrate_book(self) -> dict:
+        """How a long, chaptered text (a digest's audio edition) is voiced."""
+        raise NotImplementedError
+
 
 def narration_script(title: str, points: list[str]) -> str:
     """What is read aloud: the headline, then the key points."""
@@ -171,6 +175,9 @@ class BrowserNarrator(Narrator):
     def narrate(self, title: str, points: list[str]) -> Narration:
         return Narration("browser", narration_script(title, points), provider=self.name,
                          voice={"lang": "en-AU", "rate": 1.0})
+
+    def narrate_book(self) -> dict:
+        return {"mode": "browser", "voice": {"lang": "en-AU", "rate": 1.0}}
 
 
 class CloudNarrator(Narrator):
@@ -193,6 +200,11 @@ class CloudNarrator(Narrator):
         self.voice = voice
 
     def narrate(self, title: str, points: list[str]) -> Narration:
+        raise ProviderNotConfigured("Recorded narration is not switched on for this site yet.")
+
+    def narrate_book(self) -> dict:
+        # One recording per chapter, generated when the edition is compiled:
+        # {"mode": "audio", "chapters": {chapter id: file URL}}.
         raise ProviderNotConfigured("Recorded narration is not switched on for this site yet.")
 
 

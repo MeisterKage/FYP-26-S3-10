@@ -149,3 +149,21 @@ export const StopIcon = (p) => (
     <rect x="5.5" y="5.5" width="9" height="9" rx="1" />
   </Svg>
 );
+
+export const PlayIcon = (p) => (
+  <Svg {...p}>
+    <path d="M6.5 4.75v10.5L15 10z" />
+  </Svg>
+);
+
+export const PrevIcon = (p) => (
+  <Svg {...p}>
+    <path d="M5.5 5v10M15 5.25v9.5L7.75 10z" />
+  </Svg>
+);
+
+export const NextIcon = (p) => (
+  <Svg {...p}>
+    <path d="M14.5 5v10M5 5.25v9.5L12.25 10z" />
+  </Svg>
+);

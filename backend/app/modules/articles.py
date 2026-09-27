@@ -150,6 +150,18 @@ def _reviewer(article: Article) -> dict | None:
     }
 
 
+def may_read(article: Article, viewer) -> bool:
+    """Whether this viewer may read the article's full text."""
+    return (
+        not article.is_premium
+        or (viewer is not None and (
+            viewer.id == article.contributor_id
+            or viewer.role in {Role.EDITOR, Role.SYSTEM_ADMIN}
+            or viewer.has_premium_access()
+        ))
+    )
+
+
 def serialize(article: Article, *, include_body: bool = True, viewer=None) -> dict:
     """Serialise an article.
 
@@ -228,14 +240,7 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
     if not include_body:
         return payload
 
-    may_read_premium = (
-        not article.is_premium
-        or is_author
-        or privileged
-        or (viewer is not None and viewer.has_premium_access())
-    )
-
-    if may_read_premium:
+    if may_read(article, viewer):
         payload["body"] = article.body
     else:
         # PDD Figure 5.6: a paywalled article shows a preview and a prompt.

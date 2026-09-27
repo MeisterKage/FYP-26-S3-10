@@ -1510,3 +1510,220 @@
   color: var(--quiet);
   font-style: italic;
 }
+
+/* --- digest audio edition ----------------------------------------------------
+   An audio book laid out like one: contents on the left, the chapter being
+   read on the right in the reading serif, the current sentence tinted the way
+   In brief marks it. The panel is the one lifted object on the page. */
+
+.book {
+  margin-top: var(--s-7);
+  padding: var(--s-6);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-top: 3px solid var(--ink);
+}
+.book-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--s-5);
+  align-items: center;
+  margin-top: var(--s-5);
+  padding-block: var(--s-4);
+  border-block: 1px solid var(--hair);
+}
+.book-buttons {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+}
+.book-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border: 1px solid var(--ink);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.book-btn:hover:not(:disabled) {
+  background: var(--sunken);
+}
+.book-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.book-btn--play {
+  width: 3.25rem;
+  height: 3.25rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+.book-btn--play:hover:not(:disabled) {
+  background: var(--ink);
+  opacity: 0.9;
+}
+.book-btn:focus-visible,
+.book-contents button:focus-visible,
+.book-speed select:focus-visible,
+.book-over:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.book-progress {
+  height: 4px;
+  background: var(--sunken);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.book-progress i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.4s ease;
+}
+.book-time {
+  margin-top: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--quiet);
+  font-variant-numeric: tabular-nums;
+}
+.book-over {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--quiet);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.book-speed {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+}
+.book-speed select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+}
+.book-body {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  gap: var(--s-6);
+  margin-top: var(--s-6);
+}
+.book-contents ol {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.book-contents button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+  gap: var(--s-2);
+  align-items: baseline;
+  text-align: left;
+  padding: var(--s-2);
+  border: 0;
+  border-left: 2px solid transparent;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  line-height: 1.35;
+  color: var(--quiet);
+  cursor: pointer;
+}
+.book-contents button:hover {
+  background: var(--sunken);
+}
+.book-contents button.is-current {
+  color: var(--ink);
+  font-weight: 600;
+  border-left-color: var(--ink);
+  background: var(--sunken);
+}
+.book-num,
+.book-dur {
+  color: var(--mute);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.book-reader {
+  min-width: 0;
+  max-width: var(--w-read);
+}
+.book-live {
+  color: var(--ink);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.book-chapter {
+  font-family: var(--font-display);
+  font-size: var(--t-sub);
+  line-height: 1.25;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.book-text p {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ink);
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+.book-text p + p {
+  margin-top: var(--s-3);
+}
+.book-text p.is-reading {
+  background: var(--sunken);
+  box-shadow: 0 0 0 4px var(--sunken);
+}
+.book-read {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+}
+.book-note {
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+}
+@media (max-width: 760px) {
+  .book {
+    padding: var(--s-5) var(--s-4);
+  }
+  .book-controls {
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+  }
+  .book-body {
+    grid-template-columns: 1fr;
+  }
+  .book-contents {
+    order: 2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-progress i,
+  .book-text p {
+    transition: none;
+  }
+}

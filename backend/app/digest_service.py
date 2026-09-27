@@ -13,6 +13,7 @@ from datetime import datetime
 
 from . import digest
 from .countries import country_name
+from .digest_audio import audio_edition
 from .enums import ArticleStatus
 from .extensions import db
 from .models import (
@@ -237,9 +238,15 @@ def full(edition: DigestEdition, category: Category, viewer=None) -> dict:
             user_id=viewer.id, category_id=edition.category_id,
             country_code=edition.country_code,
         ).first() is not None
+    head = summary(edition, category)
     return {
-        **summary(edition, category),
+        **head,
         "entries": entries,
         "corrections": data["corrections"],
         "subscribed": subscribed,
+        # The edition as an audio book: chapters to listen to, with a summary
+        # of every article. None when narration is switched off.
+        "listen": audio_edition(edition, category, topic=head["topic"],
+                                month_label=head["monthLabel"],
+                                provisional=head["provisional"], viewer=viewer),
     }

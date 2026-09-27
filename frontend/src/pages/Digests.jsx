@@ -11,6 +11,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { api } from "../api";
 import { useAuth } from "../auth";
+import { AudioEdition } from "../components/AudioEdition";
 import { CredibilityInline } from "../components/Credibility";
 import { EntryThumb } from "../components/CoverImage";
 import { Button, Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
@@ -220,6 +221,16 @@ export function DigestEdition() {
         </div>
         <SubscribeButton edition={edition} onChange={load} />
       </header>
+
+      {edition.listen && (
+        <AudioEdition
+          key={`${edition.month}/${edition.key}`}
+          listen={edition.listen}
+          topic={edition.topic}
+          monthLabel={edition.monthLabel}
+          storageKey={`digest-listen:${edition.month}/${edition.key}`}
+        />
+      )}
 
       <section className="section mt-7">
         <Stats stats={edition.stats} />
