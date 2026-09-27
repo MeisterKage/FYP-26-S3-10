@@ -131,7 +131,7 @@ export function CredibilityLedger({ credibility }) {
                   <span className="ledger-note">
                     {sourcing.cited > sourcing.counted
                       ? ` · best ${sourcing.counted} of ${sourcing.cited}`
-                      : ` · ${sourcing.cited}`}
+                      : ` · ${sourcing.cited} source${sourcing.cited === 1 ? "" : "s"}`}
                   </span>
                 )}
               </dt>
