@@ -214,9 +214,14 @@ def summary(edition: DigestEdition, category: Category) -> dict:
 
 
 def full(edition: DigestEdition, category: Category, viewer=None) -> dict:
-    from .modules.articles import serialize
+    from .modules.articles import list_loads, serialize
 
     data = json.loads(edition.data)
+    # Load every ranked article, with what serialize() and the audio edition
+    # read, in one batch; each entry.article is then found without a query.
+    # Held in a variable: the session only keeps objects something refers to.
+    ids = [e.article_id for e in edition.entries]
+    loaded = Article.query.options(*list_loads()).filter(Article.id.in_(ids)).all()  # noqa: F841
     entries = []
     for entry in edition.entries:
         note = _since(entry, edition.compiled_at)

@@ -72,7 +72,8 @@ def _is_blemished(article: Article) -> bool:
     )
 
 
-def _accuracy_input(article: Article, cfg: dict) -> float:
+def _accuracy_input(article: Article, cfg: dict,
+                    counts: tuple[int, int] | None = None) -> float:
     """The accuracy figure one article's score is built from.
 
     The writer's record, minus this article's own correction or retraction.
@@ -82,7 +83,7 @@ def _accuracy_input(article: Article, cfg: dict) -> float:
     the stated 15. Every other article by the writer still carries the lower
     accuracy, which is the intended effect of a correction on a track record.
     """
-    published, blemished = _published_counts(article.contributor_id)
+    published, blemished = counts or _published_counts(article.contributor_id)
     if _is_blemished(article):
         blemished = max(0, blemished - 1)
     return credibility.smoothed_accuracy(published, blemished, cfg)
@@ -182,7 +183,7 @@ def explain_article(article: Article, settings: dict | None = None):
     cfg = settings if settings is not None else load_settings()
 
     published, blemished = _published_counts(article.contributor_id)
-    accuracy = _accuracy_input(article, cfg)
+    accuracy = _accuracy_input(article, cfg, (published, blemished))
 
     upheld = (
         db.session.query(func.count(Report.id))

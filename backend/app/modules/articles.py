@@ -21,6 +21,7 @@ import re
 from datetime import datetime, timezone
 
 from flask import Blueprint, g, jsonify, request
+from sqlalchemy.orm import joinedload, selectinload
 
 from ..enums import AUTHORING_ROLES, ArticleStatus, Role
 from ..errors import ApiError
@@ -148,6 +149,24 @@ def _reviewer(article: Article) -> dict | None:
         "title": reviewer.editor_title,
         "onPanel": reviewer.role == Role.EDITOR and reviewer.deleted_at is None,
     }
+
+
+def list_loads() -> tuple:
+    """Everything serialize() reads, fetched for a whole list in a few queries.
+
+    Without these, each article on a page of twenty loads its writer, reviewer,
+    cover image, sources and corrections one at a time: over fifty round trips
+    to the database for one list. Image bytes stay deferred; only the row is read.
+    """
+    return (
+        # One row each, so they join into the article query itself.
+        joinedload(Article.contributor),
+        joinedload(Article.reviewer),
+        joinedload(Article.cover_image),
+        # Many rows each: one extra query apiece for the whole list.
+        selectinload(Article.sources),
+        selectinload(Article.corrections),
+    )
 
 
 def may_read(article: Article, viewer) -> bool:

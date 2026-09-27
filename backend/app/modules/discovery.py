@@ -10,7 +10,7 @@ matching, because the ranking has to stay inspectable.
 from __future__ import annotations
 
 from flask import Blueprint, current_app, g, jsonify, request
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, update
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..enums import AUTHORING_ROLES, ArticleStatus, SubscriptionStatus
@@ -43,7 +43,7 @@ SOURCE_TIER_DESCRIPTIONS = (
     ("invalid", "A placeholder address, a page that does not exist, or a link cited twice."),
 )
 from ..security import current_user
-from .articles import serialize
+from .articles import list_loads, serialize
 
 bp = Blueprint("discovery", __name__)
 
@@ -51,7 +51,7 @@ PAGE_SIZE = 20
 
 
 def _published():
-    return Article.query.filter(Article.status == ArticleStatus.PUBLISHED)
+    return Article.query.options(*list_loads()).filter(Article.status == ArticleStatus.PUBLISHED)
 
 
 def _paginate(query, page: int):
@@ -308,7 +308,7 @@ def _aware(dt):
 @bp.get("/articles/<slug>")
 def read_article(slug: str):
     """PDD Figure 5.6. Byline, publish time, credibility score, accuracy rate, body."""
-    article = Article.query.filter_by(slug=slug).first()
+    article = Article.query.options(*list_loads()).filter_by(slug=slug).first()
     if article is None:
         raise ApiError("Article not found.", status=404)
 
@@ -317,17 +317,9 @@ def read_article(slug: str):
     if article.status != ArticleStatus.PUBLISHED and not is_author:
         raise ApiError("Article not found.", status=404)
 
-    # A view counter is the least important thing on this page. If the write
-    # fails on a dropped pooled connection or a lock, the reader should still
-    # get the article, so this failure is logged and swallowed rather than raised.
-    try:
-        article.view_count += 1
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        current_app.logger.warning("Could not record a view for article %s", article.id)
-
     payload = serialize(article, viewer=viewer)
+    # This view is counted below, once the page is built.
+    payload["viewCount"] = article.view_count + 1
 
     # PRD 1.3.3 promises a reader can trace exactly why a score is what it is.
     # The breakdown travels with the article so the promise is kept on the page
@@ -373,6 +365,20 @@ def read_article(slug: str):
     # "In brief" key points, with narration, for long articles. Not for a
     # reader who cannot open the article: the points are its own sentences.
     payload["inBrief"] = None if payload.get("paywalled") else in_brief(article)
+
+    # A view counter is the least important thing on this page. If the write
+    # fails on a dropped pooled connection or a lock, the reader should still
+    # get the article, so this failure is logged and swallowed rather than
+    # raised. A single UPDATE, so two readers at once cannot lose a view.
+    try:
+        db.session.execute(
+            update(Article).where(Article.id == article.id)
+            .values(view_count=Article.view_count + 1)
+        )
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        current_app.logger.warning("Could not record a view for article %s", article.id)
 
     return jsonify({"article": payload})
 
