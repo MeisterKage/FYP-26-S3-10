@@ -132,6 +132,12 @@ export function Footer() {
           <Link className="link-quiet" to="/search">
             Search
           </Link>
+          <Link className="link-quiet" to="/privacy">
+            Privacy
+          </Link>
+          <Link className="link-quiet" to="/terms">
+            Terms
+          </Link>
         </nav>
       </div>
     </footer>

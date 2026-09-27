@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 
 import { api } from "../api";
 import { Notice } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 function money(cents) {
   return `$${((cents ?? 0) / 100).toFixed(2)}`;
@@ -23,6 +24,7 @@ function money(cents) {
 export default function PricingPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  usePageTitle("Pricing");
 
   useEffect(() => {
     api

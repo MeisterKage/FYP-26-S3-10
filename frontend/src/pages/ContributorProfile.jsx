@@ -15,6 +15,7 @@ import { useAuth } from "../auth";
 import { AccuracyRate, CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
 import { startSubscription } from "./Checkout";
+import { usePageTitle } from "../usePageTitle";
 
 export default function ContributorProfile() {
   const { id } = useParams();
@@ -23,6 +24,7 @@ export default function ContributorProfile() {
 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  usePageTitle(data?.contributor?.name);
   const [notice, setNotice] = useState(null);
   const [following, setFollowing] = useState(false);
   const [busy, setBusy] = useState(null);

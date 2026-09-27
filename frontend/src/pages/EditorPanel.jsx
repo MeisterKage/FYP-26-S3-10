@@ -15,6 +15,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { CredibilityInline } from "../components/Credibility";
 import { ArticleEntry, Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 /** The figure that answers "who checks the checkers". Withheld with nothing to measure. */
 function UpheldRate({ record }) {
@@ -37,6 +38,7 @@ function Sections({ sections }) {
 
 export function EditorPanel() {
   const [editors, setEditors] = useState(null);
+  usePageTitle("Our editors");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -106,6 +108,7 @@ export function EditorPanel() {
 export function EditorProfile() {
   const { id } = useParams();
   const [data, setData] = useState(null);
+  usePageTitle(data?.editor?.name);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -120,6 +123,7 @@ export function EditorProfile() {
   if (error) {
     return (
       <Empty
+        level={1}
         title="This editor isn't on the panel"
         action={
           <Link className="link-quiet mt-4" to="/editors">

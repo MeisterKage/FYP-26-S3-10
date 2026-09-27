@@ -3,8 +3,8 @@
  *
  * The points are the article's own sentences, chosen by the server, so the box
  * can never say anything the article does not. Narration comes in two modes:
- * "browser" speaks the text with the reader's own device voice (free, and the
- * text never leaves the device); "audio" plays a recorded file, for when a
+ * "browser" speaks the text with the reader's own device voice (free, and on
+ * a local voice the text stays on the device); "audio" plays a recorded file, for when a
  * text-to-speech service is connected on the server.
  */
 import { PauseIcon, SpeakerIcon, StopIcon } from "./Icon";

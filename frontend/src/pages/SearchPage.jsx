@@ -11,10 +11,12 @@ import { api } from "../api";
 import { CredibilityInline } from "../components/Credibility";
 import { SearchIcon } from "../components/Icon";
 import { ArticleEntry, Button, Empty, EntrySkeleton, Notice } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 export default function SearchPage() {
   const [params, setParams] = useSearchParams();
   const query = params.get("q") || "";
+  usePageTitle(query ? `Search: ${query}` : "Search");
 
   const [draft, setDraft] = useState(query);
   const [result, setResult] = useState(null);

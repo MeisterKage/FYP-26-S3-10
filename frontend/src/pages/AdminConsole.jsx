@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { ROLES, useAuth } from "../auth";
 import { Button, Empty, Field, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const TABS = [
   ["overview", "Overview"],
@@ -1337,6 +1338,7 @@ function Disputes({ onNotice }) {
 /* ------------------------------------------------------------------ */
 
 export default function AdminConsole() {
+  usePageTitle("Administration");
   const { user } = useAuth();
   const [tab, setTab] = useState("overview");
   const [notice, setNotice] = useState(null);

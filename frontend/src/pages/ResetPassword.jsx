@@ -14,6 +14,7 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import { api } from "../api";
 import { Button, Field, Notice } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const MIN_PASSWORD = 12;
 
@@ -155,6 +156,7 @@ function ConfirmForm({ token }) {
 
 export default function ResetPassword() {
   const [params] = useSearchParams();
+  usePageTitle("Reset your password");
   const token = params.get("token");
 
   return (

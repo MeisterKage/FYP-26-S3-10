@@ -11,6 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../api";
 import { useAuth } from "../auth";
 import { Button, Field, Notice } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -19,6 +20,7 @@ export default function LoginPage() {
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
+  usePageTitle("Sign in");
   const [fieldError, setFieldError] = useState(null);
   const [busy, setBusy] = useState(false);
 

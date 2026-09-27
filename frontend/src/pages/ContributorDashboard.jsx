@@ -15,6 +15,7 @@ import { api } from "../api";
 import { useAuth } from "../auth";
 import { CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const EDITABLE = new Set(["draft", "rejected"]);
 
@@ -23,6 +24,7 @@ export default function ContributorDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   const [articles, setArticles] = useState(null);
+  usePageTitle("Your articles");
   const [notice, setNotice] = useState(location.state?.notice || null);
   const [error, setError] = useState(null);
   const [pendingId, setPendingId] = useState(null);

@@ -17,14 +17,16 @@ export const speechSupported =
   "SpeechSynthesisUtterance" in window;
 
 function pickVoice(lang) {
-  const voices = window.speechSynthesis.getVoices();
-  return (
+  const all = window.speechSynthesis.getVoices();
+  // A voice that runs on the device keeps the text on it; some browsers also
+  // offer online voices, used only when there is no local English one.
+  const local = all.filter((v) => v.localService);
+  const find = (voices) =>
     voices.find((v) => v.lang === lang) ||
     voices.find((v) => v.lang?.replace("_", "-") === lang) ||
     voices.find((v) => v.lang?.startsWith("en-GB")) ||
-    voices.find((v) => v.lang?.startsWith("en")) ||
-    null
-  );
+    voices.find((v) => v.lang?.startsWith("en"));
+  return find(local) || find(all) || null;
 }
 
 export function useSpeech({ lang = "en-AU", onPosition, onFinish } = {}) {

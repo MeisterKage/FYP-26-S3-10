@@ -4,17 +4,14 @@
  * Role checks here govern navigation only. Flask decides what a request may do
  * (PDD Section 3); hiding a link is a courtesy, not a control.
  */
+import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, ROLES, useAuth } from "./auth";
 import { ErrorBoundary, Footer, Masthead } from "./components/Layout";
 import { Button, Empty } from "./components/UI";
 import AboutPage from "./pages/AboutPage";
-import Account from "./pages/Account";
-import AdminConsole from "./pages/AdminConsole";
-import ArticleEditor from "./pages/ArticleEditor";
 import ArticlePage from "./pages/ArticlePage";
-import ContributorDashboard from "./pages/ContributorDashboard";
 import CategoryPage from "./pages/CategoryPage";
 import ContributorProfile from "./pages/ContributorProfile";
 import { CountryIndex, CountryPage } from "./pages/CountryPages";
@@ -25,10 +22,51 @@ import ResetPassword from "./pages/ResetPassword";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import PricingPage from "./pages/PricingPage";
-import Moderation from "./pages/Moderation";
+import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import RegisterPage from "./pages/RegisterPage";
-import ReviewQueue from "./pages/ReviewQueue";
 import SearchPage from "./pages/SearchPage";
+import { usePageTitle } from "./usePageTitle";
+
+/**
+ * Pages only signed-in writers, editors and administrators open, downloaded
+ * when first needed so a reader's first visit does not carry them.
+ *
+ * After a redeploy, a tab opened earlier may ask for a file that no longer
+ * exists. One reload fetches the new version; the flag stops a reload loop.
+ */
+function lazyPage(load) {
+  return lazy(() =>
+    load().then((page) => {
+      try {
+        window.sessionStorage.removeItem("page-reload");
+      } catch {
+        /* storage blocked: nothing to clear */
+      }
+      return page;
+    }).catch((error) => {
+      let reloaded = false;
+      try {
+        reloaded = window.sessionStorage.getItem("page-reload") === "1";
+        window.sessionStorage.setItem("page-reload", "1");
+      } catch {
+        /* storage blocked: fall through to the error screen */
+      }
+      if (!reloaded) window.location.reload();
+      throw error;
+    }),
+  );
+}
+
+const Account = lazyPage(() => import("./pages/Account"));
+const AdminConsole = lazyPage(() => import("./pages/AdminConsole"));
+const ArticleEditor = lazyPage(() => import("./pages/ArticleEditor"));
+const ContributorDashboard = lazyPage(() => import("./pages/ContributorDashboard"));
+const Moderation = lazyPage(() => import("./pages/Moderation"));
+const ReviewQueue = lazyPage(() => import("./pages/ReviewQueue"));
+
+function PageLoading() {
+  return <div className="skeleton" style={{ height: "16rem" }} aria-hidden="true" />;
+}
 
 function RequireRole({ roles, children }) {
   const { user, loading, has } = useAuth();
@@ -57,8 +95,10 @@ function RequireRole({ roles, children }) {
 }
 
 function NotFound() {
+  usePageTitle("Page not found");
   return (
     <Empty
+      level={1}
       title="That page isn't here"
       action={
         <Button variant="outline" as="a" href="/" className="mt-4">
@@ -82,11 +122,14 @@ export default function App() {
 
       <main className="shell main" id="main" tabIndex={-1}>
         <ErrorBoundary>
+          <Suspense fallback={<PageLoading />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="/articles/:slug" element={<ArticlePage />} />
             <Route path="/categories/:slug" element={<CategoryPage />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />
@@ -151,6 +194,7 @@ export default function App() {
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </ErrorBoundary>
       </main>
 

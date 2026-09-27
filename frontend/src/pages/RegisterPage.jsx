@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ApiError, api } from "../api";
 import { useAuth } from "../auth";
 import { Button, Field, Notice } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const MIN_PASSWORD = 12;
 
@@ -22,6 +23,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ displayName: "", email: "", password: "" });
   const [selected, setSelected] = useState([]);
   const [error, setError] = useState(null);
+  usePageTitle("Create an account");
   const [fieldError, setFieldError] = useState({});
   const [busy, setBusy] = useState(false);
 

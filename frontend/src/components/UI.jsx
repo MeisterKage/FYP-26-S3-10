@@ -94,10 +94,11 @@ export function Notice({ tone = "loud", children, ...rest }) {
   );
 }
 
-export function Empty({ title, children, action }) {
+export function Empty({ title, children, action, level = 2 }) {
+  const Heading = level === 1 ? "h1" : "h2";
   return (
     <div className="empty">
-      <h2 className="sub">{title}</h2>
+      <Heading className="sub">{title}</Heading>
       {children && <p className="meta">{children}</p>}
       {action}
     </div>

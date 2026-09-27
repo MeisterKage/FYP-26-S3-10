@@ -15,6 +15,7 @@ import { AudioEdition } from "../components/AudioEdition";
 import { CredibilityInline } from "../components/Credibility";
 import { EntryThumb } from "../components/CoverImage";
 import { Button, Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 function monthName(month) {
   const [y, m] = month.split("-").map(Number);
@@ -54,6 +55,7 @@ export function DigestArchive() {
   const [params, setParams] = useSearchParams();
   const month = params.get("month") || "";
   const [data, setData] = useState(null);
+  usePageTitle("Monthly digests");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -184,6 +186,7 @@ function SubscribeButton({ edition, onChange }) {
 export function DigestEdition() {
   const { month, key } = useParams();
   const [edition, setEdition] = useState(null);
+  usePageTitle(edition ? `${edition.topic}, ${edition.monthLabel}` : null);
   const [error, setError] = useState(null);
 
   const load = useCallback(() => {
@@ -197,7 +200,7 @@ export function DigestEdition() {
 
   if (error) {
     return (
-      <Empty title="This digest isn't here"
+      <Empty level={1} title="This digest isn't here"
         action={<Link className="link-quiet mt-4" to="/digests">See all digests</Link>}>
         {error}
       </Empty>

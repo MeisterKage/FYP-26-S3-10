@@ -165,7 +165,8 @@ def narration_script(title: str, points: list[str]) -> str:
 class BrowserNarrator(Narrator):
     """The reader's own browser reads the summary aloud (Web Speech API).
 
-    Free, private (no text leaves the device), and works offline once the
+    Free, and private on a local voice (the page prefers one, so the text stays
+    on the device; some browsers only offer online voices). Works offline once the
     page has loaded. Voices depend on the reader's system; the page asks for
     an English voice from the site's region first.
     """

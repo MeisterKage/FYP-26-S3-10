@@ -29,6 +29,7 @@ import { WritingSignals } from "../components/WritingSignals";
 import { SourceList } from "../components/Sources";
 import { SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 function RejectForm({ article, onCancel, onDone }) {
   const [reason, setReason] = useState("");
@@ -374,6 +375,7 @@ function BatchBar({ articles, selected, setSelected, onDone, onError }) {
 
 export default function ReviewQueue() {
   const [queue, setQueue] = useState(null);
+  usePageTitle("Review queue");
   const [notice, setNotice] = useState(null);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(() => new Set());

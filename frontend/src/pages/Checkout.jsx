@@ -15,6 +15,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 
 import { api } from "../api";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 export function money(cents, currency = "AUD") {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency }).format(cents / 100);
@@ -31,6 +32,7 @@ export function CheckoutTest() {
   const { ref } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
+  usePageTitle("Checkout");
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(null);
 
@@ -98,6 +100,7 @@ export function CheckoutResult() {
   const [params] = useSearchParams();
   const id = params.get("payment");
   const [payment, setPayment] = useState(null);
+  usePageTitle("Payment");
   const [error, setError] = useState(null);
 
   useEffect(() => {

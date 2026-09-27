@@ -12,6 +12,7 @@ import { api } from "../api";
 import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const SORTS = [
   ["recent", "Most recent"],
@@ -25,6 +26,7 @@ export default function CategoryPage() {
 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  usePageTitle(data?.category?.name);
 
   const load = useCallback(() => {
     setData(null);

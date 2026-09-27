@@ -25,6 +25,7 @@ import {
   SectionHead,
   formatDate,
 } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 function Lead({ article }) {
   const date = formatDate(article.publishedAt);
@@ -81,6 +82,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  usePageTitle(null);
 
   useEffect(() => {
     let cancelled = false;

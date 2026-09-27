@@ -13,6 +13,7 @@ import { api } from "../api";
 import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const SORTS = [
   ["recent", "Most recent"],
@@ -21,6 +22,7 @@ const SORTS = [
 
 export function CountryIndex() {
   const [countries, setCountries] = useState(null);
+  usePageTitle("Countries");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export function CountryPage() {
   const section = params.get("category") || "";
 
   const [data, setData] = useState(null);
+  usePageTitle(data?.country?.name);
   const [error, setError] = useState(null);
 
   const load = useCallback(() => {
@@ -97,6 +100,7 @@ export function CountryPage() {
   if (error) {
     return (
       <Empty
+        level={1}
         title="No news for that country"
         action={
           <Link className="link-quiet mt-4" to="/countries">

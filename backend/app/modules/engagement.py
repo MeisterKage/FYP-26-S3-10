@@ -239,15 +239,21 @@ def reading_list():
 
 @bp.get("/articles/<int:article_id>/share")
 def share(article_id: int):
+    from .share import article_url as web_url, share_page_url
+
     article = _published_article(article_id)
-    base = request.host_url.rstrip("/")
-    article_url = f"{base}/articles/{article.slug}"
+    # The copy-link address is the article itself. The platform buttons use the
+    # preview page, which carries the headline, score and picture for the card
+    # and forwards the reader on (see modules/share.py).
+    article_url = web_url(article)
+    preview_url = share_page_url(article)
 
     return jsonify(
         {
             "url": article_url,
+            "previewUrl": preview_url,
             "targets": social_share.share_urls(
-                article_url=article_url, title=article.title, score=article.credibility_score
+                article_url=preview_url, title=article.title, score=article.credibility_score
             ),
             "previewCard": social_share.preview_card(
                 title=article.title,

@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { ROLES, useAuth } from "../auth";
 import { Button, Empty, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 function CorrectionForm({ article, onDone, onCancel }) {
   const [type, setType] = useState("correction");
@@ -254,6 +255,7 @@ export default function Moderation() {
   const isAdmin = user?.role === ROLES.ADMIN;
 
   const [data, setData] = useState(null);
+  usePageTitle("Moderation");
   const [notice, setNotice] = useState(null);
   const [error, setError] = useState(null);
 

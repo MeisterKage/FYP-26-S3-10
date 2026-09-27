@@ -30,6 +30,7 @@ import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
 import { startSubscription } from "./Checkout";
+import { usePageTitle } from "../usePageTitle";
 
 /**
  * Who vouched for this article. Absent while it awaits review: the meter
@@ -104,6 +105,7 @@ export default function ArticlePage() {
   const [subscribeError, setSubscribeError] = useState(null);
 
   const [article, setArticle] = useState(null);
+  usePageTitle(article?.title);
   const [error, setError] = useState(null);
   const [reported, setReported] = useState(false);
   const [reporting, setReporting] = useState(false);
@@ -128,6 +130,7 @@ export default function ArticlePage() {
   if (error) {
     return (
       <Empty
+        level={1}
         title="This article isn't here"
         action={
           <Button variant="outline" as={Link} to="/" className="mt-4">

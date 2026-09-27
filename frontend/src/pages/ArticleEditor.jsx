@@ -18,6 +18,7 @@ import { OriginalityCheck } from "../components/Originality";
 import { SourceIcon } from "../components/Icon";
 import RichText from "../components/RichText";
 import { Button, Field, Notice, SectionHead, formatDate } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 const MAX_SOURCES = 20;
 const MAX_TAGS = 10;
@@ -102,6 +103,7 @@ export default function ArticleEditor() {
   const navigate = useNavigate();
   // "new" is a route param, not a separate route: see App.jsx.
   const isNew = id === "new" || id === undefined;
+  usePageTitle(isNew ? "New article" : "Edit article");
 
   const [form, setForm] = useState(BLANK);
   const [sources, setSources] = useState([]);

@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { CredibilityMeter } from "../components/Credibility";
 import { Notice } from "../components/UI";
+import { usePageTitle } from "../usePageTitle";
 
 function Term({ name, children }) {
   return (
@@ -30,6 +31,7 @@ function Term({ name, children }) {
 export default function AboutPage() {
   const [formula, setFormula] = useState(null);
   const [error, setError] = useState(null);
+  usePageTitle("About");
 
   useEffect(() => {
     api

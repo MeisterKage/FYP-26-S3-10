@@ -20,6 +20,7 @@ import { CredibilityInline } from "../components/Credibility";
 import { Button, Empty, Field, Notice, SectionHead, formatDate } from "../components/UI";
 import { PaymentHistory } from "./Checkout";
 import { DigestSubscriptions } from "./Digests";
+import { usePageTitle } from "../usePageTitle";
 
 const EVENT_LABELS = {
   breaking_news: "Breaking news",
@@ -556,6 +557,7 @@ function Earnings() {
 /* ------------------------------------------------------------------ */
 
 export default function Account() {
+  usePageTitle("Your account");
   const { user, has } = useAuth();
   const [notice, setNotice] = useState(null);
 

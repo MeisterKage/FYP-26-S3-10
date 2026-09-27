@@ -35,6 +35,12 @@ class Config:
     RESET_TOKEN_TTL_MINUTES = int(os.environ.get("RESET_TOKEN_TTL_MINUTES", 30))
 
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
+    # The public website, for links the API hands out (shared articles). Taken
+    # from the allowed origins, which already name it, unless set explicitly.
+    SITE_URL = os.environ.get("SITE_URL") or next(
+        (o for o in CORS_ORIGINS if "localhost" not in o and "127.0.0.1" not in o),
+        CORS_ORIGINS[0],
+    ).strip()
 
     # PRD 5.1 Security: "passwords of at least 12 characters"
     MIN_PASSWORD_LENGTH = 12
