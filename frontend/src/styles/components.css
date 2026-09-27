@@ -1366,14 +1366,6 @@
 .browse-trigger svg {
   flex-shrink: 0;
 }
-/* On a phone the panel is the screen; a 6px sliver of page beside it reads
-   as a mistake, not as a backdrop. */
-@media (max-width: 30rem) {
-  .browse-drawer {
-    width: 100vw;
-    border-right: 0;
-  }
-}
 
 .browse-layer {
   position: fixed;
@@ -1558,4 +1550,14 @@
 @keyframes browse-fade {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* On a phone the panel is the screen; a 6px sliver of page beside it reads
+   as a mistake, not as a backdrop. Last in the file so it outranks the
+   panel's own width. */
+@media (max-width: 30rem) {
+  .browse-drawer {
+    width: 100vw;
+    border-right: 0;
+  }
 }
