@@ -101,7 +101,9 @@ export function SourceList({ sources, articleId, reviewable = false, onChange })
                   )}
                 </p>
               )}
-              {r?.reason && <p className="source-reason">{r.reason}</p>}
+              {/* The reason behind a grade is for editors weighing the source; a
+                  reader sees the grade itself. */}
+              {reviewable && r?.reason && <p className="source-reason">{r.reason}</p>}
               {reviewable && (
                 <Verdict articleId={articleId} source={source} onChange={(result) => onChange?.(result)} />
               )}
