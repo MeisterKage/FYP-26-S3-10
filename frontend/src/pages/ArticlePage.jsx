@@ -23,6 +23,7 @@ import ArticleExtras from "../components/ArticleExtras";
 import { CoverFigure } from "../components/CoverImage";
 import Corrections from "../components/Corrections";
 import { SourceList } from "../components/Sources";
+import { WriterCard } from "../components/WriterCard";
 import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
@@ -186,6 +187,10 @@ export default function ArticlePage() {
               dangerouslySetInnerHTML={{ __html: article.body }}
             />
           )}
+
+          {/* Where a reader who liked it decides to follow or subscribe. Left out
+              behind a paywall, which has its own subscribe button in place. */}
+          {!article.paywalled && article.writer && <WriterCard writer={article.writer} />}
 
           {article.sources?.length > 0 && (
             <section className="sources">

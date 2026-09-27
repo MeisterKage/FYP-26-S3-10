@@ -1256,3 +1256,70 @@
   border-left: 2px solid var(--ink);
   padding-left: var(--s-3);
 }
+
+/* --- writer card -----------------------------------------------------------
+   Closes the article: who wrote it, how accurate they are, and the two ways to
+   hear more from them. Set in the sunken tint so it reads as apart from the
+   article, not as another paragraph of it. */
+
+.writer-card {
+  max-width: var(--w-article, var(--w-read));
+  margin-top: var(--s-7);
+  padding: var(--s-5);
+  background: var(--sunken);
+  border-top: 2px solid var(--ink);
+}
+.writer-card-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-5);
+  margin-top: var(--s-3);
+}
+.writer-card-who {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.writer-card-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.writer-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+}
+.writer-card-bio {
+  margin-top: var(--s-3);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  color: var(--body);
+}
+.writer-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s-2);
+  flex: 0 0 auto;
+  min-width: 12rem;
+}
+.writer-card-note {
+  max-width: 14rem;
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--quiet);
+}
+@media (max-width: 40rem) {
+  .writer-card-actions {
+    width: 100%;
+  }
+}

@@ -13,11 +13,12 @@ from flask import Blueprint, current_app, g, jsonify, request
 from sqlalchemy import func, or_
 from sqlalchemy.exc import SQLAlchemyError
 
-from ..enums import ArticleStatus
+from ..enums import AUTHORING_ROLES, ArticleStatus, SubscriptionStatus
+from ..payment_service import SUBSCRIPTION_PRICE_CENTS
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
-    Article, Category, Follow, Like, SavedArticle, User, UserCategoryPreference,
+    Article, Category, Follow, Like, SavedArticle, User, UserCategoryPreference, utcnow,
 )
 from ..countries import COUNTRIES, DEFAULT_COUNTRY, codes_matching
 from ..credibility import DEFAULTS, credibility_score
@@ -282,6 +283,27 @@ def search():
     return jsonify(result)
 
 
+def _relation(viewer, contributor_id: int) -> dict:
+    """Whether this reader follows, or pays to subscribe to, this writer."""
+    if viewer is None or viewer.id == contributor_id:
+        return {"following": False, "subscribed": False, "isSelf": viewer is not None}
+    now = utcnow()
+    following = db.session.query(
+        Follow.query.filter_by(follower_id=viewer.id, contributor_id=contributor_id).exists()
+    ).scalar()
+    subscribed = any(
+        s.contributor_id == contributor_id and s.status == SubscriptionStatus.ACTIVE
+        and _aware(s.period_end) > now
+        for s in viewer.subscriptions
+    )
+    return {"following": bool(following), "subscribed": subscribed, "isSelf": False}
+
+
+def _aware(dt):
+    from datetime import timezone
+    return dt.replace(tzinfo=timezone.utc) if dt is not None and dt.tzinfo is None else dt
+
+
 @bp.get("/articles/<slug>")
 def read_article(slug: str):
     """PDD Figure 5.6. Byline, publish time, credibility score, accuracy rate, body."""
@@ -330,6 +352,20 @@ def read_article(slug: str):
                 ).exists()
             ).scalar(),
         }
+
+    # The writer, for the card at the end of the article: a reader who liked it
+    # can follow or subscribe there, without a trip to the profile.
+    writer = article.contributor
+    payload["writer"] = {
+        "id": writer.id,
+        "name": writer.byline,
+        "bio": writer.bio if not writer.deleted_at else None,
+        "accuracyRate": writer.accuracy_rate,
+        "followerCount": Follow.query.filter_by(contributor_id=writer.id).count(),
+        "offersSubscription": writer.role in AUTHORING_ROLES and not writer.deleted_at,
+        "monthlyPriceCents": SUBSCRIPTION_PRICE_CENTS,
+        **_relation(viewer, writer.id),
+    }
 
     return jsonify({"article": payload})
 
@@ -466,6 +502,10 @@ def contributor_profile(user_id: int):
                 "followerCount": db.session.query(Follow)
                 .filter_by(contributor_id=user.id)
                 .count(),
+                # The profile's Follow button reads this; it was never sent, so
+                # the button always said "Follow", even to a reader following.
+                "isFollowedByViewer": _relation(current_user(), user.id)["following"],
+                "isSubscribedByViewer": _relation(current_user(), user.id)["subscribed"],
             },
             "articles": [
                 serialize(a, include_body=False, viewer=current_user()) for a in articles

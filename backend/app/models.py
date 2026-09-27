@@ -36,6 +36,12 @@ def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _aware(dt: datetime | None) -> datetime | None:
+    """Treat a stored time without a zone as UTC. PostgreSQL keeps the zone;
+    SQLite, which the tests use, drops it, and comparing the two raises."""
+    return dt.replace(tzinfo=timezone.utc) if dt is not None and dt.tzinfo is None else dt
+
+
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(
@@ -98,7 +104,7 @@ class User(TimestampMixin, db.Model):
         """Live paywall check. Never trust `role` alone; it does not expire."""
         now = now or utcnow()
         return any(
-            s.status == SubscriptionStatus.ACTIVE and s.period_end > now
+            s.status == SubscriptionStatus.ACTIVE and _aware(s.period_end) > now
             for s in self.subscriptions
         )
 
