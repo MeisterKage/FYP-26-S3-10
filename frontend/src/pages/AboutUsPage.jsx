@@ -29,7 +29,7 @@ export default function AboutUsPage() {
   }, []);
 
   return (
-    <div className="about">
+    <div className="about doc">
       <header className="read">
         <p className="label">About us</p>
         <h1 className="display mt-3">News you can check.</h1>

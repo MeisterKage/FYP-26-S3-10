@@ -1889,3 +1889,112 @@
     transition: none;
   }
 }
+
+/* --- document pages: About us, How scoring works, Pricing, Privacy, Terms ----
+   The full width of the page, laid out like a printed reference: the title
+   across the top, then each section's heading in a left column and its
+   content filling the right. Paragraphs keep a readable measure; definition
+   lists become a two-column grid and tables take the whole content column.
+   On narrow screens it all stacks as one column. */
+
+.doc {
+  --doc-side: minmax(12rem, 17rem);
+  --doc-measure: 46rem;
+}
+.doc > .read,
+.doc > header.read,
+.doc > section.read {
+  max-width: none;
+}
+.doc > header.read {
+  display: grid;
+  grid-template-columns: var(--doc-side) minmax(0, 1fr);
+  column-gap: var(--s-8);
+}
+.doc > header.read > * {
+  grid-column: 1 / -1;
+}
+.doc > header.read > h1 {
+  max-width: 22ch;
+  text-wrap: balance;
+}
+.doc > header.read > .lead {
+  grid-column: 2;
+  max-width: var(--doc-measure);
+}
+
+.doc > .section.read,
+.doc > .read.prose {
+  display: grid;
+  grid-template-columns: var(--doc-side) minmax(0, 1fr);
+  column-gap: var(--s-8);
+  align-items: start;
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--hair);
+}
+.doc > .section.read > *,
+.doc > .read.prose > * {
+  grid-column: 2;
+}
+.doc > .section.read > h2,
+.doc > .read.prose > h2 {
+  grid-column: 1;
+  margin-top: 0;
+  font-size: var(--t-heading);
+  text-wrap: balance;
+}
+/* The content beside a heading starts level with it. */
+.doc > .section.read > h2 + *,
+.doc > .read.prose > h2 + * {
+  margin-top: 0;
+}
+/* In a long prose page, each heading after the first starts a new band. */
+.doc > .read.prose > h2:not(:first-child),
+.doc > .read.prose > h2:not(:first-child) + * {
+  margin-top: var(--s-8);
+}
+.doc > .section.read > p,
+.doc > .read.prose > p,
+.doc > .read.prose > ul {
+  max-width: var(--doc-measure);
+}
+.doc .terms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-6) var(--s-7);
+}
+.doc .terms > * + * {
+  margin-top: 0;
+}
+/* The platform figures run the full width, in one row on a wide screen. */
+.doc > .section.read > .about-figures {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.doc > .section.read:has(> .about-figures) {
+  border-top: 0;
+  padding-top: 0;
+}
+
+@media (max-width: 56rem) {
+  .doc > header.read,
+  .doc > .section.read,
+  .doc > .read.prose {
+    display: block;
+  }
+  .doc > .section.read > h2 + *,
+  .doc > .read.prose > h2 + * {
+    margin-top: var(--s-5);
+  }
+  .doc .terms {
+    grid-template-columns: 1fr;
+  }
+  .doc > .section.read > .about-figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 56.01rem) and (max-width: 72rem) {
+  .doc > .section.read > .about-figures {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

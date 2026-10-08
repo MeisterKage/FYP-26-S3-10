@@ -43,7 +43,7 @@ export default function AboutPage() {
   const v = formula;
 
   return (
-    <div className="about">
+    <div className="about doc">
       <header className="read">
         <h1 className="display">Every score is arithmetic you can check.</h1>
         <p className="lead mt-6">

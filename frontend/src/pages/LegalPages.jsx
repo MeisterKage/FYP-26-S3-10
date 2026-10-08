@@ -13,7 +13,7 @@ const UPDATED = "28 September 2026";
 
 function LegalPage({ title, intro, children }) {
   return (
-    <div className="legal">
+    <div className="legal doc">
       <header className="read">
         <p className="label">Last updated {UPDATED}</p>
         <h1 className="title mt-3">{title}</h1>

@@ -34,7 +34,7 @@ export default function PricingPage() {
   }, []);
 
   return (
-    <div className="about">
+    <div className="about doc">
       <header className="read">
         <h1 className="display">What a subscription pays for.</h1>
         <p className="lead mt-6">
