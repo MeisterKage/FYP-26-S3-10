@@ -53,6 +53,26 @@ def has_duplicate_title(article: Article) -> bool:
     return bool(duplicate_titles(article.title, exclude_article_id=article.id))
 
 
+def duplicated_titles(articles: list[Article]) -> set[int]:
+    """Which of these articles share their exact title with any other article.
+
+    The same rule as has_duplicate_title (normalised, exact), in one query for
+    a whole list instead of one per article.
+    """
+    from sqlalchemy import func
+
+    def norm(title: str) -> str:
+        return " ".join(title.lower().split())
+
+    wanted = {norm(a.title) for a in articles}
+    if not wanted:
+        return set()
+    counts: dict[str, int] = {}
+    for (title,) in db.session.query(Article.title).filter(func.lower(Article.title).in_(wanted)):
+        counts[norm(title)] = counts.get(norm(title), 0) + 1
+    return {a.id for a in articles if counts.get(norm(a.title), 0) > 1}
+
+
 def is_suspended(user: User, now: datetime) -> bool:
     until = _aware(user.autopublish_suspended_until)
     return until is not None and until > now
@@ -62,11 +82,13 @@ def is_suspended(user: User, now: datetime) -> bool:
 #  Queue ordering
 # --------------------------------------------------------------------------- #
 
-def priority_for(article: Article, settings: dict, now: datetime) -> triage.PriorityBreakdown:
+def priority_for(article: Article, settings: dict, now: datetime,
+                 duplicate: bool | None = None) -> triage.PriorityBreakdown:
+    """`duplicate` may be passed when the caller checked a whole list at once."""
     return triage.review_priority(
         contributor_accuracy=article.contributor.accuracy_rate,
         source_count=valid_source_count(article),
-        has_duplicate_title=has_duplicate_title(article),
+        has_duplicate_title=has_duplicate_title(article) if duplicate is None else duplicate,
         hours_waiting=hours_since(article.submitted_at, now),
         similarity_percent=article.originality_percent,
         settings=settings,

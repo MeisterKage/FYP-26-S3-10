@@ -2128,3 +2128,20 @@
   text-align: center;
   padding-block: var(--s-10);
 }
+
+/* Figures: the number first and on one line with its neighbours, its label
+   beneath however many lines it takes. */
+.about-figures > div {
+  flex-direction: column;
+}
+.about-figures dd {
+  order: -1;
+}
+/* What an account gets you, as a real list with room above it. */
+.auth-benefits {
+  margin: var(--s-6) 0 0;
+  list-style: disc;
+}
+.auth-benefits li::marker {
+  color: var(--mute);
+}

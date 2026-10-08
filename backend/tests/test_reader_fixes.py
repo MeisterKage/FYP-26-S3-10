@@ -64,3 +64,15 @@ def test_topics_carry_their_published_article_counts(client, world):
 def test_platform_figures_count_only_published_work(client, world):
     f = client.get("/api/platform").get_json()
     assert (f["articles"], f["writers"], f["editors"], f["countries"], f["sections"]) == (2, 1, 1, 1, 2)
+
+
+def test_the_batched_duplicate_check_agrees_with_the_single_one(app, world):
+    from app.review_service import duplicated_titles, has_duplicate_title
+    twin = Article(contributor_id=world["stories"][0].contributor_id,
+                   category_id=world["politics"].id, title="  story 0 ", slug="story-0-copy",
+                   body="<p>b</p>", status=ArticleStatus.PENDING)
+    _db.session.add(twin)
+    _db.session.commit()
+    articles = world["stories"] + [twin]
+    assert duplicated_titles(articles) == {a.id for a in articles if has_duplicate_title(a)}
+    assert duplicated_titles(articles) == {world["stories"][0].id, twin.id}

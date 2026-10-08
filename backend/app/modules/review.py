@@ -16,13 +16,13 @@ from ..enums import REVIEW_ROLES, ArticleStatus, Role
 from ..errors import ApiError
 from ..extensions import db
 from ..models import Article, AuditLog, EditorCategory, Notification, utcnow
-from ..review_service import confirm_article, priority_for, publish_article
+from ..review_service import confirm_article, duplicated_titles, priority_for, publish_article
 from ..sanitize import clean_plain_text
-from ..scoring_service import explain_article, load_settings
+from ..scoring_service import explain_article, load_settings, upheld_report_counts
 from ..security import editor_owns_category, roles_required
 from ..validation import json_body, require_choice, require_list, require_str
 from ..source_service import apply_verdict, serialize as serialize_source
-from .articles import serialize
+from .articles import list_loads, serialize
 
 bp = Blueprint("review", __name__)
 
@@ -62,8 +62,8 @@ def review_queue():
             }
         )
 
-    pending = Article.query.filter_by(status=ArticleStatus.PENDING)
-    awaiting = Article.query.filter(
+    pending = Article.query.options(*list_loads()).filter_by(status=ArticleStatus.PENDING)
+    awaiting = Article.query.options(*list_loads()).filter(
         Article.status == ArticleStatus.PUBLISHED,
         Article.auto_published_at.isnot(None),
         Article.review_confirmed_at.is_(None),
@@ -82,14 +82,20 @@ def review_queue():
     # *would* carry on publication instead. Read-only: explain_article persists
     # nothing.
     payload = []
-    for article in pending.order_by(Article.submitted_at.asc()).all():
+    articles = pending.order_by(Article.submitted_at.asc()).all()
+    # What each article's score and priority need, counted for the whole queue
+    # at once rather than once per article.
+    record_counts: dict = {}
+    upheld = upheld_report_counts([a.id for a in articles])
+    duplicates = duplicated_titles(articles)
+    for article in articles:
         data = serialize(article, viewer=g.current_user)
         data["credibility"] = {
             **data["credibility"],
-            **explain_article(article, settings).as_dict(),
+            **explain_article(article, settings, record_counts, upheld).as_dict(),
             "prospective": True,
         }
-        data["priority"] = priority_for(article, settings, now).as_dict()
+        data["priority"] = priority_for(article, settings, now, article.id in duplicates).as_dict()
         payload.append(data)
 
     # Highest priority first. The sort is stable, so articles of equal priority

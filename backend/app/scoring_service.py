@@ -31,6 +31,18 @@ def load_settings() -> dict[str, float]:
 RECORD_STATUSES = (ArticleStatus.PUBLISHED, ArticleStatus.RETRACTED, ArticleStatus.UNPUBLISHED)
 
 
+def upheld_report_counts(article_ids: list[int]) -> dict[int, int]:
+    """Upheld reports per article, for a list, in one query."""
+    if not article_ids:
+        return {}
+    return dict(
+        db.session.query(Report.article_id, func.count(Report.id))
+        .filter(Report.article_id.in_(article_ids), Report.status == ReportStatus.UPHELD)
+        .group_by(Report.article_id)
+        .all()
+    )
+
+
 def _published_counts(contributor_id: int) -> tuple[int, int]:
     """(articles on the writer's record, of which corrected or retracted)."""
     published = (
@@ -172,7 +184,8 @@ def rescore_article(article: Article, settings: dict | None = None):
     return result
 
 
-def explain_article(article: Article, settings: dict | None = None):
+def explain_article(article: Article, settings: dict | None = None,
+                    record_counts: dict | None = None, upheld_counts: dict | None = None):
     """Recompute one article's score WITHOUT persisting anything.
 
     The reader-facing disclosure needs the arithmetic, not just the total, and a
@@ -182,15 +195,26 @@ def explain_article(article: Article, settings: dict | None = None):
     """
     cfg = settings if settings is not None else load_settings()
 
-    published, blemished = _published_counts(article.contributor_id)
+    # A list of articles (the review queue) often has several by one writer;
+    # `record_counts` lets the caller count each writer's record once.
+    if record_counts is not None and article.contributor_id in record_counts:
+        published, blemished = record_counts[article.contributor_id]
+    else:
+        published, blemished = _published_counts(article.contributor_id)
+        if record_counts is not None:
+            record_counts[article.contributor_id] = (published, blemished)
     accuracy = _accuracy_input(article, cfg, (published, blemished))
 
-    upheld = (
-        db.session.query(func.count(Report.id))
-        .filter(Report.article_id == article.id, Report.status == ReportStatus.UPHELD)
-        .scalar()
-        or 0
-    )
+    # Likewise `upheld_counts` ({article id: upheld reports}) for a whole list.
+    if upheld_counts is not None:
+        upheld = upheld_counts.get(article.id, 0)
+    else:
+        upheld = (
+            db.session.query(func.count(Report.id))
+            .filter(Report.article_id == article.id, Report.status == ReportStatus.UPHELD)
+            .scalar()
+            or 0
+        )
 
     return credibility.credibility_score(
         contributor_accuracy=accuracy,
