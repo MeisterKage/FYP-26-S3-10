@@ -11,6 +11,8 @@ import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, ROLES, useAuth } from "./auth";
 import { ErrorBoundary, Footer, Masthead } from "./components/Layout";
 import { Button, Empty } from "./components/UI";
 import AboutPage from "./pages/AboutPage";
+import AboutUsPage from "./pages/AboutUsPage";
+import TopicsIndex from "./pages/TopicsIndex";
 import ArticlePage from "./pages/ArticlePage";
 import CategoryPage from "./pages/CategoryPage";
 import ContributorProfile from "./pages/ContributorProfile";
@@ -127,6 +129,8 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/about-us" element={<AboutUsPage />} />
+            <Route path="/topics" element={<TopicsIndex />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />

@@ -39,13 +39,26 @@ export default function CategoryPage() {
 
   useEffect(load, [load]);
 
+  // Every topic, as quick links beside this one, so a reader can move between
+  // them or go back to All topics without the menu.
+  const [topics, setTopics] = useState([]);
+  useEffect(() => {
+    api
+      .get("/categories")
+      .then((d) => setTopics((d.categories || []).filter((c) => c.slug !== "uncategorised")))
+      .catch(() => setTopics([]));
+  }, []);
+
   if (error) return <Notice>{error}</Notice>;
 
   return (
     <div className="wide">
       <header className="dash-head">
         <div>
-          <h1 className="title">{data?.category?.name || "Section"}</h1>
+          <p className="label">
+            <Link className="link-quiet" to="/topics">All topics</Link>
+          </p>
+          <h1 className="title mt-3">{data?.category?.name || "Section"}</h1>
           <p className="meta mt-3">
             {data ? `${data.articles.length} published` : "Loading"}
           </p>
@@ -69,6 +82,18 @@ export default function CategoryPage() {
           </select>
         </div>
       </header>
+
+      {topics.length > 0 && (
+        <nav className="chips mt-6" aria-label="Topics">
+          <Link className="chip" to="/topics">All topics</Link>
+          {topics.map((t) => (
+            <Link className="chip" key={t.id} to={`/categories/${t.slug}`}
+              aria-current={t.slug === slug ? "page" : undefined}>
+              {t.name}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       <section className="section mt-7">
         <SectionHead title="Articles" />

@@ -37,6 +37,11 @@ def _serialize(user: User) -> dict:
         "bio": user.bio,
         "accuracyRate": user.accuracy_rate,
         "hasPremiumAccess": user.has_premium_access(),
+        # The sections chosen for the front page, so the account page can show
+        # them ticked. Without this every save looked as if it had not stuck.
+        "categoryIds": [
+            p.category_id for p in UserCategoryPreference.query.filter_by(user_id=user.id)
+        ],
     }
 
 

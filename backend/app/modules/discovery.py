@@ -15,13 +15,13 @@ from flask import Blueprint, current_app, g, jsonify, request
 from sqlalchemy import func, or_, update
 from sqlalchemy.exc import SQLAlchemyError
 
-from ..enums import AUTHORING_ROLES, ArticleStatus, SubscriptionStatus
+from ..enums import AUTHORING_ROLES, ArticleStatus, Role, SubscriptionStatus
 from ..payment_service import SUBSCRIPTION_PRICE_CENTS
 from ..insights_service import in_brief
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
-    Article, Category, Follow, Like, SavedArticle, User, UserCategoryPreference, utcnow,
+    Article, Category, Correction, Follow, Like, SavedArticle, User, UserCategoryPreference, utcnow,
 )
 from ..countries import COUNTRIES, DEFAULT_COUNTRY, codes_matching
 from ..credibility import DEFAULTS, credibility_score
@@ -69,14 +69,44 @@ def _paginate(query, page: int):
 @bp.get("/categories")
 def list_categories():
     categories = Category.query.filter_by(deleted_at=None).order_by(Category.name).all()
+    # Published articles per section, for the All topics page. One grouped query.
+    counts = dict(
+        db.session.query(Article.category_id, func.count(Article.id))
+        .filter(Article.status == ArticleStatus.PUBLISHED)
+        .group_by(Article.category_id)
+        .all()
+    )
     return jsonify(
         {
             "categories": [
-                {"id": c.id, "name": c.name, "slug": c.slug, "description": c.description}
+                {"id": c.id, "name": c.name, "slug": c.slug, "description": c.description,
+                 "articleCount": counts.get(c.id, 0)}
                 for c in categories
             ]
         }
     )
+
+
+@bp.get("/platform")
+def platform_figures():
+    """The platform in numbers, for the About us page. All public."""
+    published = Article.status == ArticleStatus.PUBLISHED
+    articles, writers, countries = db.session.query(
+        func.count(Article.id),
+        func.count(func.distinct(Article.contributor_id)),
+        func.count(func.distinct(Article.country_code)),
+    ).filter(published).one()
+    editors = User.query.filter(User.role == Role.EDITOR, User.deleted_at.is_(None)).count()
+    corrections = (
+        db.session.query(func.count(Correction.id))
+        .filter(Correction.overturned_at.is_(None)).scalar() or 0
+    )
+    sections = Category.query.filter(Category.deleted_at.is_(None),
+                                     Category.slug != "uncategorised").count()
+    return jsonify({
+        "articles": articles, "writers": writers, "editors": editors,
+        "countries": countries, "sections": sections, "corrections": corrections,
+    })
 
 
 @bp.get("/feed/trending")

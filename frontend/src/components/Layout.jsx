@@ -3,17 +3,17 @@
  * render from blanking the whole application.
  */
 import { Component, useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import { api } from "../api";
 import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, useAuth } from "../auth";
+import { AccountMenu } from "./AccountMenu";
 import { BrowseMenu } from "./BrowseMenu";
 import Notifications from "./Notifications";
 import { Button, Notice } from "./UI";
 
 export function Masthead() {
-  const { user, signOut, has } = useAuth();
-  const navigate = useNavigate();
+  const { user, has } = useAuth();
 
   return (
     <header className="masthead">
@@ -50,25 +50,18 @@ export function Masthead() {
           )}
 
           {user && <Notifications />}
+          {!user && (
+            <NavLink className="nav-link" to="/pricing">
+              Pricing
+            </NavLink>
+          )}
+        </nav>
 
-          <span className="nav-divider" aria-hidden="true" />
-
+        {/* Outside the nav, which scrolls sideways on narrow screens: the way
+            to your account or to sign in must never be scrolled out of view. */}
+        <div className="masthead-account">
           {user ? (
-            <>
-              <NavLink className="nav-link nav-name" to="/account">
-                {user.displayName}
-              </NavLink>
-              <Button
-                variant="quiet"
-                size="sm"
-                onClick={async () => {
-                  await signOut();
-                  navigate("/");
-                }}
-              >
-                Sign out
-              </Button>
-            </>
+            <AccountMenu />
           ) : (
             <>
               <NavLink className="nav-link" to="/login">
@@ -79,7 +72,7 @@ export function Masthead() {
               </Button>
             </>
           )}
-        </nav>
+        </div>
       </div>
     </header>
   );
@@ -114,8 +107,14 @@ export function Footer() {
           </nav>
         )}
         <nav aria-label="Footer">
+          <Link className="link-quiet" to="/about-us">
+            About us
+          </Link>
           <Link className="link-quiet" to="/about">
             How scoring works
+          </Link>
+          <Link className="link-quiet" to="/topics">
+            All topics
           </Link>
           <Link className="link-quiet" to="/digests">
             Monthly digests

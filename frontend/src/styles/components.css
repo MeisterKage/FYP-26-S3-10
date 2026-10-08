@@ -1569,3 +1569,158 @@
   color: var(--mute);
   font-variant-numeric: tabular-nums;
 }
+
+/* --- account area ----------------------------------------------------------
+   Outside the nav, so it is never scrolled out of view. On wide screens it
+   ends the masthead; on phones it shares the top row with the wordmark. */
+
+.masthead-account {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-shrink: 0;
+}
+.account-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  max-width: 14rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  cursor: pointer;
+}
+.account-trigger:hover,
+.account-trigger[aria-expanded="true"] {
+  background: var(--sunken);
+}
+.account-trigger:focus-visible,
+.account-links a:focus-visible,
+.account-signout:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.account-initial {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--t-caption);
+  font-weight: 600;
+}
+.account-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.account-panel {
+  position: fixed;
+  z-index: 40;
+  width: 16rem;
+  max-width: calc(100vw - 2rem);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  box-shadow: 0 12px 32px rgb(19 57 85 / 0.14);
+}
+.account-who {
+  padding: var(--s-4);
+  border-bottom: 1px solid var(--hair);
+}
+.account-who-name {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--ink);
+}
+.account-who-email {
+  margin-top: var(--s-1);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-links {
+  list-style: none;
+  margin: 0;
+  padding: var(--s-2) 0;
+}
+.account-links a {
+  display: block;
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+  text-decoration: none;
+}
+.account-links a:hover {
+  background: var(--sunken);
+}
+.account-signout {
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  border: 0;
+  border-top: 1px solid var(--hair);
+  background: transparent;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--quiet);
+  cursor: pointer;
+}
+.account-signout:hover {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+/* The name goes first when space runs short; the initial always stays. */
+@media (max-width: 72rem) {
+  .account-name {
+    display: none;
+  }
+  .account-trigger {
+    padding: 0.25rem;
+  }
+}
+@media (max-width: 60rem) {
+  .wordmark {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .masthead-account {
+    order: 1;
+  }
+  .nav {
+    order: 2;
+  }
+}
+@media (max-width: 26rem) {
+  .wordmark {
+    font-size: 1.2rem;
+  }
+  .masthead-account .nav-link {
+    padding-inline: var(--s-2);
+  }
+}
+
+/* Topic links are chips too; the current topic is marked like a pressed one. */
+a.chip {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.chip[aria-current="page"] {
+  background: var(--deep);
+  border-color: var(--deep);
+  color: var(--paper);
+}

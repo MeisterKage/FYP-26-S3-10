@@ -190,10 +190,12 @@ export function BrowseMenu() {
                         which could not fit it beside Browse for the
                         administrator. It is also in the footer and on every
                         article, beside the score it explains. */}
+                    <Row to="/">Home</Row>
+                    <Row to="/about-us">About us</Row>
                     <Row to="/about">How scoring works</Row>
                     <Row to="/digests">Monthly digests</Row>
                     <Row to="/editors">Our editors</Row>
-                    <Row to="/">Front page</Row>
+                    <Row to="/pricing">Pricing</Row>
                   </ul>
                   <Link className="browse-feature" to="/digests">
                     <span className="browse-feature-label">Featured</span>
@@ -209,11 +211,16 @@ export function BrowseMenu() {
                 error ? <p className="browse-error">{error}</p>
                   : !data ? <Loading />
                   : (
-                    <ul className="browse-list">
-                      {data.topics.map((t) => (
-                        <Row key={t.id} to={`/categories/${t.slug}`}>{t.name}</Row>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="browse-list">
+                        <Row to="/topics">All topics</Row>
+                      </ul>
+                      <ul className="browse-list browse-list--secondary">
+                        {data.topics.map((t) => (
+                          <Row key={t.id} to={`/categories/${t.slug}`}>{t.name}</Row>
+                        ))}
+                      </ul>
+                    </>
                   )
               )}
 

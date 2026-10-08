@@ -9,7 +9,7 @@
  * A paywalled article arrives from the server without a body at all, so this
  * renders whatever it was given.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../api";
@@ -21,7 +21,7 @@ import {
 } from "../components/Credibility";
 import ArticleExtras from "../components/ArticleExtras";
 import { CoverFigure } from "../components/CoverImage";
-import { InBrief } from "../components/InBrief";
+import { ArticleAudio } from "../components/ArticleAudio";
 import Corrections from "../components/Corrections";
 import { SourceList } from "../components/Sources";
 import { WriterCard } from "../components/WriterCard";
@@ -105,6 +105,7 @@ export default function ArticlePage() {
   const [subscribeError, setSubscribeError] = useState(null);
 
   const [article, setArticle] = useState(null);
+  const proseRef = useRef(null);
   usePageTitle(article?.title);
   const [error, setError] = useState(null);
   const [reported, setReported] = useState(false);
@@ -196,8 +197,9 @@ export default function ArticlePage() {
       <div className="article-grid">
         <div className="article-body">
           <CoverFigure image={article.coverImage} priority />
-          {!article.paywalled && article.inBrief && (
-            <InBrief title={article.title} brief={article.inBrief} />
+          {!article.paywalled && (
+            <ArticleAudio title={article.title} brief={article.inBrief} proseRef={proseRef}
+              bodyKey={article.id} />
           )}
           {article.paywalled ? (
             <>
@@ -230,6 +232,9 @@ export default function ArticlePage() {
                       <Link className="link-quiet" to="/login">
                         Already have one? Sign in
                       </Link>
+                      <Link className="link-quiet" to="/pricing">
+                        What a subscription costs
+                      </Link>
                     </>
                   )}
                 </div>
@@ -244,6 +249,7 @@ export default function ArticlePage() {
             // Safe: the server sanitises against an allowlist on write, so
             // nothing reaches here that was not already filtered.
             <div
+              ref={proseRef}
               className="prose"
               dangerouslySetInnerHTML={{ __html: article.body }}
             />

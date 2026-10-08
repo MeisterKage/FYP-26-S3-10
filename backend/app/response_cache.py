@@ -37,6 +37,7 @@ CACHEABLE = frozenset({
     "discovery.by_country",
     "discovery.search",
     "discovery.scoring_formula",
+    "discovery.platform_figures",
     "discovery.contributor_profile",
     "editors.editor_panel",
     "editors.editor_profile",

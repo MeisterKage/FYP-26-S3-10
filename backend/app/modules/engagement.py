@@ -219,10 +219,11 @@ def unsave_article(article_id: int):
 @bp.get("/me/reading-list")
 @login_required
 def reading_list():
-    from .articles import serialize
+    from .articles import list_loads, serialize
 
     saved = (
         db.session.query(Article)
+        .options(*list_loads())
         .join(SavedArticle, SavedArticle.article_id == Article.id)
         .filter(SavedArticle.user_id == g.current_user.id)
         .order_by(SavedArticle.created_at.desc())
@@ -230,6 +231,24 @@ def reading_list():
     )
     return jsonify(
         {"articles": [serialize(a, include_body=False, viewer=g.current_user) for a in saved]}
+    )
+
+@bp.get("/me/liked")
+@login_required
+def liked_articles():
+    """Articles this reader has liked, most recent like first. Published ones only."""
+    from .articles import list_loads, serialize
+
+    liked = (
+        db.session.query(Article)
+        .options(*list_loads())
+        .join(Like, Like.article_id == Article.id)
+        .filter(Like.user_id == g.current_user.id, Article.status == ArticleStatus.PUBLISHED)
+        .order_by(Like.created_at.desc())
+        .all()
+    )
+    return jsonify(
+        {"articles": [serialize(a, include_body=False, viewer=g.current_user) for a in liked]}
     )
 
 

@@ -11,7 +11,7 @@
  * discovered after submitting.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { api } from "../api";
 import { EntryThumb } from "../components/CoverImage";
@@ -48,6 +48,8 @@ function Profile({ onNotice }) {
 
   useEffect(() => {
     setForm({ displayName: user?.displayName || "", bio: user?.bio || "" });
+    // Tick the sections already chosen, so a save visibly sticks.
+    setSelected(user?.categoryIds || []);
     api
       .get("/categories")
       .then((d) => setCategories(d.categories || []))
@@ -132,25 +134,22 @@ function Profile({ onNotice }) {
 
 /* ------------------------------------------------------------------ */
 
-function ReadingList() {
+/** A list of the reader's articles: saved for later, or liked. */
+function ArticleList({ endpoint, empty }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    setData(null);
     api
-      .get("/me/reading-list")
+      .get(endpoint)
       .then(setData)
       .catch((e) => setError(e.message));
-  }, []);
+  }, [endpoint]);
 
   if (error) return <Notice>{error}</Notice>;
   if (!data) return <div className="skeleton" style={{ height: "12rem" }} />;
-  if (data.articles.length === 0)
-    return (
-      <Empty title="Nothing saved yet">
-        Use <em>Save for later</em> on any article and it appears here.
-      </Empty>
-    );
+  if (data.articles.length === 0) return empty;
 
   return (
     <div className="index">
@@ -567,6 +566,7 @@ export default function Account() {
   const tabs = [
     ["profile", "Profile"],
     ["reading", "Reading list"],
+    ["liked", "Liked"],
     ["alerts", "Email alerts"],
     ["digests", "Digests"],
     ...(canApply ? [["apply", "Become a contributor"]] : []),
@@ -574,11 +574,33 @@ export default function Account() {
     ...(canWrite ? [["earnings", "Earnings"]] : []),
   ];
 
-  const [tab, setTab] = useState("profile");
+  // The tab is in the address (?tab=liked) so the account menu can link to it.
+  const [params, setParams] = useSearchParams();
+  const tab = tabs.some(([key]) => key === params.get("tab")) ? params.get("tab") : "profile";
+  const setTab = (key) => setParams(key === "profile" ? {} : { tab: key });
 
   const panels = {
     profile: <Profile onNotice={setNotice} />,
-    reading: <ReadingList />,
+    reading: (
+      <ArticleList
+        endpoint="/me/reading-list"
+        empty={
+          <Empty title="Nothing saved yet">
+            Use <em>Save for later</em> on any article and it appears here.
+          </Empty>
+        }
+      />
+    ),
+    liked: (
+      <ArticleList
+        endpoint="/me/liked"
+        empty={
+          <Empty title="No liked articles yet">
+            Like an article and it appears here, newest first.
+          </Empty>
+        }
+      />
+    ),
     alerts: <NotificationSettings onNotice={setNotice} />,
     digests: <DigestSubscriptions onNotice={setNotice} />,
     apply: <Application onNotice={setNotice} />,
