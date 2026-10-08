@@ -1691,17 +1691,21 @@
     padding: 0.25rem;
   }
 }
+/* Phones: Browse and the wordmark on the first row; the nav, scrolling if it
+   must, and the account area pinned to its right on the second. */
 @media (max-width: 60rem) {
   .wordmark {
     width: auto;
-    flex: 1 1 auto;
+    flex: 1 1 calc(100% - 4rem);
+    min-width: 0;
+  }
+  .nav {
+    flex: 1 1 0;
+    width: auto;
     min-width: 0;
   }
   .masthead-account {
-    order: 1;
-  }
-  .nav {
-    order: 2;
+    margin-left: auto;
   }
 }
 @media (max-width: 26rem) {
