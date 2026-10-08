@@ -67,10 +67,14 @@ def duplicated_titles(articles: list[Article]) -> set[int]:
     wanted = {norm(a.title) for a in articles}
     if not wanted:
         return set()
-    counts: dict[str, int] = {}
-    for (title,) in db.session.query(Article.title).filter(func.lower(Article.title).in_(wanted)):
-        counts[norm(title)] = counts.get(norm(title), 0) + 1
-    return {a.id for a in articles if counts.get(norm(a.title), 0) > 1}
+    # Exactly has_duplicate_title's rule: this article's normalised title
+    # against other articles' lower-cased titles as stored.
+    owners: dict[str, set[int]] = {}
+    rows = db.session.query(Article.id, func.lower(Article.title)).filter(
+        func.lower(Article.title).in_(wanted))
+    for article_id, title in rows:
+        owners.setdefault(title, set()).add(article_id)
+    return {a.id for a in articles if owners.get(norm(a.title), set()) - {a.id}}
 
 
 def is_suspended(user: User, now: datetime) -> bool:

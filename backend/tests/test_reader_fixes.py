@@ -75,4 +75,4 @@ def test_the_batched_duplicate_check_agrees_with_the_single_one(app, world):
     _db.session.commit()
     articles = world["stories"] + [twin]
     assert duplicated_titles(articles) == {a.id for a in articles if has_duplicate_title(a)}
-    assert duplicated_titles(articles) == {world["stories"][0].id, twin.id}
+    assert duplicated_titles(articles) == {twin.id}   # the stored title keeps its spaces
