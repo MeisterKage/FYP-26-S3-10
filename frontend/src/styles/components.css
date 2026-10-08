@@ -1699,8 +1699,10 @@
     flex: 1 1 calc(100% - 4rem);
     min-width: 0;
   }
+  /* A real starting width, so the nav cannot squeeze onto the first row
+     beside the wordmark; it grows to fill the second and scrolls if needed. */
   .nav {
-    flex: 1 1 0;
+    flex: 1 1 8rem;
     width: auto;
     min-width: 0;
   }
