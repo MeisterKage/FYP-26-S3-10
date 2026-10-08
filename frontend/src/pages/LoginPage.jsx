@@ -11,6 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ApiError } from "../api";
 import { useAuth } from "../auth";
 import { Button, Field, Notice } from "../components/UI";
+import { AuthAside } from "../components/AuthAside";
 import { usePageTitle } from "../usePageTitle";
 
 export default function LoginPage() {
@@ -93,16 +94,9 @@ export default function LoginPage() {
         </form>
       </div>
 
-      <aside className="auth-aside">
-        <p className="lead">
-          Every article on Wollongong News carries a credibility score produced by a
-          fixed set of rules. The working sits beside the article, where you can
-          check it.
-        </p>
-        <Link className="link-quiet mt-5" to="/about" style={{ display: "inline-block" }}>
-          How scoring works
-        </Link>
-      </aside>
+      <AuthAside
+        lead="Every article on Wollongong News carries a credibility score produced by a fixed set of rules. The working sits beside the article, where you can check it."
+      />
     </div>
   );
 }

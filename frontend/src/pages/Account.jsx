@@ -72,9 +72,10 @@ function Profile({ onNotice }) {
   }
 
   return (
-    <form className="form" onSubmit={save}>
+    <form className="form profile-form" onSubmit={save}>
       {error && <Notice>{error}</Notice>}
 
+      <div className="profile-main">
       <Field label="Display name" id="displayName">
         {(props) => (
           <input
@@ -100,7 +101,9 @@ function Profile({ onNotice }) {
         )}
       </Field>
 
-      <fieldset className="fieldset">
+      </div>
+
+      <fieldset className="fieldset profile-side">
         <legend className="field-label">Sections you follow</legend>
         <p className="field-hint">
           These shape your front page. Leaving them empty falls back to trending.
@@ -123,7 +126,7 @@ function Profile({ onNotice }) {
         </div>
       </fieldset>
 
-      <div className="row gap-4 mt-6">
+      <div className="row gap-4 profile-actions">
         <Button variant="primary" type="submit" busy={busy}>
           Save profile
         </Button>

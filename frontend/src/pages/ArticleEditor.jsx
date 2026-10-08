@@ -370,7 +370,10 @@ export default function ArticleEditor() {
         </div>
       )}
 
-      <form className="form mt-7" onSubmit={save} noValidate>
+      <form className="form editor-form mt-7" onSubmit={save} noValidate>
+        {/* The writing on the left; what it is filed under, and the buttons
+            that send it, beside it on a wide screen. */}
+        <div className="editor-main">
         <Field label="Headline" id="title" error={fieldError.title}>
           {(props) => (
             <input
@@ -404,6 +407,61 @@ export default function ArticleEditor() {
           )}
         </Field>
 
+        <Field
+          label="Article"
+          id="body"
+          hint="Anything unsafe is stripped when you save, whatever you paste."
+          error={fieldError.body}
+        >
+          {(props) => (
+            <RichText
+              {...props}
+              value={form.body}
+              onChange={(html) => {
+                setForm((f) => ({ ...f, body: html }));
+                setFieldError((f) => ({ ...f, body: undefined }));
+              }}
+              disabled={!editable}
+            />
+          )}
+        </Field>
+
+        <section className="section">
+          <SectionHead title="Sources">
+            <p className="label">
+              <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
+              {validSources} verified
+            </p>
+          </SectionHead>
+          <p className="field-hint">
+            Each source raises the credibility score by what kind of source it is: an
+            official body, published research or an established outlet counts for most;
+            placeholders, social media and deprecated sites count for nothing. Only
+            your five best sources count, so a better source helps more than another
+            link. Your editor sees the rating for each one.
+          </p>
+          <div className="mt-4">
+            <SourceRows sources={sources} onChange={setSources} disabled={!editable} />
+          </div>
+        </section>
+
+        {editable && (
+          <section className="section">
+            <SectionHead title="Originality" />
+            <p className="field-hint">
+              Runs automatically when you submit, and your editor sees the result. Check
+              first so nothing surprises you. Quotations are never counted as copying.
+            </p>
+            <div className="mt-4">
+              {/* Saves first: the check reads what is stored, not the form. */}
+              <OriginalityCheck beforeCheck={persist} />
+            </div>
+          </section>
+        )}
+
+        </div>
+
+        <aside className="editor-side" aria-label="Article settings">
         <Field label="Section" id="categoryId" error={fieldError.categoryId}>
           {(props) => (
             <select
@@ -466,58 +524,6 @@ export default function ArticleEditor() {
         />
 
         <Field
-          label="Article"
-          id="body"
-          hint="Anything unsafe is stripped when you save, whatever you paste."
-          error={fieldError.body}
-        >
-          {(props) => (
-            <RichText
-              {...props}
-              value={form.body}
-              onChange={(html) => {
-                setForm((f) => ({ ...f, body: html }));
-                setFieldError((f) => ({ ...f, body: undefined }));
-              }}
-              disabled={!editable}
-            />
-          )}
-        </Field>
-
-        <section className="section mt-7">
-          <SectionHead title="Sources">
-            <p className="label">
-              <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
-              {validSources} verified
-            </p>
-          </SectionHead>
-          <p className="field-hint">
-            Each source raises the credibility score by what kind of source it is: an
-            official body, published research or an established outlet counts for most;
-            placeholders, social media and deprecated sites count for nothing. Only
-            your five best sources count, so a better source helps more than another
-            link. Your editor sees the rating for each one.
-          </p>
-          <div className="mt-4">
-            <SourceRows sources={sources} onChange={setSources} disabled={!editable} />
-          </div>
-        </section>
-
-        {editable && (
-          <section className="section mt-7">
-            <SectionHead title="Originality" />
-            <p className="field-hint">
-              Runs automatically when you submit, and your editor sees the result. Check
-              first so nothing surprises you. Quotations are never counted as copying.
-            </p>
-            <div className="mt-4">
-              {/* Saves first: the check reads what is stored, not the form. */}
-              <OriginalityCheck beforeCheck={persist} />
-            </div>
-          </section>
-        )}
-
-        <Field
           label="Tags"
           id="tags"
           hint="Comma separated. Used by search, which matches on keywords only."
@@ -550,7 +556,7 @@ export default function ArticleEditor() {
         </div>
 
         {(status === "published" || status === "scheduled") && (
-          <section className="well mt-7">
+          <section className="well">
             <p className="label">Schedule publication</p>
             <p className="field-hint mt-2">
               Only an approved article can be scheduled, and only for a time in the
@@ -577,7 +583,7 @@ export default function ArticleEditor() {
           </section>
         )}
 
-        <div className="row gap-4 mt-7">
+        <div className="editor-actions">
           <Button
             variant="primary"
             type="button"
@@ -610,6 +616,7 @@ export default function ArticleEditor() {
             </Button>
           )}
         </div>
+        </aside>
       </form>
     </div>
   );

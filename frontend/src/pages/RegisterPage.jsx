@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ApiError, api } from "../api";
 import { useAuth } from "../auth";
 import { Button, Field, Notice } from "../components/UI";
+import { AuthAside } from "../components/AuthAside";
 import { usePageTitle } from "../usePageTitle";
 
 const MIN_PASSWORD = 12;
@@ -156,16 +157,9 @@ export default function RegisterPage() {
         </form>
       </div>
 
-      <aside className="auth-aside">
-        <p className="lead">
-          Writing here is by application. Anyone can read, comment, and report an
-          inaccuracy; publishing requires an editor&rsquo;s approval, and every
-          article you publish carries your accuracy rate with it.
-        </p>
-        <Link className="link-quiet mt-5" to="/about" style={{ display: "inline-block" }}>
-          How scoring works
-        </Link>
-      </aside>
+      <AuthAside
+        lead="Writing here is by application. Anyone can read, comment, and report an inaccuracy; publishing requires an editor’s approval, and every article you publish carries your accuracy rate with it."
+      />
     </div>
   );
 }

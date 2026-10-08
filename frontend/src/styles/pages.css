@@ -1998,3 +1998,133 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* --- full-width layouts ------------------------------------------------------
+   Listing pages, sign-in, the article editor and the account profile use the
+   whole page instead of a narrow column. Running text keeps its own measure. */
+
+.wide {
+  max-width: none;
+}
+.entry-summary {
+  max-width: 52rem;
+}
+
+/* Sign in and create account: the form and what an account is for, in halves. */
+.auth {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-9);
+}
+.auth-form .form {
+  max-width: 28rem;
+}
+.auth-aside {
+  border-left: 0;
+  padding: var(--s-7);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-top: 3px solid var(--ink);
+}
+.auth-aside .lead {
+  font-size: var(--t-body);
+  max-width: 40rem;
+}
+.auth-benefits {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.auth-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+}
+@media (max-width: 56rem) {
+  .auth {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+}
+
+/* Article editor: the writing, and its settings beside it. */
+.editor {
+  max-width: none;
+}
+.editor-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22rem;
+  gap: var(--s-8);
+  align-items: start;
+}
+.editor-form > * + * {
+  margin-top: 0;
+}
+.editor-main > * + *,
+.editor-side > * + * {
+  margin-top: var(--s-6);
+}
+.editor-side {
+  padding: var(--s-5);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+}
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+}
+@media (max-width: 64rem) {
+  .editor-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Account profile: name and bio, with the followed sections beside them. */
+.profile-form {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+  gap: var(--s-6) var(--s-8);
+  align-items: start;
+}
+.profile-form > * + * {
+  margin-top: 0;
+}
+.profile-form > .notice {
+  grid-column: 1 / -1;
+}
+.profile-main > * + * {
+  margin-top: var(--s-5);
+}
+.profile-side {
+  margin: 0;
+}
+.profile-side .checkbox-grid {
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+.profile-actions {
+  grid-column: 1 / -1;
+}
+@media (max-width: 56rem) {
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A page that is only a "not found" message sits in the middle of the page. */
+.main > .empty:only-child,
+.main > div > .empty:only-child {
+  max-width: 40rem;
+  margin-inline: auto;
+  text-align: center;
+  padding-block: var(--s-10);
+}
