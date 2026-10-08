@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 import { usePageTitle } from "../usePageTitle";
 
-const UPDATED = "28 September 2026";
+const UPDATED = "8 October 2026";
 
 function LegalPage({ title, intro, children }) {
   return (
@@ -72,11 +72,6 @@ export function PrivacyPage() {
         <li>
           <strong>Hosting:</strong> the website and its server run on Render, and the database on
           Supabase. They store the data above on our behalf.
-        </li>
-        <li>
-          <strong>Republished articles:</strong> articles republished from The Conversation load its
-          page-view counter, as its licence requires. That request goes to The Conversation, which
-          sees your internet address and that the article was viewed.
         </li>
         <li>
           <strong>Checking sources:</strong> to grade the sources a writer cites, the server looks
@@ -177,13 +172,6 @@ export function TermsPage() {
         Subscribing to a writer costs A$5.00 a month. While a subscription is active you can read
         subscriber-only articles. You can cancel any time from your account; subscriber-only
         articles close again when you cancel. The checkout is currently a test and takes no money.
-      </p>
-
-      <h2>Republished articles</h2>
-      <p>
-        Some articles are republished from other publishers under Creative Commons licences. They
-        belong to their authors and are shown unchanged, credited, and linked to the original, as
-        their licences require.
       </p>
 
       <h2>Summaries and narration</h2>

@@ -128,8 +128,7 @@ export default function AboutPage() {
             Not every link is evidence. Each source an article cites is graded by what
             kind of source it is, and the grade decides what it adds to the score.
             Only an article&rsquo;s five best sources count, up to 25 points, so piling on
-            extra links cannot raise a score; citing better ones can. A republished
-            article&rsquo;s link to its own original does not count. Every grade comes
+            extra links cannot raise a score; citing better ones can. Every grade comes
             from a rule or a public list, never from this site&rsquo;s
             opinion, and an editor who has read the source has the final word.
           </p>

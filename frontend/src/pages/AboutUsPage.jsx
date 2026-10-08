@@ -88,13 +88,6 @@ export default function AboutUsPage() {
           <li>Report an article you believe is wrong. Editors review every report.</li>
         </ul>
 
-        <h2>Republished articles</h2>
-        <p>
-          Alongside our own writers, we republish some articles from The Conversation under its
-          Creative Commons licence. They are shown unchanged, credited to their authors, and
-          linked to the original.
-        </p>
-
         <h2>Your data</h2>
         <p>
           No advertising and no tracking. The <Link className="link" to="/privacy">privacy page</Link>{" "}

@@ -247,8 +247,7 @@ export function AudioEdition({ listen, topic, monthLabel, storageKey }) {
 
       <p className="book-note">
         Article summaries are the writers&rsquo; own sentences, chosen automatically. Subscriber-only
-        articles are summarised only for their subscribers, and republished articles are read
-        from their own opening, unchanged.
+        articles are summarised only for their subscribers.
       </p>
     </section>
   );
