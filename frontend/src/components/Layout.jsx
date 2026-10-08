@@ -18,12 +18,16 @@ export function Masthead() {
   return (
     <header className="masthead">
       <div className="shell masthead-inner">
+        {/* First on the left, beside the wordmark: the panel it opens slides in
+            from this side. */}
+        <div className="masthead-browse">
+          <BrowseMenu />
+        </div>
         <Link className="wordmark" to="/">
           Wollongong News
         </Link>
 
         <nav className="nav" aria-label="Main">
-          <BrowseMenu />
           <NavLink className="nav-link" to="/search">
             Search
           </NavLink>

@@ -1724,3 +1724,23 @@ a.chip {
   border-color: var(--deep);
   color: var(--paper);
 }
+
+/* Browse sits at the far left, before the wordmark, on every width. */
+.masthead-browse {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: calc(-1 * var(--s-3));
+}
+@media (max-width: 60rem) {
+  .masthead-browse {
+    margin-left: calc(-1 * var(--s-2));
+  }
+}
+@media (max-width: 26rem) {
+  /* On the narrowest phones the icon alone says Browse. */
+  .masthead-browse .browse-trigger {
+    font-size: 0;
+    gap: 0;
+  }
+}
