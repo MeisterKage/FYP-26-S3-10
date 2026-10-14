@@ -26,9 +26,11 @@ import {
   formatDate,
 } from "../components/UI";
 import { usePageTitle } from "../usePageTitle";
+import { useI18n } from "../i18n";
 
 function Lead({ article }) {
   const date = formatDate(article.publishedAt);
+  const { t } = useI18n();
 
   return (
     <article className="lead-article">
@@ -51,12 +53,12 @@ function Lead({ article }) {
       </div>
 
       <aside className="lead-aside">
-        <p className="label">Credibility</p>
+        <p className="label">{t("home.credibility")}</p>
         <div className="mt-4">
           <CredibilityMeter credibility={article.credibility} review={article.review} />
         </div>
         <Link className="link-quiet lead-trace" to={`/articles/${article.slug}`}>
-          Trace this score
+          {t("home.trace")}
           <ArrowIcon size={15} />
         </Link>
       </aside>
@@ -82,6 +84,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const { t } = useI18n();
   usePageTitle(null);
 
   useEffect(() => {
@@ -120,9 +123,7 @@ export default function HomePage() {
   if (data.articles) {
     if (data.articles.length === 0) {
       return (
-        <Empty title="Nothing published yet">
-          The first article appears here the moment an editor approves it.
-        </Empty>
+        <Empty title={t("home.nothing")}>{t("home.nothingNote")}</Empty>
       );
     }
 
@@ -133,8 +134,8 @@ export default function HomePage() {
         <Lead article={lead} />
         {rest.length > 0 && (
           <section className="section mt-7">
-            <SectionHead title="Also today">
-              <p className="label">{rest.length} articles</p>
+            <SectionHead title={t("home.alsoToday")}>
+              <p className="label">{t("home.articles", { n: rest.length })}</p>
             </SectionHead>
             <Index articles={rest} />
           </section>
@@ -153,20 +154,18 @@ export default function HomePage() {
           <Lead article={forYou[0]} />
           {forYou.length > 1 && (
             <section className="section mt-7">
-              <SectionHead title="In your categories" />
+              <SectionHead title={t("home.inYourCategories")} />
               <Index articles={forYou.slice(1)} />
             </section>
           )}
         </>
       ) : (
-        <Empty title="Nothing in your categories yet">
-          Choose a few more interests and this page fills up.
-        </Empty>
+        <Empty title={t("home.nothingCats")}>{t("home.nothingCatsNote")}</Empty>
       )}
 
       {fromFollowed.length > 0 && (
         <section className="section">
-          <SectionHead title="From writers you follow" />
+          <SectionHead title={t("home.fromFollowed")} />
           <Index articles={fromFollowed} />
         </section>
       )}

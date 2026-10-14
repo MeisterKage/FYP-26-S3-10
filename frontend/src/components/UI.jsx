@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { EntryThumb } from "./CoverImage";
 
 import { AlertIcon, InfoIcon } from "./Icon";
+import { currentLang } from "../i18n";
 
 export function Button({
   variant = "outline",
@@ -132,11 +133,13 @@ export function EntrySkeleton({ rows = 3 }) {
   );
 }
 
+const DATE_LOCALES = { en: undefined, zh: "zh-CN", ms: "ms-MY" };
+
 export function formatDate(iso) {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(DATE_LOCALES[currentLang()], {
     day: "numeric",
     month: "long",
     year: "numeric",

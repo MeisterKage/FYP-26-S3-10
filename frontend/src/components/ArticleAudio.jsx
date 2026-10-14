@@ -16,10 +16,12 @@ import { PauseIcon, PlayIcon, StopIcon } from "./Icon";
 import { InBrief } from "./InBrief";
 import { SpeechTimeline } from "./SpeechTimeline";
 import { estimate, speechSupported, useSpeech } from "./useSpeech";
+import { useI18n } from "../i18n";
 
 const SPEEDS = [0.75, 1, 1.25, 1.5, 2];
 // Ends a sentence at . ! or ? (and a closing quote) before a capital or a quote.
-const SENTENCE_END = /(?<=[.!?])["”’]?\s+(?=["“‘A-Z0-9])/;
+// Chinese ends a sentence at 。！？ with no space after it.
+const SENTENCE_END = /(?<=[.!?])["”’]?\s+(?=["“‘A-Z0-9])|(?<=[。！？])["”’]?/;
 
 function sentences(text) {
   return text.split(SENTENCE_END).map((s) => s.trim()).filter(Boolean);
@@ -45,7 +47,8 @@ function readBody(container) {
   return { items, blocks };
 }
 
-export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
+export function ArticleAudio({ title, brief, proseRef, bodyKey, voiceLang = "en-AU" }) {
+  const { t } = useI18n();
   const [mode, setMode] = useState(brief ? "brief" : "full");
   const [body, setBody] = useState({ items: [], blocks: [] });
   const marked = useRef(null);
@@ -56,12 +59,12 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
   }, [proseRef, bodyKey]);
 
   const briefParts = useMemo(
-    () => (brief ? [`${title}. In brief.`, ...brief.points] : []),
-    [brief, title],
+    () => (brief ? [`${title}. ${t("listen.inBrief")}`, ...brief.points] : []),
+    [brief, title, t],
   );
   const fullParts = useMemo(() => [`${title}.`, ...body.items.map((i) => i.text)], [body, title]);
   const parts = mode === "brief" ? briefParts : fullParts;
-  const speech = useSpeech({ lang: brief?.narration?.voice?.lang || "en-AU", items: parts });
+  const speech = useSpeech({ lang: voiceLang, items: parts });
   const playing = speech.state !== "idle";
 
   // Mark the paragraph being read in the article itself, and keep it in view.
@@ -101,28 +104,29 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
     else speech.play();
   }
 
-  const label = speech.state === "speaking" ? "Pause" : speech.state === "paused" ? "Resume" : "Listen";
+  const label = speech.state === "speaking" ? t("listen.pause")
+    : speech.state === "paused" ? t("listen.resume") : t("listen.listen");
 
   return (
     <>
-      <div className="listen" role="group" aria-label="Listen to this article">
+      <div className="listen" role="group" aria-label={t("listen.group")}>
         <button type="button" className="listen-play" onClick={toggle}
-          aria-label={`${label}: ${mode === "brief" ? "key points" : "full article"}`}>
+          aria-label={`${label}: ${mode === "brief" ? t("listen.keyPoints") : t("listen.fullArticle")}`}>
           {speech.state === "speaking" ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
           <span>{label}</span>
         </button>
 
-        <div className="listen-modes" role="radiogroup" aria-label="What to listen to">
+        <div className="listen-modes" role="radiogroup" aria-label={t("listen.modes")}>
           {brief && (
             <button type="button" role="radio" aria-checked={mode === "brief"}
               className="listen-mode" onClick={() => choose("brief")}>
-              Key points <span className="listen-time">{minutes(briefParts, speech.rate)} min</span>
+              {t("listen.keyPoints")} <span className="listen-time">{t("listen.min", { n: minutes(briefParts, speech.rate) })}</span>
             </button>
           )}
           {hasFull && (
             <button type="button" role="radio" aria-checked={mode === "full"}
               className="listen-mode" onClick={() => choose("full")}>
-              Full article <span className="listen-time">{minutes(fullParts, speech.rate)} min</span>
+              {t("listen.fullArticle")} <span className="listen-time">{t("listen.min", { n: minutes(fullParts, speech.rate) })}</span>
             </button>
           )}
         </div>
@@ -130,14 +134,14 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
         <div className="listen-end">
           {playing && (
             <button type="button" className="listen-stop" onClick={speech.stop}
-              aria-label="Stop listening">
+              aria-label={t("listen.stop")}>
               <StopIcon size={16} />
             </button>
           )}
           <label className="listen-speed">
             <span className="sr-only">Speed</span>
             <select value={speech.rate} onChange={(e) => speech.setRate(Number(e.target.value))}
-              aria-label="Reading speed">
+              aria-label={t("listen.speed")}>
               {SPEEDS.map((s) => <option key={s} value={s}>{s}×</option>)}
             </select>
           </label>
@@ -145,7 +149,7 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
       </div>
 
       <SpeechTimeline speech={speech}
-        label={mode === "brief" ? "Position in the key points" : "Position in the article"} />
+        label={mode === "brief" ? t("listen.posBrief") : t("listen.posArticle")} />
 
       {brief && <InBrief brief={brief} current={mode === "brief" ? speech.index - 1 : -1} />}
     </>

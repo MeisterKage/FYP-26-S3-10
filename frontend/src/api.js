@@ -10,6 +10,17 @@ const BASE = import.meta.env.VITE_API_BASE || "";
 
 const TOKEN_KEY = "nrs.token";
 
+// The reader's language (see i18n.jsx), sent with every read so lists and
+// articles come back translated where a translation exists.
+let lang = "en";
+export function setApiLang(next) {
+  lang = next;
+}
+function withLang(path) {
+  if (lang === "en") return path;
+  return `${path}${path.includes("?") ? "&" : "?"}lang=${lang}`;
+}
+
 export function getToken() {
   try {
     return localStorage.getItem(TOKEN_KEY);
@@ -50,7 +61,7 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
   const token = auth ? getToken() : null;
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(`${BASE}/api${path}`, {
+  const response = await fetch(`${BASE}/api${method === "GET" ? withLang(path) : path}`, {
     method,
     headers,
     body: body === undefined || isForm ? body : JSON.stringify(body),
@@ -79,7 +90,7 @@ export async function downloadFile(path, filename) {
   const headers = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const response = await fetch(`${BASE}/api${path}`, { headers });
+  const response = await fetch(`${BASE}/api${withLang(path)}`, { headers });
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
     throw new ApiError(payload?.error?.message || "The download failed.", response.status);

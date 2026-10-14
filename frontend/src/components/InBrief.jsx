@@ -7,14 +7,16 @@
  * this box which point is being read. When a text-to-speech service is
  * connected on the server, its recording plays here instead.
  */
+import { useI18n } from "../i18n";
 export function InBrief({ brief, current = -1 }) {
   const narration = brief.narration || {};
+  const { t } = useI18n();
 
   return (
     <aside className="brief" aria-labelledby="brief-title">
       <div className="brief-head">
         <p className="label" id="brief-title">
-          In brief <span className="brief-time">· {brief.readingMinutes} min read</span>
+          {t("brief.title")} <span className="brief-time">· {t("brief.minRead", { n: brief.readingMinutes })}</span>
         </p>
       </div>
       <ul className="brief-points">
@@ -29,7 +31,7 @@ export function InBrief({ brief, current = -1 }) {
           Your browser cannot play this recording.
         </audio>
       )}
-      <p className="brief-method">{brief.method}</p>
+      <p className="brief-method">{t("brief.method")}</p>
     </aside>
   );
 }

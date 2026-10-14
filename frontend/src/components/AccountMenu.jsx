@@ -16,9 +16,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth";
+import { useI18n } from "../i18n";
 
 export function AccountMenu() {
   const { user, signOut } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -75,7 +77,7 @@ export function AccountMenu() {
       >
         <span className="account-initial" aria-hidden="true">{initial}</span>
         <span className="account-name">{user.displayName}</span>
-        <span className="sr-only">Your account menu</span>
+        <span className="sr-only">{t("account.menu")}</span>
       </button>
 
       {open && (
@@ -85,10 +87,10 @@ export function AccountMenu() {
             <p className="account-who-email">{user.email}</p>
           </div>
           <ul className="account-links">
-            <li><Link to="/account">Your account</Link></li>
-            <li><Link to="/account?tab=reading">Reading list</Link></li>
-            <li><Link to="/account?tab=liked">Liked articles</Link></li>
-            <li><Link to="/account?tab=subs">Subscriptions</Link></li>
+            <li><Link to="/account">{t("account.yourAccount")}</Link></li>
+            <li><Link to="/account?tab=reading">{t("account.readingList")}</Link></li>
+            <li><Link to="/account?tab=liked">{t("account.liked")}</Link></li>
+            <li><Link to="/account?tab=subs">{t("account.subscriptions")}</Link></li>
           </ul>
           <button
             type="button"
@@ -99,7 +101,7 @@ export function AccountMenu() {
               navigate("/");
             }}
           >
-            Sign out
+            {t("account.signOut")}
           </button>
         </div>
       )}

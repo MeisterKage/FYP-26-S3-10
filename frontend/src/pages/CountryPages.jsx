@@ -14,6 +14,7 @@ import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
 import { usePageTitle } from "../usePageTitle";
+import { useI18n } from "../i18n";
 
 const SORTS = [
   ["recent", "Most recent"],
@@ -22,7 +23,8 @@ const SORTS = [
 
 export function CountryIndex() {
   const [countries, setCountries] = useState(null);
-  usePageTitle("Countries");
+  const { t, country } = useI18n();
+  usePageTitle(t("countries.title"));
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -35,11 +37,8 @@ export function CountryIndex() {
   return (
     <div className="wide">
       <header className="read">
-        <h1 className="display">Countries</h1>
-        <p className="lead mt-6">
-          News by the country it is about. Only countries with published
-          articles are listed.
-        </p>
+        <h1 className="display">{t("countries.title")}</h1>
+        <p className="lead mt-6">{t("countries.lead")}</p>
       </header>
 
       <section className="section mt-8">
@@ -55,10 +54,8 @@ export function CountryIndex() {
             {countries.map((c) => (
               <li key={c.code}>
                 <Link className="country-card" to={`/countries/${c.code.toLowerCase()}`}>
-                  <span className="country-name">{c.name}</span>
-                  <span className="meta">
-                    {c.articleCount} article{c.articleCount === 1 ? "" : "s"}
-                  </span>
+                  <span className="country-name">{country(c.code, c.name)}</span>
+                  <span className="meta">{t("topics.articles", { n: c.articleCount })}</span>
                 </Link>
               </li>
             ))}
@@ -76,7 +73,9 @@ export function CountryPage() {
   const section = params.get("category") || "";
 
   const [data, setData] = useState(null);
-  usePageTitle(data?.country?.name);
+  const { t, country, section: sectionName } = useI18n();
+  const countryName = data?.country ? country(data.country.code, data.country.name) : null;
+  usePageTitle(countryName);
   const [error, setError] = useState(null);
 
   const load = useCallback(() => {
@@ -121,10 +120,10 @@ export function CountryPage() {
         <div>
           <p className="label">
             <Link className="link-quiet" to="/countries">
-              Countries
+              {t("countries.title")}
             </Link>
           </p>
-          <h1 className="title mt-3">{data?.country?.name || "Country"}</h1>
+          <h1 className="title mt-3">{countryName || t("list.loading")}</h1>
           <p className="meta mt-3">
             {data
               ? `${data.articles.length} published${selectedName ? ` in ${selectedName}` : ""}`
@@ -159,7 +158,7 @@ export function CountryPage() {
             aria-pressed={!section}
             onClick={() => update({ category: "" })}
           >
-            All sections
+            {t("list.allSections")}
           </button>
           {data.sections.map((s) => (
             <button
@@ -169,7 +168,7 @@ export function CountryPage() {
               aria-pressed={section === s.slug}
               onClick={() => update({ category: s.slug })}
             >
-              {s.name}
+              {sectionName(s.slug, s.name)}
               <span className="chip-count">{s.articleCount}</span>
             </button>
           ))}
@@ -177,7 +176,7 @@ export function CountryPage() {
       )}
 
       <section className="section mt-7">
-        <SectionHead title="Articles" />
+        <SectionHead title={t("list.articles")} />
         {!data && <EntrySkeleton rows={4} />}
         {data && data.articles.length === 0 && (
           <Empty title="Nothing published here yet">

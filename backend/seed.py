@@ -13,6 +13,7 @@ corrections, and reports.
     py seed.py --long-bodies # full-length bodies for articles already seeded
     py seed.py --daily-views # a history of daily views behind each demo total
     py seed.py --expansion   # more editors, writers and articles; right sections (internet)
+    py seed.py --translations # the demo articles in Mandarin and Malay
     flask rate-sources       # then grade every cited source (needs internet)
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
@@ -537,6 +538,61 @@ def seed_expansion() -> None:
           f"moved {moved} article(s) to their right section; added {added} article(s).")
 
 
+def translation_problems(article, tr: dict) -> list[str]:
+    """Why a stored translation does not line up with its English, if it does not."""
+    from app.insights import key_points, paragraphs, word_count
+
+    english = paragraphs(article.body)
+    problems = []
+    if len(tr["paragraphs"]) != len(english):
+        problems.append(f"{len(tr['paragraphs'])} paragraphs for {len(english)} in English")
+    else:
+        for i, (para, mine) in enumerate(zip(english, tr["paragraphs"])):
+            if para.heading != mine.startswith("## "):
+                problems.append(f"paragraph {i + 1}: subheading in one language only")
+    wanted = len(key_points(article.body)) if word_count(article.body) >= 350 else 0
+    if len(tr.get("points") or []) != wanted:
+        problems.append(f"{len(tr.get('points') or [])} key points for {wanted} in English")
+    return problems
+
+
+def seed_translations() -> None:
+    """Store the demo articles' Mandarin and Malay translations (demo_translations/).
+
+    Each is checked against the article's current English first, and stored
+    with a fingerprint of that English, so a later edit marks it stale. Safe to
+    run again: existing translations are replaced.
+    """
+    import json
+    import demo_translations
+    from demo_bodies import render
+    from app.models import ArticleTranslation
+    from app.translation_service import source_hash
+
+    stored, skipped = 0, []
+    for lang in ("zh", "ms"):
+        for title, tr in demo_translations.load(lang).items():
+            article = Article.query.filter_by(title=title).first()
+            if article is None:
+                skipped.append(f"{lang}: no article '{title[:50]}'")
+                continue
+            problems = translation_problems(article, tr)
+            if problems:
+                skipped.append(f"{lang}: '{title[:50]}': {'; '.join(problems)}")
+                continue
+            ArticleTranslation.query.filter_by(article_id=article.id, lang=lang).delete()
+            db.session.add(ArticleTranslation(
+                article_id=article.id, lang=lang, title=tr["title"], summary=tr["summary"],
+                body=render(tr["paragraphs"]), points=json.dumps(tr.get("points") or [], ensure_ascii=False),
+                provider="ai", source_hash=source_hash(article.title, article.summary, article.body),
+            ))
+            stored += 1
+    db.session.commit()
+    print(f"Translations: stored {stored}.")
+    for line in skipped:
+        print("  skipped", line)
+
+
 def seed_daily_views() -> None:
     """Give each demo article a history of daily views behind its total.
 
@@ -975,6 +1031,9 @@ if __name__ == "__main__":
             sys.exit(0)
         if "--expansion" in sys.argv:
             seed_expansion()
+            sys.exit(0)
+        if "--translations" in sys.argv:
+            seed_translations()
             sys.exit(0)
         if "--reset" in sys.argv:
             reset()

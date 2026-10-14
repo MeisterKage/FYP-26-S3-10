@@ -2452,3 +2452,17 @@
   margin-top: var(--s-2);
   margin-bottom: var(--s-3);
 }
+
+/* Which language an article is shown in. */
+.translation-note {
+  margin-top: var(--s-4);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--quiet);
+}
+.translation-note--missing {
+  padding: var(--s-2) var(--s-3);
+  background: var(--sunken);
+  color: var(--ink);
+  max-width: var(--w-article, var(--w-read));
+}

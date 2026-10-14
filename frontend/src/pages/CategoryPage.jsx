@@ -13,10 +13,11 @@ import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
 import { usePageTitle } from "../usePageTitle";
+import { useI18n } from "../i18n";
 
 const SORTS = [
-  ["recent", "Most recent"],
-  ["credibility", "Highest credibility"],
+  ["recent", "list.mostRecent"],
+  ["credibility", "list.highest"],
 ];
 
 export default function CategoryPage() {
@@ -26,7 +27,9 @@ export default function CategoryPage() {
 
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  usePageTitle(data?.category?.name);
+  const { t, section } = useI18n();
+  const name = data?.category ? section(data.category.slug, data.category.name) : null;
+  usePageTitle(name);
 
   const load = useCallback(() => {
     setData(null);
@@ -56,11 +59,11 @@ export default function CategoryPage() {
       <header className="dash-head">
         <div>
           <p className="label">
-            <Link className="link-quiet" to="/topics">All topics</Link>
+            <Link className="link-quiet" to="/topics">{t("topics.title")}</Link>
           </p>
-          <h1 className="title mt-3">{data?.category?.name || "Section"}</h1>
+          <h1 className="title mt-3">{name || t("list.loading")}</h1>
           <p className="meta mt-3">
-            {data ? `${data.articles.length} published` : "Loading"}
+            {data ? t("list.published", { n: data.articles.length }) : t("list.loading")}
           </p>
         </div>
 
@@ -76,7 +79,7 @@ export default function CategoryPage() {
           >
             {SORTS.map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
@@ -85,18 +88,18 @@ export default function CategoryPage() {
 
       {topics.length > 0 && (
         <nav className="chips mt-6" aria-label="Topics">
-          <Link className="chip" to="/topics">All topics</Link>
-          {topics.map((t) => (
-            <Link className="chip" key={t.id} to={`/categories/${t.slug}`}
-              aria-current={t.slug === slug ? "page" : undefined}>
-              {t.name}
+          <Link className="chip" to="/topics">{t("topics.title")}</Link>
+          {topics.map((x) => (
+            <Link className="chip" key={x.id} to={`/categories/${x.slug}`}
+              aria-current={x.slug === slug ? "page" : undefined}>
+              {section(x.slug, x.name)}
             </Link>
           ))}
         </nav>
       )}
 
       <section className="section mt-7">
-        <SectionHead title="Articles" />
+        <SectionHead title={t("list.articles")} />
         {!data && <EntrySkeleton rows={4} />}
         {data && data.articles.length === 0 && (
           <Empty title="Nothing published in this section yet">

@@ -10,9 +10,11 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { EntrySkeleton, Notice } from "../components/UI";
 import { usePageTitle } from "../usePageTitle";
+import { useI18n } from "../i18n";
 
 export default function TopicsIndex() {
-  usePageTitle("All topics");
+  const { t, section } = useI18n();
+  usePageTitle(t("topics.title"));
   const [topics, setTopics] = useState(null);
   const [error, setError] = useState(null);
 
@@ -26,11 +28,8 @@ export default function TopicsIndex() {
   return (
     <div className="wide">
       <header className="read">
-        <h1 className="display">All topics</h1>
-        <p className="lead mt-6">
-          Every section of Wollongong News. Each article is scored by the same rules,
-          whichever section it is in.
-        </p>
+        <h1 className="display">{t("topics.title")}</h1>
+        <p className="lead mt-6">{t("topics.lead")}</p>
       </header>
 
       <section className="section mt-8">
@@ -38,21 +37,19 @@ export default function TopicsIndex() {
         {!topics && !error && <EntrySkeleton rows={3} />}
         {topics && (
           <ul className="country-grid topic-grid">
-            {topics.map((t) => (
-              <li key={t.id}>
-                <Link className="country-card topic-card" to={`/categories/${t.slug}`}>
-                  <span className="country-name">{t.name}</span>
-                  {t.description && <span className="topic-description">{t.description}</span>}
-                  <span className="meta">
-                    {t.articleCount} article{t.articleCount === 1 ? "" : "s"}
-                  </span>
+            {topics.map((x) => (
+              <li key={x.id}>
+                <Link className="country-card topic-card" to={`/categories/${x.slug}`}>
+                  <span className="country-name">{section(x.slug, x.name)}</span>
+                  {x.description && <span className="topic-description">{x.description}</span>}
+                  <span className="meta">{t("topics.articles", { n: x.articleCount })}</span>
                 </Link>
               </li>
             ))}
           </ul>
         )}
         <p className="meta mt-7">
-          Looking for a place instead? <Link className="link" to="/countries">Browse by country</Link>.
+          {t("topics.byCountry")} <Link className="link" to="/countries">{t("topics.browseCountry")}</Link>.
         </p>
       </section>
     </div>

@@ -9,11 +9,14 @@ import { api } from "../api";
 import { CAN_ADMIN, CAN_AUTHOR, CAN_REVIEW, useAuth } from "../auth";
 import { AccountMenu } from "./AccountMenu";
 import { BrowseMenu } from "./BrowseMenu";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import Notifications from "./Notifications";
 import { Button, Notice } from "./UI";
+import { useI18n } from "../i18n";
 
 export function Masthead() {
   const { user, has } = useAuth();
+  const { t } = useI18n();
 
   return (
     <header className="masthead">
@@ -29,34 +32,34 @@ export function Masthead() {
 
         <nav className="nav" aria-label="Main">
           <NavLink className="nav-link" to="/search">
-            Search
+            {t("nav.search")}
           </NavLink>
 
           {has(...CAN_AUTHOR) && (
             <NavLink className="nav-link" to="/dashboard">
-              Your writing
+              {t("nav.yourWriting")}
             </NavLink>
           )}
           {has(...CAN_REVIEW) && (
             <NavLink className="nav-link" to="/review">
-              Review queue
+              {t("nav.reviewQueue")}
             </NavLink>
           )}
           {has(...CAN_REVIEW) && (
             <NavLink className="nav-link" to="/moderation">
-              Flagged
+              {t("nav.flagged")}
             </NavLink>
           )}
           {has(...CAN_ADMIN) && (
             <NavLink className="nav-link" to="/admin">
-              Administration
+              {t("nav.admin")}
             </NavLink>
           )}
 
           {user && <Notifications />}
           {!user && (
             <NavLink className="nav-link" to="/pricing">
-              Pricing
+              {t("nav.pricing")}
             </NavLink>
           )}
         </nav>
@@ -64,15 +67,16 @@ export function Masthead() {
         {/* Outside the nav, which scrolls sideways on narrow screens: the way
             to your account or to sign in must never be scrolled out of view. */}
         <div className="masthead-account">
+          <LanguageSwitcher />
           {user ? (
             <AccountMenu />
           ) : (
             <>
               <NavLink className="nav-link" to="/login">
-                Sign in
+                {t("nav.signIn")}
               </NavLink>
               <Button variant="primary" size="sm" as={Link} to="/register">
-                Create account
+                {t("nav.createAccount")}
               </Button>
             </>
           )}
@@ -87,6 +91,7 @@ export function Footer() {
   // remove one at runtime, and a footer listing last month's sections would be
   // worse than listing none.
   const [categories, setCategories] = useState([]);
+  const { t, section } = useI18n();
 
   useEffect(() => {
     api
@@ -99,48 +104,28 @@ export function Footer() {
     <footer className="footer">
       <div className="shell footer-inner">
         <p>
-          Wollongong News. Every article scored by the same fixed rules.
+          {t("footer.tagline")}
         </p>
         {categories.length > 0 && (
           <nav className="footer-sections" aria-label="Sections">
             {categories.map((c) => (
               <Link className="link-quiet" key={c.id} to={`/categories/${c.slug}`}>
-                {c.name}
+                {section(c.slug, c.name)}
               </Link>
             ))}
           </nav>
         )}
         <nav aria-label="Footer">
-          <Link className="link-quiet" to="/about-us">
-            About us
-          </Link>
-          <Link className="link-quiet" to="/about">
-            How scoring works
-          </Link>
-          <Link className="link-quiet" to="/topics">
-            All topics
-          </Link>
-          <Link className="link-quiet" to="/digests">
-            Monthly digests
-          </Link>
-          <Link className="link-quiet" to="/countries">
-            Countries
-          </Link>
-          <Link className="link-quiet" to="/editors">
-            Our editors
-          </Link>
-          <Link className="link-quiet" to="/pricing">
-            Subscriptions
-          </Link>
-          <Link className="link-quiet" to="/search">
-            Search
-          </Link>
-          <Link className="link-quiet" to="/privacy">
-            Privacy
-          </Link>
-          <Link className="link-quiet" to="/terms">
-            Terms
-          </Link>
+          <Link className="link-quiet" to="/about-us">{t("footer.aboutUs")}</Link>
+          <Link className="link-quiet" to="/about">{t("footer.howScoring")}</Link>
+          <Link className="link-quiet" to="/topics">{t("footer.allTopics")}</Link>
+          <Link className="link-quiet" to="/digests">{t("footer.digests")}</Link>
+          <Link className="link-quiet" to="/countries">{t("footer.countries")}</Link>
+          <Link className="link-quiet" to="/editors">{t("footer.editors")}</Link>
+          <Link className="link-quiet" to="/pricing">{t("footer.subscriptions")}</Link>
+          <Link className="link-quiet" to="/search">{t("footer.search")}</Link>
+          <Link className="link-quiet" to="/privacy">{t("footer.privacy")}</Link>
+          <Link className="link-quiet" to="/terms">{t("footer.terms")}</Link>
         </nav>
       </div>
     </footer>

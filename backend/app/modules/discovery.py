@@ -19,6 +19,9 @@ from ..enums import AUTHORING_ROLES, ArticleStatus, Role, SubscriptionStatus
 from ..payment_service import SUBSCRIPTION_PRICE_CENTS
 from ..insights_service import in_brief
 from ..similar_service import similar_to
+from ..translation_service import (
+    VOICE_LANG, fresh as fresh_translation, points as translation_points, request_lang,
+)
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
@@ -375,7 +378,7 @@ def read_article(slug: str):
     # A signed-out reader gets the same page as every other signed-out reader,
     # so it is remembered for a minute (app/response_cache.py). The view is
     # still counted every time.
-    cache_key = f"article:{slug}"
+    cache_key = f"article:{slug}:{request_lang()}"
     if viewer is None:
         cached = response_cache.cached_copy(cache_key)
         if cached is not None:
@@ -438,6 +441,15 @@ def read_article(slug: str):
     # "In brief" key points, with narration, for long articles. Not for a
     # reader who cannot open the article: the points are its own sentences.
     payload["inBrief"] = None if payload.get("paywalled") else in_brief(article)
+    lang = request_lang()
+    if payload["inBrief"] and lang != "en":
+        translation = fresh_translation(article, lang)
+        translated = translation_points(translation) if translation else []
+        if translated:
+            payload["inBrief"]["points"] = translated
+            payload["inBrief"]["narration"]["text"] = " ".join([payload["title"]] + translated)
+        payload["inBrief"]["narration"]["voice"] = {
+            **payload["inBrief"]["narration"]["voice"], "lang": VOICE_LANG[lang]}
 
     # "More like this", shown after the article: the published articles closest
     # in subject (app/similar.py).

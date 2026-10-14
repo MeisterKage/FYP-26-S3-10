@@ -1750,3 +1750,23 @@ a.chip {
     gap: 0;
   }
 }
+
+/* Language: a compact select beside the account area, on screen at every width. */
+.lang-switch select {
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-pill);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+.lang-switch select:hover {
+  background: var(--sunken);
+}
+.lang-switch select:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

@@ -16,6 +16,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { api } from "../api";
 import { BackIcon, ChevronIcon, CloseIcon, MenuIcon } from "./Icon";
+import { useI18n } from "../i18n";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -70,6 +71,7 @@ export function BrowseMenu() {
   const drawer = useRef(null);
   const location = useLocation();
   const { data, error } = useBrowseData(open);
+  const { t, section, country } = useI18n();
 
   const close = useCallback(() => {
     setOpen(false);
@@ -131,7 +133,7 @@ export function BrowseMenu() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, panel, close]);
 
-  const title = { main: "Browse", topics: "Topics", countries: "Countries" }[panel];
+  const title = { main: t("browse.title"), topics: t("browse.topics"), countries: t("browse.countries") }[panel];
 
   return (
     <>
@@ -145,7 +147,7 @@ export function BrowseMenu() {
         onClick={() => setOpen(true)}
       >
         <MenuIcon size={18} />
-        Browse
+        {t("nav.browse")}
       </button>
 
       {open && createPortal(
@@ -161,7 +163,7 @@ export function BrowseMenu() {
           >
             <div className="browse-head">
               {panel === "main" ? (
-                <p className="browse-title">Browse</p>
+                <p className="browse-title">{t("browse.title")}</p>
               ) : (
                 <button type="button" className="browse-back" onClick={() => setPanel("main")}>
                   <BackIcon size={18} />
@@ -169,7 +171,7 @@ export function BrowseMenu() {
                 </button>
               )}
               <button type="button" className="browse-close" onClick={close}
-                aria-label="Close the menu">
+                aria-label={t("browse.close")}>
                 <CloseIcon size={20} />
               </button>
             </div>
@@ -179,10 +181,10 @@ export function BrowseMenu() {
                 <>
                   <ul className="browse-list">
                     <Row onClick={() => setPanel("topics")} count={data?.topics.length}>
-                      Topics
+                      {t("browse.topics")}
                     </Row>
                     <Row onClick={() => setPanel("countries")} count={data?.countries.length}>
-                      Countries
+                      {t("browse.countries")}
                     </Row>
                   </ul>
                   <ul className="browse-list browse-list--secondary">
@@ -190,19 +192,17 @@ export function BrowseMenu() {
                         which could not fit it beside Browse for the
                         administrator. It is also in the footer and on every
                         article, beside the score it explains. */}
-                    <Row to="/">Home</Row>
-                    <Row to="/about-us">About us</Row>
-                    <Row to="/about">How scoring works</Row>
-                    <Row to="/digests">Monthly digests</Row>
-                    <Row to="/editors">Our editors</Row>
-                    <Row to="/pricing">Pricing</Row>
+                    <Row to="/">{t("browse.home")}</Row>
+                    <Row to="/about-us">{t("browse.aboutUs")}</Row>
+                    <Row to="/about">{t("browse.howScoring")}</Row>
+                    <Row to="/digests">{t("browse.digests")}</Row>
+                    <Row to="/editors">{t("browse.editors")}</Row>
+                    <Row to="/pricing">{t("browse.pricing")}</Row>
                   </ul>
                   <Link className="browse-feature" to="/digests">
-                    <span className="browse-feature-label">Featured</span>
-                    <span className="browse-feature-title">This month&rsquo;s most credible reporting</span>
-                    <span className="browse-feature-note">
-                      Every section&rsquo;s best-verified articles, and what we corrected.
-                    </span>
+                    <span className="browse-feature-label">{t("browse.featured")}</span>
+                    <span className="browse-feature-title">{t("browse.featuredTitle")}</span>
+                    <span className="browse-feature-note">{t("browse.featuredNote")}</span>
                   </Link>
                 </>
               )}
@@ -213,11 +213,11 @@ export function BrowseMenu() {
                   : (
                     <>
                       <ul className="browse-list">
-                        <Row to="/topics">All topics</Row>
+                        <Row to="/topics">{t("browse.allTopics")}</Row>
                       </ul>
                       <ul className="browse-list browse-list--secondary">
-                        {data.topics.map((t) => (
-                          <Row key={t.id} to={`/categories/${t.slug}`}>{t.name}</Row>
+                        {data.topics.map((x) => (
+                          <Row key={x.id} to={`/categories/${x.slug}`}>{section(x.slug, x.name)}</Row>
                         ))}
                       </ul>
                     </>
@@ -230,13 +230,13 @@ export function BrowseMenu() {
                   : (
                     <>
                       <ul className="browse-list">
-                        <Row to="/countries">All countries</Row>
+                        <Row to="/countries">{t("browse.allCountries")}</Row>
                       </ul>
                       <ul className="browse-list browse-list--secondary">
                         {data.countries.map((c) => (
                           <Row key={c.code} to={`/countries/${c.code.toLowerCase()}`}
                             count={c.articleCount}>
-                            {c.name}
+                            {country(c.code, c.name)}
                           </Row>
                         ))}
                       </ul>

@@ -15,6 +15,7 @@
  * survives grayscale printing and colour-blind vision.
  */
 import { InfoIcon, ScaleIcon } from "./Icon";
+import { useI18n } from "../i18n";
 
 /**
  * Whether an editor has read this article yet.
@@ -27,6 +28,7 @@ import { InfoIcon, ScaleIcon } from "./Icon";
  * this is who has checked it.
  */
 function ReviewFlag({ review, compact = false }) {
+  const { t } = useI18n();
   if (!review?.awaitingReview) return null;
   return (
     <span
@@ -34,13 +36,14 @@ function ReviewFlag({ review, compact = false }) {
       title="Published automatically while the review queue was backed up. An editor has not read it yet."
     >
       <InfoIcon size={compact ? 12 : 14} />
-      {compact ? "Not yet reviewed" : "Not yet reviewed by an editor"}
+      {compact ? t("cred.notReviewed") : t("cred.notReviewedLong")}
     </span>
   );
 }
 
 /** Full readout: score, band, meter. Used where the score is the subject. */
 export function CredibilityMeter({ credibility, review, animate = true }) {
+  const { t } = useI18n();
   if (!credibility || credibility.score == null) return null;
   const { score, band } = credibility;
 
@@ -49,7 +52,7 @@ export function CredibilityMeter({ credibility, review, animate = true }) {
       <div className="cred-readout">
         <span className="cred-score">{Math.round(score)}</span>
         <span className="cred-outof">/ 100</span>
-        <span className="cred-band">{band}</span>
+        <span className="cred-band">{t(`band.${band}`)}</span>
       </div>
       <div
         className="cred-track"
@@ -75,6 +78,7 @@ export function CredibilityMeter({ credibility, review, animate = true }) {
 
 /** Compact reading for listings, where the score is a column, not the subject. */
 export function CredibilityInline({ credibility, review }) {
+  const { t } = useI18n();
   if (!credibility || credibility.score == null) return null;
   const { score, band } = credibility;
   const rounded = Math.round(score);
@@ -85,7 +89,7 @@ export function CredibilityInline({ credibility, review }) {
       <span className="cred-inline-bar" aria-hidden="true">
         <i data-band={band} style={{ width: `${Math.max(0, Math.min(100, score))}%` }} />
       </span>
-      <span>{band}</span>
+      <span>{t(`band.${band}`)}</span>
       <span className="sr-only">
         Credibility {rounded} out of 100, rated {band}
       </span>
@@ -95,11 +99,11 @@ export function CredibilityInline({ credibility, review }) {
 }
 
 const LEDGER_ROWS = [
-  ["Contributor accuracy", "accuracy"],
-  ["Verified sources", "sources"],
-  ["Corrections", "corrections"],
-  ["Retraction", "retraction"],
-  ["Reader reports", "reports"],
+  ["ledger.accuracy", "accuracy"],
+  ["ledger.sources", "sources"],
+  ["ledger.corrections", "corrections"],
+  ["ledger.retraction", "retraction"],
+  ["ledger.reports", "reports"],
 ];
 
 /**
@@ -111,6 +115,7 @@ const LEDGER_ROWS = [
  * reader has to hunt for and cannot print.
  */
 export function CredibilityLedger({ credibility }) {
+  const { t } = useI18n();
   const breakdown = credibility?.breakdown;
   if (!breakdown) return null;
 
@@ -126,12 +131,12 @@ export function CredibilityLedger({ credibility }) {
           return (
             <div className="ledger-row" key={key}>
               <dt>
-                {label}
+                {t(label)}
                 {sourcing && sourcing.cited > 0 && (
                   <span className="ledger-note">
                     {sourcing.cited > sourcing.counted
-                      ? ` · best ${sourcing.counted} of ${sourcing.cited}`
-                      : ` · ${sourcing.cited} source${sourcing.cited === 1 ? "" : "s"}`}
+                      ? t("ledger.bestOf", { counted: sourcing.counted, cited: sourcing.cited })
+                      : sourcing.cited === 1 ? t("ledger.source1") : t("ledger.sourcesN", { n: sourcing.cited })}
                   </span>
                 )}
               </dt>
@@ -140,7 +145,7 @@ export function CredibilityLedger({ credibility }) {
           );
         })}
         <div className="ledger-row ledger-total">
-          <dt>Credibility score</dt>
+          <dt>{t("cred.score")}</dt>
           <dd>{Math.round(credibility.score)}</dd>
         </div>
       </dl>
@@ -162,10 +167,11 @@ export function CredibilityLedger({ credibility }) {
  * of what it means.
  */
 export function AccuracyRate({ rate, prefix = "" }) {
+  const { t } = useI18n();
   const isNew = rate == null;
   return (
     <span className="accuracy" data-new={isNew}>
-      {isNew ? "New contributor" : `${prefix}${rate}% accuracy`}
+      {isNew ? t("cred.new") : `${prefix}${t("cred.accuracy", { rate })}`}
     </span>
   );
 }

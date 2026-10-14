@@ -33,17 +33,19 @@ import { FlagIcon, SourceIcon } from "../components/Icon";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
 import { startSubscription } from "./Checkout";
 import { usePageTitle } from "../usePageTitle";
+import { useI18n } from "../i18n";
 
 /**
  * Who vouched for this article. Absent while it awaits review: the meter
  * already says so, and no editor has vouched for it yet.
  */
 function ApprovedBy({ review }) {
+  const { t } = useI18n();
   const reviewer = review?.reviewer;
   if (!reviewer) return null;
   return (
     <span>
-      Approved by{" "}
+      {t("article.approvedBy")}{" "}
       {reviewer.onPanel ? (
         <Link className="link-quiet" to={`/editors/${reviewer.id}`}>
           {reviewer.name}
@@ -99,6 +101,8 @@ function RepublishedFooter({ info }) {
   );
 }
 
+const VOICE_LANGS = { en: "en-AU", zh: "zh-CN", ms: "ms-MY" };
+
 export default function ArticlePage() {
   const { slug } = useParams();
   const { user } = useAuth();
@@ -108,6 +112,7 @@ export default function ArticlePage() {
 
   const [article, setArticle] = useState(null);
   const proseRef = useRef(null);
+  const { t, lang, country } = useI18n();
   usePageTitle(article?.title);
   const [error, setError] = useState(null);
   const [reported, setReported] = useState(false);
@@ -168,6 +173,14 @@ export default function ArticlePage() {
 
         {article.republication && <Republished info={article.republication} />}
 
+        {/* Which language this is: AI translated, or English because no
+            translation exists yet. */}
+        {article.translation && (
+          <p className={`translation-note${article.translation.available ? "" : " translation-note--missing"}`}>
+            {article.translation.note}
+          </p>
+        )}
+
         <div className="article-byline">
           {article.republication ? (
             // The authors, with their institutions, as the licence asks.
@@ -189,7 +202,7 @@ export default function ArticlePage() {
           {date && <span>{date}</span>}
           {article.country && (
             <Link className="link-quiet" to={`/countries/${article.country.code.toLowerCase()}`}>
-              {article.country.name}
+              {country(article.country.code, article.country.name)}
             </Link>
           )}
           <ApprovedBy review={article.review} />
@@ -201,7 +214,8 @@ export default function ArticlePage() {
           <CoverFigure image={article.coverImage} priority />
           {!article.paywalled && (
             <ArticleAudio title={article.title} brief={article.inBrief} proseRef={proseRef}
-              bodyKey={article.id} />
+              bodyKey={`${article.id}-${lang}`}
+              voiceLang={article.translation?.available ? VOICE_LANGS[lang] : "en-AU"} />
           )}
           {article.paywalled ? (
             <>
@@ -209,10 +223,9 @@ export default function ArticlePage() {
                 <p>{article.bodyPreview}</p>
               </div>
               <div className="paywall">
-                <h2 className="heading">Continue reading</h2>
+                <h2 className="heading">{t("article.continueReading")}</h2>
                 <p className="lead mt-4">
-                  This article is published for {article.contributor.name}&rsquo;s
-                  subscribers.
+                  {t("article.forSubscribers", { name: article.contributor.name })}
                 </p>
                 <div className="row gap-4 mt-5">
                   {user ? (
@@ -224,18 +237,18 @@ export default function ArticlePage() {
                         )
                       }
                     >
-                      Subscribe to read
+                      {t("article.subscribeToRead")}
                     </Button>
                   ) : (
                     <>
                       <Button variant="primary" as={Link} to="/register">
-                        Create an account
+                        {t("article.createAccount")}
                       </Button>
                       <Link className="link-quiet" to="/login">
-                        Already have one? Sign in
+                        {t("article.haveAccount")}
                       </Link>
                       <Link className="link-quiet" to="/pricing">
-                        What a subscription costs
+                        {t("article.whatCosts")}
                       </Link>
                     </>
                   )}
@@ -267,14 +280,14 @@ export default function ArticlePage() {
           {article.sources?.length > 0 && (
             <section className="sources">
               <h2 className="label">
-                Sources
+                {t("article.sources")}
                 <span className="sources-count">{article.sources.length}</span>
               </h2>
               <SourceList sources={article.sources} />
               <p className="meta mt-4">
                 <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
-                The five best sources add to the score, by what kind of source each is.{" "}
-                <Link className="link-quiet" to="/about#sources">How sources are graded</Link>
+                {t("article.sourcesNote")}{" "}
+                <Link className="link-quiet" to="/about#sources">{t("article.howGraded")}</Link>
               </p>
             </section>
           )}
@@ -317,15 +330,15 @@ export default function ArticlePage() {
 
         <aside className="article-margin">
           <div className="margin-card">
-            <p className="label">Credibility</p>
+            <p className="label">{t("home.credibility")}</p>
             <div className="mt-4">
               <CredibilityMeter credibility={article.credibility} review={article.review} />
             </div>
             <CredibilityLedger credibility={article.credibility} />
             <p className="meta mt-5">
-              Arithmetic, not prediction.{" "}
+              {t("cred.arithmetic")}{" "}
               <Link className="link-quiet" to="/about">
-                How this is calculated
+                {t("cred.howCalculated")}
               </Link>
             </p>
           </div>

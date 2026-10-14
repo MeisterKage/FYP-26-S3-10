@@ -272,6 +272,9 @@ class Article(TimestampMixin, db.Model):
     reports: Mapped[list["Report"]] = relationship(
         back_populates="article", cascade="all, delete-orphan"
     )
+    translations: Mapped[list["ArticleTranslation"]] = relationship(
+        back_populates="article", cascade="all, delete-orphan"
+    )
 
     @property
     def is_retracted(self) -> bool:
@@ -337,6 +340,35 @@ class DigestSubscription(db.Model):
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"))
     country_code: Mapped[str] = mapped_column(String(2), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class ArticleTranslation(db.Model):
+    """An article in another language (see translation_service).
+
+    `source_hash` fingerprints the English it was translated from, so an edit
+    to the article marks the translation stale instead of showing readers a
+    translation of text that has changed.
+    """
+
+    __tablename__ = "article_translations"
+    __table_args__ = (UniqueConstraint("article_id", "lang"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("articles.id", ondelete="CASCADE"), index=True
+    )
+    lang: Mapped[str] = mapped_column(String(8))
+    title: Mapped[str] = mapped_column(String(400))
+    summary: Mapped[str | None] = mapped_column(Text)
+    body: Mapped[str] = mapped_column(Text)
+    #: The In brief points, translated, as a JSON list.
+    points: Mapped[str | None] = mapped_column(Text)
+    #: Who translated it: "ai" for the demo articles, or a provider's name.
+    provider: Mapped[str] = mapped_column(String(20))
+    source_hash: Mapped[str] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    article: Mapped["Article"] = relationship(back_populates="translations")
 
 
 class ArticleDailyView(db.Model):

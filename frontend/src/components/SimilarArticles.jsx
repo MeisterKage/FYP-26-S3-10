@@ -7,12 +7,14 @@ import { Link } from "react-router-dom";
 
 import { imageUrl } from "../api";
 import { CredibilityInline } from "./Credibility";
+import { useI18n } from "../i18n";
 
 export function SimilarArticles({ articles }) {
+  const { t, country } = useI18n();
   if (!articles?.length) return null;
   return (
     <section className="similar" aria-labelledby="similar-title">
-      <h2 className="heading" id="similar-title">More like this</h2>
+      <h2 className="heading" id="similar-title">{t("similar.title")}</h2>
       <ul className="similar-grid">
         {articles.map((a) => (
           <li key={a.id}>
@@ -25,7 +27,7 @@ export function SimilarArticles({ articles }) {
                 <span className="similar-thumb similar-thumb--empty" aria-hidden="true" />
               )}
               <span className="similar-meta">
-                {a.country?.name ? `${a.country.name} · ` : ""}{a.contributor.name}
+                {a.country?.name ? `${country(a.country.code, a.country.name)} · ` : ""}{a.contributor.name}
               </span>
               <span className="similar-title">{a.title}</span>
             </Link>

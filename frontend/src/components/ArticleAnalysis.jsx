@@ -15,17 +15,22 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { api } from "../api";
+import { useI18n } from "../i18n";
 
-const DIRECTION = {
-  rising: "Rising",
-  steady: "Steady",
-  falling: "Falling",
-  quiet: "No recent views",
-};
+const LOCALES = { en: "en-AU", zh: "zh-CN", ms: "ms-MY" };
 
-function shortDay(iso) {
+function shortDay(iso, lang = "en") {
   const d = new Date(`${iso}T00:00:00Z`);
-  return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", timeZone: "UTC" });
+  return d.toLocaleDateString(LOCALES[lang], { day: "numeric", month: "short", timeZone: "UTC" });
+}
+
+/** The band for a tone score: the same cut-offs as the server (app/analysis.py). */
+function toneBand(score) {
+  if (score >= 0.25) return "positive";
+  if (score >= 0.1) return "leans_positive";
+  if (score >= -0.05) return "neutral";
+  if (score >= -0.2) return "leans_negative";
+  return "negative";
 }
 
 function signed(n) {
@@ -79,6 +84,8 @@ function Bars({ data, label, diverging = false, describe }) {
 export function ArticleAnalysis({ slug }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const { t, lang, section } = useI18n();
+  const day = (iso) => shortDay(iso, lang);
 
   useEffect(() => {
     setData(null);
@@ -94,78 +101,78 @@ export function ArticleAnalysis({ slug }) {
 
   return (
     <section className="analysis" aria-labelledby="analysis-title">
-      <h2 className="label" id="analysis-title">Tone and trend</h2>
+      <h2 className="label" id="analysis-title">{t("analysis.title")}</h2>
 
       <div className="analysis-grid">
         {tone && (
           <div className="analysis-block">
-            <p className="analysis-kicker">Tone of the writing</p>
-            <p className="analysis-figure">{tone.label}</p>
+            <p className="analysis-kicker">{t("analysis.tone")}</p>
+            <p className="analysis-figure">{t(`tone.${tone.band}`)}</p>
             <p className="meta">
-              {signed(tone.score)} on a scale from −1 (negative) to +1 (positive) ·{" "}
-              {Math.round(tone.share.positive * 100)}% of sentences positive,{" "}
-              {Math.round(tone.share.negative * 100)}% negative
+              {t("analysis.scale", { score: signed(tone.score) })} ·{" "}
+              {t("analysis.share", { p: Math.round(tone.share.positive * 100), n: Math.round(tone.share.negative * 100) })}
             </p>
             {tone.paragraphs.length > 1 && (
               <Bars
                 diverging
-                label="Tone of each paragraph, in reading order"
+                label={t("analysis.paragraphs")}
                 data={tone.paragraphs.map((v, i) => ({ value: v, i }))}
-                describe={(d) => `Paragraph ${d.i + 1}: ${signed(d.value)}`}
+                describe={(d) => t("analysis.paragraph", { i: d.i + 1, v: signed(d.value) })}
               />
             )}
-            <p className="analysis-caption">Each bar is a paragraph, in order: above the line reads positive, below it negative.</p>
+            <p className="analysis-caption">{t("analysis.paragraphCaption")}</p>
             {tone.mostPositive && (
               <blockquote className="analysis-quote">
-                <span className="analysis-quote-label">Most positive line</span>
+                <span className="analysis-quote-label">{t("analysis.mostPositive")}</span>
                 {tone.mostPositive.text}
               </blockquote>
             )}
             {tone.mostNegative && (
               <blockquote className="analysis-quote">
-                <span className="analysis-quote-label">Most negative line</span>
+                <span className="analysis-quote-label">{t("analysis.mostNegative")}</span>
                 {tone.mostNegative.text}
               </blockquote>
             )}
             {topic.tone != null && (
               <p className="meta mt-4">
-                Other {topic.name} articles from the last eight weeks: {topic.toneLabel}{" "}
-                ({signed(topic.tone)}).
+                {t("analysis.topicTone", {
+                  topic: section(topic.slug, topic.name),
+                  label: t(`tone.${toneBand(topic.tone)}`),
+                  score: signed(topic.tone),
+                })}
               </p>
             )}
           </div>
         )}
 
         <div className="analysis-block">
-          <p className="analysis-kicker">Reader interest</p>
-          <p className="analysis-figure">{DIRECTION[trend.direction]}</p>
+          <p className="analysis-kicker">{t("analysis.interest")}</p>
+          <p className="analysis-figure">{t(`direction.${trend.direction}`)}</p>
           <p className="meta">
-            {trend.viewsInPeriod.toLocaleString()} views in the last 14 days ·{" "}
-            {trend.viewsTotal.toLocaleString()} in total
-            {likes + comments > 0 && ` · ${likes} like${likes === 1 ? "" : "s"} and ${comments} comment${comments === 1 ? "" : "s"} in that time`}
+            {t("analysis.views", { n: trend.viewsInPeriod.toLocaleString(), total: trend.viewsTotal.toLocaleString() })}
+            {likes + comments > 0 && t("analysis.engagement", { likes, comments })}
           </p>
           <Bars
-            label="Views per day over the last 14 days"
+            label={t("analysis.viewsChart")}
             data={trend.views.map((d) => ({ value: d.count, day: d.day }))}
-            describe={(d) => `${shortDay(d.day)}: ${d.value.toLocaleString()} view${d.value === 1 ? "" : "s"}`}
+            describe={(d) => t("analysis.viewsDay", { day: day(d.day), n: d.value.toLocaleString() })}
           />
           <p className="analysis-caption">
-            Views per day, {shortDay(trend.views[0].day)} to {shortDay(trend.views[trend.views.length - 1].day)}.
-            Rising or falling compares the last seven days with the seven before.
+            {t("analysis.viewsCaption", { from: day(trend.views[0].day), to: day(trend.views[trend.views.length - 1].day) })}
           </p>
 
           {topic.name && (
             <>
               <p className="analysis-kicker mt-6">
-                Coverage of <Link className="link-quiet" to={`/categories/${topic.slug}`}>{topic.name}</Link>
+                {t("analysis.coverage")} <Link className="link-quiet" to={`/categories/${topic.slug}`}>{section(topic.slug, topic.name)}</Link>
               </p>
               <Bars
-                label={`${topic.name} articles published per week, last eight weeks`}
+                label={t("analysis.weekChart", { topic: section(topic.slug, topic.name) })}
                 data={topic.weekly.map((w) => ({ value: w.count, week: w.weekEnding }))}
-                describe={(d) => `Week to ${shortDay(d.week)}: ${d.value} article${d.value === 1 ? "" : "s"}`}
+                describe={(d) => t("analysis.week", { day: day(d.week), n: d.value })}
               />
               <p className="analysis-caption">
-                Articles published per week in this section, about {perWeek.toFixed(1)} a week on average.
+                {t("analysis.coverageCaption", { avg: perWeek.toFixed(1) })}
               </p>
             </>
           )}
@@ -173,8 +180,7 @@ export function ArticleAnalysis({ slug }) {
       </div>
 
       <p className="analysis-note">
-        Tone describes the wording, not whether the article is accurate: careful reporting of bad
-        news reads negative. Scored automatically with VADER, a standard sentiment model.
+        {t("analysis.note")}
       </p>
     </section>
   );

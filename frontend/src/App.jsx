@@ -28,6 +28,7 @@ import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import RegisterPage from "./pages/RegisterPage";
 import SearchPage from "./pages/SearchPage";
 import { usePageTitle } from "./usePageTitle";
+import { useI18n } from "./i18n";
 
 /**
  * Pages only signed-in writers, editors and administrators open, downloaded
@@ -114,6 +115,7 @@ function NotFound() {
 }
 
 export default function App() {
+  const { lang } = useI18n();
   return (
     <>
       <a className="skip" href="#main">
@@ -122,7 +124,9 @@ export default function App() {
 
       <Masthead />
 
-      <main className="shell main" id="main" tabIndex={-1}>
+      {/* Keyed by language: switching remounts the page, so it fetches its
+          articles again in the new language. */}
+      <main className="shell main" id="main" tabIndex={-1} key={lang}>
         <ErrorBoundary>
           <Suspense fallback={<PageLoading />}>
           <Routes>

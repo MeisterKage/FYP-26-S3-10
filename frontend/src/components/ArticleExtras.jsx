@@ -14,9 +14,11 @@ import { useState } from "react";
 
 import { api, downloadFile } from "../api";
 import { Button, Notice, formatDate } from "./UI";
+import { useI18n } from "../i18n";
 
 export default function ArticleExtras({ article }) {
   const [share, setShare] = useState(null);
+  const { t } = useI18n();
   const [downloading, setDownloading] = useState(null);
   const [revisions, setRevisions] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -75,20 +77,20 @@ export default function ArticleExtras({ article }) {
     <div className="article-extras">
       <div className="row gap-4">
         <Button variant="quiet" size="sm" onClick={openShare}>
-          {share ? "Hide sharing" : "Share"}
+          {share ? t("article.hideShare") : t("article.share")}
         </Button>
         <Button variant="quiet" size="sm" onClick={openRevisions}>
-          {revisions ? "Hide history" : "Revision history"}
+          {revisions ? t("article.hideHistory") : t("article.history")}
         </Button>
         {!article.paywalled && (
           <>
             <Button variant="quiet" size="sm" busy={downloading === "pdf"}
               onClick={() => download("pdf")}>
-              Download PDF
+              {t("article.downloadPdf")}
             </Button>
             <Button variant="quiet" size="sm" busy={downloading === "pptx"}
               onClick={() => download("pptx")}>
-              Download slides
+              {t("article.downloadSlides")}
             </Button>
           </>
         )}

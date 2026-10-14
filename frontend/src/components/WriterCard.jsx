@@ -17,6 +17,7 @@ import { useAuth } from "../auth";
 import { startSubscription } from "../pages/Checkout";
 import { AccuracyRate } from "./Credibility";
 import { Button, Notice } from "./UI";
+import { useI18n } from "../i18n";
 
 export function WriterCard({ writer }) {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ export function WriterCard({ writer }) {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState(null);
 
+  const { t } = useI18n();
   if (writer.isSelf) return null;
 
   async function toggleFollow() {
@@ -59,7 +61,7 @@ export function WriterCard({ writer }) {
 
   return (
     <aside className="writer-card" aria-label={`About ${writer.name}`}>
-      <p className="label">About the writer</p>
+      <p className="label">{t("writer.about")}</p>
       <div className="writer-card-main">
         <div className="writer-card-who">
           <Link className="writer-card-name link-quiet" to={`/contributors/${writer.id}`}>
@@ -68,7 +70,7 @@ export function WriterCard({ writer }) {
           <p className="writer-card-meta">
             <AccuracyRate rate={writer.accuracyRate} />
             <span className="dot" aria-hidden="true" />
-            <span>{followers} follower{followers === 1 ? "" : "s"}</span>
+            <span>{followers === 1 ? t("writer.follower1") : t("writer.followers", { n: followers })}</span>
           </p>
           {writer.bio && <p className="writer-card-bio">{writer.bio}</p>}
         </div>
@@ -77,11 +79,11 @@ export function WriterCard({ writer }) {
           {!user ? (
             <>
               <Button variant="primary" size="sm" as={Link} to="/register">
-                Subscribe
+                {t("writer.subscribe")}
               </Button>
               <p className="writer-card-note">
-                <Link className="link-quiet" to="/login">Sign in</Link> or create a free
-                account to follow or subscribe.
+                <Link className="link-quiet" to="/login">{t("writer.signIn")}</Link>{" "}
+                {t("writer.signInNote")}
               </p>
             </>
           ) : (
@@ -89,18 +91,18 @@ export function WriterCard({ writer }) {
               {writer.offersSubscription && (
                 writer.subscribed ? (
                   <Button variant="outline" size="sm" as={Link} to="/account">
-                    Subscribed
+                    {t("writer.subscribed")}
                   </Button>
                 ) : (
                   <Button variant="primary" size="sm" busy={busy === "subscribe"}
                     onClick={subscribe}>
-                    Subscribe
+                    {t("writer.subscribe")}
                   </Button>
                 )
               )}
               <Button variant={following ? "outline" : "quiet"} size="sm"
                 busy={busy === "follow"} onClick={toggleFollow} aria-pressed={following}>
-                {following ? "Following" : "Follow"}
+                {following ? t("writer.following") : t("writer.follow")}
               </Button>
             </>
           )}

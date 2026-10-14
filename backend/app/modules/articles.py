@@ -21,7 +21,7 @@ import re
 from datetime import datetime, timezone
 
 from flask import Blueprint, g, jsonify, request
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from ..enums import AUTHORING_ROLES, ArticleStatus, Role
 from ..errors import ApiError
@@ -33,6 +33,7 @@ from ..source_service import rate_sources, serialize as serialize_source
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
 from ..review_service import category_problem
+from ..translation_service import fresh as fresh_translation, note as translation_note, request_lang
 from ..scoring_service import load_settings, rescore_article
 from ..security import login_required, roles_required
 from ..validation import json_body, require_int, require_list, require_str
@@ -163,13 +164,17 @@ def list_loads() -> tuple:
     # the API server, so each round trip costs far more than the few duplicate
     # rows the joined collections add (a page is twenty articles, each with a
     # handful of sources and rarely more than one correction).
-    return (
+    loads = (
         joinedload(Article.contributor),
         joinedload(Article.reviewer),
         joinedload(Article.cover_image),
         joinedload(Article.sources),
         joinedload(Article.corrections),
     )
+    # In another language, the translations too: one more query for the list.
+    if request_lang() != "en":
+        loads += (selectinload(Article.translations),)
+    return loads
 
 
 def may_read(article: Article, viewer) -> bool:
@@ -259,14 +264,24 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         # An editorial tool, never shown to readers.
         payload["originality"] = originality_summary(article)
 
+    # Another language: the translation's words, if there is a current one.
+    lang = request_lang()
+    translation = fresh_translation(article, lang) if lang != "en" else None
+    if lang != "en":
+        payload["translation"] = translation_note(lang, translation)
+        if translation is not None:
+            payload["title"] = translation.title
+            payload["summary"] = translation.summary
+    body = translation.body if translation is not None else article.body
+
     if not include_body:
         return payload
 
     if may_read(article, viewer):
-        payload["body"] = article.body
+        payload["body"] = body
     else:
         # PDD Figure 5.6: a paywalled article shows a preview and a prompt.
-        payload["bodyPreview"] = preview_text(article.body)
+        payload["bodyPreview"] = preview_text(body)
         payload["paywalled"] = True
 
     return payload
