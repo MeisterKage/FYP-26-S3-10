@@ -12,11 +12,12 @@
  */
 import { useState } from "react";
 
-import { api } from "../api";
+import { api, downloadFile } from "../api";
 import { Button, Notice, formatDate } from "./UI";
 
 export default function ArticleExtras({ article }) {
   const [share, setShare] = useState(null);
+  const [downloading, setDownloading] = useState(null);
   const [revisions, setRevisions] = useState(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(null);
@@ -46,6 +47,18 @@ export default function ArticleExtras({ article }) {
     }
   }
 
+  async function download(kind) {
+    setDownloading(kind);
+    setError(null);
+    try {
+      await downloadFile(`/articles/${article.slug}/download.${kind}`, `${article.slug}.${kind}`);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setDownloading(null);
+    }
+  }
+
   async function copy(url) {
     try {
       await navigator.clipboard.writeText(url);
@@ -67,6 +80,18 @@ export default function ArticleExtras({ article }) {
         <Button variant="quiet" size="sm" onClick={openRevisions}>
           {revisions ? "Hide history" : "Revision history"}
         </Button>
+        {!article.paywalled && (
+          <>
+            <Button variant="quiet" size="sm" busy={downloading === "pdf"}
+              onClick={() => download("pdf")}>
+              Download PDF
+            </Button>
+            <Button variant="quiet" size="sm" busy={downloading === "pptx"}
+              onClick={() => download("pptx")}>
+              Download slides
+            </Button>
+          </>
+        )}
       </div>
 
       {error && (

@@ -15,6 +15,8 @@ Flask-Limiter==3.8.0
 Pillow==11.0.0  # decodes and re-encodes uploaded images (app/images.py)
 gunicorn==23.0.0  # production WSGI server; the Flask dev server is not one
 vaderSentiment==3.3.2  # article tone (app/analysis.py), MIT licence
+reportlab==5.0.1  # article PDFs (app/exports.py), BSD licence
+python-pptx==1.0.2  # article slides (app/exports.py), MIT licence
 
 # dev / test
 pytest==8.3.3

@@ -70,6 +70,31 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
   return payload;
 }
 
+/**
+ * Fetch a file the API builds (an article as PDF or slides) and hand it to the
+ * browser to save. Sent with the reader's sign-in, so a subscriber can download
+ * a subscriber-only article.
+ */
+export async function downloadFile(path, filename) {
+  const headers = {};
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const response = await fetch(`${BASE}/api${path}`, { headers });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new ApiError(payload?.error?.message || "The download failed.", response.status);
+  }
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
 export const api = {
   get: (path) => request(path),
   post: (path, body) => request(path, { method: "POST", body }),
