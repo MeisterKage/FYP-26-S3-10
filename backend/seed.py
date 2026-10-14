@@ -12,6 +12,7 @@ corrections, and reports.
     py seed.py --originality # distinct demo bodies, index, and a planted copy
     py seed.py --long-bodies # full-length bodies for articles already seeded
     py seed.py --daily-views # a history of daily views behind each demo total
+    py seed.py --expansion   # more editors, writers and articles; right sections (internet)
     flask rate-sources       # then grade every cited source (needs internet)
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
@@ -435,6 +436,105 @@ def seed_countries() -> None:
     )
     for code, count in sorted(rows, key=lambda r: -r[1]):
         print(f"  {code or 'international':<14} {count} published")
+
+
+def seed_expansion() -> None:
+    """More editors, writers and articles, and every demo article in the right section.
+
+    Safe to run again and on the live database: accounts and articles that
+    already exist are left as they are; an article is only moved when it is in
+    the wrong section. Sources for moved and new articles are rated (this needs
+    internet access) and every score is recalculated.
+    """
+    import demo_expansion as more
+    from demo_bodies import render
+    from app.models import EditorCategory
+    from app.originality_service import index_article
+    from app.source_service import rate_sources
+
+    sections = {c.name: c for c in Category.query.filter_by(deleted_at=None)}
+    now = utcnow()
+
+    def account(email, name, role, **extra):
+        user = User.query.filter_by(email=email).first()
+        if user is None:
+            user = User(email=email, display_name=name, role=role,
+                        password_hash=hash_password(DEMO_PASSWORD), **extra)
+            db.session.add(user)
+            db.session.flush()
+        return user
+
+    for e in more.NEW_EDITORS:
+        editor = account(e["email"], e["name"], Role.EDITOR, bio=e["bio"],
+                         editor_title=e["title"], editor_credentials=e["credentials"])
+        for name in e["sections"]:
+            if not EditorCategory.query.filter_by(editor_id=editor.id,
+                                                  category_id=sections[name].id).first():
+                db.session.add(EditorCategory(editor_id=editor.id, category_id=sections[name].id))
+    for w in more.NEW_WRITERS:
+        account(w["email"], w["name"], Role.VERIFIED_CONTRIBUTOR, bio=w["bio"])
+    db.session.flush()
+
+    touched = []
+
+    def resource(article, section_name):
+        ArticleSource.query.filter_by(article_id=article.id).delete()
+        for url, label in sources_for(article.title, article.country_code, section_name,
+                                      article.contributor.email):
+            db.session.add(ArticleSource(article_id=article.id, url=url, label=label))
+
+    moved = 0
+    for title, section_name in more.SECTION_FIX.items():
+        for article in Article.query.filter_by(title=title):
+            if article.category_id != sections[section_name].id:
+                article.category_id = sections[section_name].id
+                resource(article, section_name)
+                touched.append(article)
+                moved += 1
+
+    added = 0
+    for n, (code, section_name, email, title, standfirst, paragraphs) in enumerate(more.NEW_ARTICLES):
+        if Article.query.filter_by(title=title).first():
+            continue
+        writer = User.query.filter_by(email=email).one()
+        published_at = now - timedelta(days=1 + (n * 37) % 22, hours=(n * 7) % 18)
+        article = Article(
+            contributor_id=writer.id, category_id=sections[section_name].id, country_code=code,
+            title=title, slug=slugify(title), summary=standfirst, body=render(paragraphs),
+            tags="regional,analysis", status=ArticleStatus.PUBLISHED,
+            published_at=published_at, submitted_at=published_at - timedelta(hours=5),
+            view_count=140 + (n * 131) % 1500,
+        )
+        db.session.add(article)
+        db.session.flush()
+        article.slug = slugify(title, article.id)
+        resource(article, section_name)
+        touched.append(article)
+        added += 1
+    db.session.flush()
+
+    # Each published demo article is approved by an editor of its own section.
+    editors_of: dict[int, list[int]] = {}
+    for row in EditorCategory.query.order_by(EditorCategory.editor_id):
+        editors_of.setdefault(row.category_id, []).append(row.editor_id)
+    for article in Article.query.filter(Article.status == ArticleStatus.PUBLISHED,
+                                        Article.republication.is_(None)):
+        editors = editors_of.get(article.category_id)
+        if editors and article.reviewed_by_id not in editors and not article.awaiting_review:
+            article.reviewed_by_id = editors[article.id % len(editors)]
+
+    for article in touched:
+        db.session.expire(article, ["sources"])
+        rate_sources(article)
+        index_article(article)
+    db.session.flush()
+    for writer in User.query.filter(User.role.in_([Role.VERIFIED_CONTRIBUTOR, Role.EDITOR,
+                                                    Role.SYSTEM_ADMIN])):
+        rescore_contributor_articles(writer)
+    db.session.commit()
+    seed_daily_views()
+    print(f"Expansion: {len(more.NEW_EDITORS)} editors and {len(more.NEW_WRITERS)} writers ready; "
+          f"moved {moved} article(s) to their right section; added {added} article(s).")
 
 
 def seed_daily_views() -> None:
@@ -872,6 +972,9 @@ if __name__ == "__main__":
             sys.exit(0)
         if "--daily-views" in sys.argv:
             seed_daily_views()
+            sys.exit(0)
+        if "--expansion" in sys.argv:
+            seed_expansion()
             sys.exit(0)
         if "--reset" in sys.argv:
             reset()

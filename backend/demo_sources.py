@@ -162,7 +162,16 @@ OVERRIDES = {
     ],
 }
 
-COUNTS = {"veteran@newsrelease.test": 5, "contributor@newsrelease.test": 3}
+COUNTS = {"veteran@newsrelease.test": 5, "contributor@newsrelease.test": 3,
+          "farah.hashim@newsrelease.test": 3, "rohan.iyer@newsrelease.test": 3}
+
+# Malaysia, China and India, added with the expanded demo (demo_expansion.py).
+from demo_expansion import OFFICIAL as _MORE_OFFICIAL, OUTLETS as _MORE_OUTLETS  # noqa: E402
+from demo_expansion import STATISTICS as _MORE_STATISTICS  # noqa: E402
+
+OFFICIAL.update(_MORE_OFFICIAL)
+STATISTICS.update(_MORE_STATISTICS)
+OUTLETS.update(_MORE_OUTLETS)
 
 
 def sources_for(title: str, country: str | None, section: str, writer_email: str) -> list[tuple]:
