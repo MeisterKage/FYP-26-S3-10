@@ -22,7 +22,8 @@ from ..similar_service import similar_to
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
-    Article, Category, Correction, Follow, Like, SavedArticle, User, UserCategoryPreference, utcnow,
+    Article, ArticleDailyView, Category, Correction, Follow, Like, SavedArticle, User,
+    UserCategoryPreference, utcnow,
 )
 from ..countries import COUNTRIES, DEFAULT_COUNTRY, codes_matching
 from ..credibility import DEFAULTS, credibility_score
@@ -351,6 +352,15 @@ def _count_view(article_id: int) -> None:
             update(Article).where(Article.id == article_id)
             .values(view_count=Article.view_count + 1)
         )
+        # And today's row in the history behind the total.
+        today = utcnow().date()
+        bumped = db.session.execute(
+            update(ArticleDailyView)
+            .where(ArticleDailyView.article_id == article_id, ArticleDailyView.day == today)
+            .values(views=ArticleDailyView.views + 1)
+        ).rowcount
+        if not bumped:
+            db.session.add(ArticleDailyView(article_id=article_id, day=today, views=1))
         db.session.commit()
     except SQLAlchemyError:
         db.session.rollback()

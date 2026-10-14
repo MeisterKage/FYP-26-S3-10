@@ -17,10 +17,10 @@ category", PRD 1.3.2), and AuditLog (system logs, PDD Figure 5.62).
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy import (
-    BigInteger, Boolean, CheckConstraint, DateTime, Enum as SAEnum, Float, ForeignKey,
+    BigInteger, Boolean, CheckConstraint, Date, DateTime, Enum as SAEnum, Float, ForeignKey,
     Index, Integer, LargeBinary, String, Text, UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -337,6 +337,25 @@ class DigestSubscription(db.Model):
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"))
     country_code: Mapped[str] = mapped_column(String(2), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class ArticleDailyView(db.Model):
+    """How many times an article was opened on one day (UTC).
+
+    The running total stays on Article.view_count; this is the history behind
+    it, for the trend on the article's analysis panel. One row per article per
+    day that had any views.
+    """
+
+    __tablename__ = "article_daily_views"
+    __table_args__ = (UniqueConstraint("article_id", "day"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("articles.id", ondelete="CASCADE"), index=True
+    )
+    day: Mapped[date] = mapped_column(Date)
+    views: Mapped[int] = mapped_column(Integer, default=0)
 
 
 class ArticleFingerprint(db.Model):

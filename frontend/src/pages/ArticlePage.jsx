@@ -26,6 +26,7 @@ import Corrections from "../components/Corrections";
 import { SourceList } from "../components/Sources";
 import { WriterCard } from "../components/WriterCard";
 import { SimilarArticles } from "../components/SimilarArticles";
+import { ArticleAnalysis } from "../components/ArticleAnalysis";
 import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
@@ -277,6 +278,8 @@ export default function ArticlePage() {
               </p>
             </section>
           )}
+
+          {article.status === "published" && <ArticleAnalysis slug={article.slug} />}
 
           <Corrections article={article} />
 

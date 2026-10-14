@@ -11,6 +11,7 @@ corrections, and reports.
     py seed.py --countries   # tag countries and add samples to existing data
     py seed.py --originality # distinct demo bodies, index, and a planted copy
     py seed.py --long-bodies # full-length bodies for articles already seeded
+    py seed.py --daily-views # a history of daily views behind each demo total
     flask rate-sources       # then grade every cited source (needs internet)
 
 Passwords are all `DemoPassword123!` -- fine for a local demo, never for a
@@ -436,6 +437,42 @@ def seed_countries() -> None:
         print(f"  {code or 'international':<14} {count} published")
 
 
+def seed_daily_views() -> None:
+    """Give each demo article a history of daily views behind its total.
+
+    Demo data only. The seeded view counts are themselves made up, so this
+    spreads each article's existing total over the days since it was published
+    (at most six weeks), most of it early and tailing off, as reading usually
+    does, with a little day-to-day variation. Real views are recorded day by
+    day from now on. Articles that already have a history are left alone, so
+    it is safe to run again.
+    """
+    import math
+    from datetime import timedelta
+    from app.models import ArticleDailyView
+
+    today = utcnow().date()
+    filled = 0
+    for article in Article.query.filter(Article.status == ArticleStatus.PUBLISHED):
+        if ArticleDailyView.query.filter_by(article_id=article.id).first():
+            continue
+        if not article.published_at or not article.view_count:
+            continue
+        start = max(article.published_at.date(), today - timedelta(days=41))
+        days = (today - start).days + 1
+        rng = random.Random(article.id)
+        weights = [math.exp(-d / 6) * (0.75 + rng.random() * 0.5) for d in range(days)]
+        total = sum(weights)
+        counts = [int(article.view_count * w / total) for w in weights]
+        counts[0] += article.view_count - sum(counts)
+        for d, n in enumerate(counts):
+            if n:
+                db.session.add(ArticleDailyView(article_id=article.id, day=start + timedelta(d), views=n))
+        filled += 1
+    db.session.commit()
+    print(f"Daily views: gave {filled} article(s) a history.")
+
+
 def seed_long_bodies() -> None:
     """Swap the short demo bodies on an existing database for the long ones.
 
@@ -788,6 +825,7 @@ def seed() -> None:
     db.session.commit()
     seed_countries()
     seed_originality()
+    seed_daily_views()
 
     print("Seeded.")
     print(f"  categories   {len(categories)}")
@@ -831,6 +869,9 @@ if __name__ == "__main__":
             sys.exit(0)
         if "--long-bodies" in sys.argv:
             seed_long_bodies()
+            sys.exit(0)
+        if "--daily-views" in sys.argv:
+            seed_daily_views()
             sys.exit(0)
         if "--reset" in sys.argv:
             reset()

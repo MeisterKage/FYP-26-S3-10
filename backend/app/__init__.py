@@ -50,11 +50,12 @@ def create_app(config_object=Config) -> Flask:
     from .modules.payments import bp as payments_bp
     from .modules.insights import bp as insights_bp
     from .modules.share import bp as share_bp
+    from .modules.analysis import bp as analysis_bp
 
     for blueprint in (
         auth_bp, users_bp, articles_bp, review_bp, discovery_bp,
         engagement_bp, moderation_bp, notifications_bp, subscriptions_bp, admin_bp,
-        editors_bp, images_bp, originality_bp, digests_bp, payments_bp, insights_bp, share_bp,
+        editors_bp, images_bp, originality_bp, digests_bp, payments_bp, insights_bp, share_bp, analysis_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
 
