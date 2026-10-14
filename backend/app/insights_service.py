@@ -89,7 +89,7 @@ class ExtractiveSummariser(Summariser):
 
     def summarise(self, body_html: str) -> Summary:
         return Summary(insights.key_points(body_html),
-                       "Key sentences chosen automatically from the article.", self.name)
+                       "AI generated", self.name)
 
 
 class ClaudeSummariser(Summariser):

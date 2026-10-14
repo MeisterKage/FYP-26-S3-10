@@ -2145,3 +2145,77 @@
 .auth-benefits li::marker {
   color: var(--mute);
 }
+
+/* --- listening timeline -------------------------------------------------- */
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  max-width: var(--w-article, var(--w-read));
+  margin-top: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: var(--t-caption);
+  color: var(--quiet);
+  font-variant-numeric: tabular-nums;
+}
+.book .timeline {
+  max-width: none;
+  margin-top: 0;
+}
+.timeline-time {
+  min-width: 2.75rem;
+  text-align: center;
+}
+.timeline-range {
+  flex: 1;
+  min-width: 0;
+  height: 1.25rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.timeline-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(to right, var(--ink) var(--pct, 0%), var(--sunken) var(--pct, 0%));
+}
+.timeline-range::-moz-range-track {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+}
+.timeline-range::-moz-range-progress {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+}
+.timeline-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+.timeline-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 2px solid var(--paper);
+}
+.timeline-range:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+.listen + .timeline {
+  margin-top: var(--s-3);
+}
+.timeline + .brief {
+  margin-top: var(--s-5);
+}

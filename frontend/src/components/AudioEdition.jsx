@@ -10,19 +10,14 @@
  * Without speech support the edition is still here to read: the same chapters,
  * as text.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { NextIcon, PauseIcon, PlayIcon, PrevIcon, StopIcon } from "./Icon";
-import { speechSupported, useSpeech } from "./useSpeech";
+import { SpeechTimeline } from "./SpeechTimeline";
+import { clock, speechSupported, useSpeech } from "./useSpeech";
 
 const SPEEDS = [0.75, 1, 1.25, 1.5, 2];
-const WPM = 160;
-
-function clock(seconds) {
-  const s = Math.max(0, Math.round(seconds));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
 
 // The listening position is a per-reader convenience: kept in this browser
 // only, and the page works the same when storage is unavailable.
@@ -49,86 +44,74 @@ export function AudioEdition({ listen, topic, monthLabel, storageKey }) {
   const narration = listen.narration || {};
   const canPlay = narration.mode === "browser" && speechSupported;
 
-  // Every sentence in reading order, which chapter it belongs to, and the
-  // words spoken before it (for the elapsed time).
+  // Every sentence in reading order, and which chapter it belongs to.
   const book = useMemo(() => {
     const sentences = [];
     const owner = [];
     const starts = [];
-    const before = [];
-    let words = 0;
     chapters.forEach((chapter, ci) => {
       starts.push(sentences.length);
       chapter.parts.forEach((part, pi) => {
         sentences.push(part);
         owner.push([ci, pi]);
-        before.push(words);
-        words += part.split(/\s+/).length;
       });
     });
-    return { sentences, owner, starts, before, words };
+    return { sentences, owner, starts };
   }, [chapters]);
-
-  const [saved, setSaved] = useState(() => {
-    const n = readSaved(storageKey);
-    return n < book.sentences.length ? n : -1;
-  });
-  const [viewing, setViewing] = useState(() => (saved > 0 ? book.owner[saved][0] : 0));
 
   const speech = useSpeech({
     lang: narration.voice?.lang || "en-AU",
-    onPosition: (i) => {
-      writeSaved(storageKey, i);
-      setSaved(i);
-    },
-    onFinish: () => {
-      writeSaved(storageKey, -1);
-      setSaved(-1);
-      setViewing(0);
-    },
+    items: book.sentences,
+    onPosition: (i) => writeSaved(storageKey, i),
+    onFinish: () => writeSaved(storageKey, -1),
   });
 
-  const playing = speech.index >= 0;
-  const [chapterIndex, partIndex] = playing ? book.owner[speech.index] : [viewing, -1];
-  const chapter = chapters[chapterIndex];
-  const resumeHere = !playing && saved > 0 && book.owner[saved][0] === viewing;
+  // Pick up where this reader stopped last time.
+  useEffect(() => {
+    const saved = readSaved(storageKey);
+    if (saved > 0 && saved < book.sentences.length) speech.cue(saved);
+    // Once, when the edition loads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey, book]);
 
-  const elapsedWords = playing ? book.before[speech.index] : resumeHere ? book.before[saved] : 0;
-  const pace = WPM * (speech.rate || 1);
-  const elapsed = (elapsedWords / pace) * 60;
-  const total = (book.words / pace) * 60;
+  const playing = speech.index >= 0;
+  // Playing: the sentence being read. Stopped: where Play will start.
+  const at = playing ? speech.index : speech.cursor;
+  const [chapterIndex, partIndex] = book.owner[at] || [0, 0];
+  const chapter = chapters[chapterIndex];
+  const resumeHere = !playing && speech.cursor > 0;
 
   function playFrom(ci) {
-    setViewing(ci);
-    if (!canPlay) return;
+    if (!canPlay) {
+      speech.cue(book.starts[ci]);
+      return;
+    }
     if (playing) speech.jump(book.starts[ci]);
-    else speech.play(book.sentences, book.starts[ci]);
+    else speech.play(book.starts[ci]);
   }
 
   function toggle() {
     if (speech.state === "speaking") speech.pause();
     else if (speech.state === "paused") speech.resume();
-    else speech.play(book.sentences, resumeHere ? saved : book.starts[viewing]);
+    else speech.play();
   }
 
   function previous() {
     // Like any audio book: back to the start of this chapter first, then to the one before.
-    const target = playing && partIndex > 0 ? chapterIndex : Math.max(0, chapterIndex - 1);
+    const target = partIndex > 0 ? chapterIndex : Math.max(0, chapterIndex - 1);
     if (playing) speech.jump(book.starts[target]);
-    else setViewing(target);
+    else speech.cue(book.starts[target]);
   }
 
   function next() {
     const target = Math.min(chapters.length - 1, chapterIndex + 1);
     if (playing) speech.jump(book.starts[target]);
-    else setViewing(target);
+    else speech.cue(book.starts[target]);
   }
 
   function startOver() {
     writeSaved(storageKey, -1);
-    setSaved(-1);
-    setViewing(0);
-    if (canPlay) speech.play(book.sentences, 0);
+    if (canPlay) speech.play(0);
   }
 
   const playLabel =
@@ -144,7 +127,7 @@ export function AudioEdition({ listen, topic, monthLabel, storageKey }) {
         </h2>
         <p className="meta mt-3">
           {chapters.length} chapters · about {listen.minutes} min at normal speed ·{" "}
-          {canPlay ? "read by your device's voice" : "your browser cannot read aloud, so here is the text"}
+          {canPlay ? "read aloud in a soft voice" : "your browser cannot read aloud, so here is the text"}
         </p>
       </header>
 
@@ -171,22 +154,14 @@ export function AudioEdition({ listen, topic, monthLabel, storageKey }) {
             )}
           </div>
           <div className="book-progress-wrap">
-            <div className="book-progress" role="progressbar" aria-label="Listening progress"
-              aria-valuemin={0} aria-valuemax={Math.round(total)} aria-valuenow={Math.round(elapsed)}
-              aria-valuetext={`${clock(elapsed)} of ${clock(total)}`}>
-              <i style={{ width: `${total ? (elapsed / total) * 100 : 0}%` }} />
-            </div>
-            <p className="book-time">
-              {clock(elapsed)} / {clock(total)}
-              {resumeHere && (
-                <>
-                  {" · "}
-                  <button type="button" className="link-quiet book-over" onClick={startOver}>
-                    Start from the beginning
-                  </button>
-                </>
-              )}
-            </p>
+            <SpeechTimeline speech={speech} label="Position in the audio edition" />
+            {resumeHere && (
+              <p className="book-time">
+                <button type="button" className="link-quiet book-over" onClick={startOver}>
+                  Start from the beginning
+                </button>
+              </p>
+            )}
           </div>
           <label className="book-speed">
             <span>Speed</span>
@@ -246,8 +221,8 @@ export function AudioEdition({ listen, topic, monthLabel, storageKey }) {
       </div>
 
       <p className="book-note">
-        Article summaries are the writers&rsquo; own sentences, chosen automatically. Subscriber-only
-        articles are summarised only for their subscribers.
+        Article summaries are AI generated. Subscriber-only articles are summarised only for their
+        subscribers.
       </p>
     </section>
   );

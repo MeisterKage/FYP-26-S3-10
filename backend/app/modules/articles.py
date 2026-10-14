@@ -32,6 +32,7 @@ from ..originality_service import check as check_originality, index_article, sum
 from ..source_service import rate_sources, serialize as serialize_source
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
+from ..review_service import category_problem
 from ..scoring_service import load_settings, rescore_article
 from ..security import login_required, roles_required
 from ..validation import json_body, require_int, require_list, require_str
@@ -405,6 +406,9 @@ def submit_article(article_id: int):
         )
     if not article.body.strip():
         raise ApiError("Add some content before submitting.", status=422, field="body")
+    problem = category_problem(article)
+    if problem:
+        raise ApiError(problem, status=422, field="categoryId")
     _require_image_provenance(article)
 
     # Every submission reaches the editor with its sources rated and its

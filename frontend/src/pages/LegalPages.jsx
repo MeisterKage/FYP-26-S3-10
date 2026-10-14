@@ -79,9 +79,9 @@ export function PrivacyPage() {
           the source&rsquo;s address, never anything about you.
         </li>
         <li>
-          <strong>Listening:</strong> narration uses your device&rsquo;s own voice where it has
-          one. Some browsers only offer online voices, in which case the text being read (never
-          anything about you) goes to your browser&rsquo;s voice service.
+          <strong>Listening:</strong> narration uses the softest female voice your browser offers.
+          Some of those voices run online, in which case the text being read (never anything about
+          you) goes to your browser&rsquo;s voice service.
         </li>
         <li>
           <strong>Payments:</strong> subscriptions currently run on a test checkout and no money is
@@ -176,9 +176,9 @@ export function TermsPage() {
 
       <h2>Summaries and narration</h2>
       <p>
-        &ldquo;In brief&rdquo; summaries and digest summaries are sentences chosen automatically from
-        the articles themselves. Narration is read by your device&rsquo;s voice. Read the full article
-        before relying on it.
+        &ldquo;In brief&rdquo; summaries and digest summaries are AI generated from the articles
+        themselves. Narration is read aloud by a synthetic voice. Read the full article before
+        relying on either.
       </p>
 
       <h2>Changes</h2>

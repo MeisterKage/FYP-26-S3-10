@@ -200,7 +200,11 @@ def batch_approve():
         except ApiError as error:
             failed.append({"id": article_id, "reason": error.message})
             continue
-        publish_article(article, reviewer_id=g.current_user.id, now=now)
+        try:
+            publish_article(article, reviewer_id=g.current_user.id, now=now)
+        except ApiError as error:
+            failed.append({"id": article_id, "reason": error.message})
+            continue
         approved.append(article_id)
 
     db.session.commit()

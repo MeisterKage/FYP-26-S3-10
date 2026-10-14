@@ -462,7 +462,8 @@ export default function ArticleEditor() {
         </div>
 
         <aside className="editor-side" aria-label="Article settings">
-        <Field label="Section" id="categoryId" error={fieldError.categoryId}>
+        <Field label="Section" id="categoryId" error={fieldError.categoryId}
+          hint="Required. An article cannot be submitted or published without a section.">
           {(props) => (
             <select
               {...props}
@@ -473,7 +474,8 @@ export default function ArticleEditor() {
               required
             >
               <option value="">Choose a section</option>
-              {categories.map((c) => (
+              {/* Uncategorised is never offered: every article needs a real section. */}
+              {categories.filter((c) => c.slug !== "uncategorised").map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>

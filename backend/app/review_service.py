@@ -103,6 +103,23 @@ def priority_for(article: Article, settings: dict, now: datetime,
 #  Publishing
 # --------------------------------------------------------------------------- #
 
+CATEGORY_REQUIRED = "Choose a section other than Uncategorised before this article can be published."
+
+
+def category_problem(article: Article) -> str | None:
+    """Why this article cannot be published yet for want of a real section, if so.
+
+    Every published article belongs to a real section: Uncategorised is only
+    where articles land when a section is deleted, never somewhere to publish.
+    """
+    from .models import Category
+
+    category = db.session.get(Category, article.category_id) if article.category_id else None
+    if category is None or category.is_system or category.deleted_at is not None:
+        return CATEGORY_REQUIRED
+    return None
+
+
 def publish_article(
     article: Article,
     *,
@@ -115,7 +132,14 @@ def publish_article(
 
     Publishing is when a credibility score first becomes visible, so it is
     computed here rather than lazily on first read.
+
+    Refuses an article without a real section, whichever route publishes it.
     """
+    from .errors import ApiError
+
+    problem = category_problem(article)
+    if problem:
+        raise ApiError(problem, status=422, field="categoryId")
     article.status = ArticleStatus.PUBLISHED
     article.published_at = now
     article.reviewed_by_id = reviewer_id
@@ -232,6 +256,9 @@ def run_autopublish(now: datetime | None = None) -> dict:
         verdict = eligibility_for(article, cfg, now)
         if not verdict.eligible:
             result["held"][article.id] = verdict.reasons
+            continue
+        if category_problem(article):
+            result["held"][article.id] = ["no section chosen"]
             continue
         publish_article(article, reviewer_id=None, now=now, auto=True, detail=reason)
         result["published"].append(article.id)

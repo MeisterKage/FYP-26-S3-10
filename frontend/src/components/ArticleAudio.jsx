@@ -14,9 +14,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { PauseIcon, PlayIcon, StopIcon } from "./Icon";
 import { InBrief } from "./InBrief";
-import { speechSupported, useSpeech } from "./useSpeech";
+import { SpeechTimeline } from "./SpeechTimeline";
+import { estimate, speechSupported, useSpeech } from "./useSpeech";
 
-const WPM = 160;
 const SPEEDS = [0.75, 1, 1.25, 1.5, 2];
 // Ends a sentence at . ! or ? (and a closing quote) before a capital or a quote.
 const SENTENCE_END = /(?<=[.!?])["”’]?\s+(?=["“‘A-Z0-9])/;
@@ -26,8 +26,7 @@ function sentences(text) {
 }
 
 function minutes(parts, rate = 1) {
-  const words = parts.reduce((n, p) => n + p.split(/\s+/).length, 0);
-  return Math.max(1, Math.round(words / (WPM * rate)));
+  return Math.max(1, Math.round(estimate(parts) / 60 / rate));
 }
 
 /** Each sentence of the article body, and the paragraph element it belongs to. */
@@ -50,7 +49,6 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
   const [mode, setMode] = useState(brief ? "brief" : "full");
   const [body, setBody] = useState({ items: [], blocks: [] });
   const marked = useRef(null);
-  const speech = useSpeech({ lang: brief?.narration?.voice?.lang || "en-AU" });
 
   // The article body is rendered by the page; read it once it is there.
   useEffect(() => {
@@ -63,6 +61,7 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
   );
   const fullParts = useMemo(() => [`${title}.`, ...body.items.map((i) => i.text)], [body, title]);
   const parts = mode === "brief" ? briefParts : fullParts;
+  const speech = useSpeech({ lang: brief?.narration?.voice?.lang || "en-AU", items: parts });
   const playing = speech.state !== "idle";
 
   // Mark the paragraph being read in the article itself, and keep it in view.
@@ -99,7 +98,7 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
   function toggle() {
     if (speech.state === "speaking") speech.pause();
     else if (speech.state === "paused") speech.resume();
-    else speech.play(parts, 0);
+    else speech.play();
   }
 
   const label = speech.state === "speaking" ? "Pause" : speech.state === "paused" ? "Resume" : "Listen";
@@ -144,6 +143,9 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey }) {
           </label>
         </div>
       </div>
+
+      <SpeechTimeline speech={speech}
+        label={mode === "brief" ? "Position in the key points" : "Position in the article"} />
 
       {brief && <InBrief brief={brief} current={mode === "brief" ? speech.index - 1 : -1} />}
     </>
