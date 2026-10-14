@@ -133,10 +133,13 @@ def world(app):
     }
 
 
-def upload(client, headers, data=None, name="photo.jpg"):
+def upload(client, headers, data=None, name="photo.jpg", declaration="not-ai"):
+    form = {"file": (io.BytesIO(data or picture(exif=gps_exif())), name)}
+    if declaration:
+        form["declaration"] = declaration
     return client.post(
         "/api/images",
-        data={"file": (io.BytesIO(data or picture(exif=gps_exif())), name)},
+        data=form,
         headers=headers, content_type="multipart/form-data",
     )
 

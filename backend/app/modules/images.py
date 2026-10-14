@@ -15,6 +15,7 @@ from flask import Blueprint, Response, g, jsonify, request
 from ..enums import AUTHORING_ROLES
 from ..errors import ApiError
 from ..extensions import db
+from ..image_provenance import ai_markers
 from ..images import MAX_UPLOAD_BYTES, ImageRejected, process
 from ..models import Article, ArticleImage, utcnow
 from ..ratelimit import client_address, limiter
@@ -70,10 +71,21 @@ def upload_image():
     upload = request.files.get("file")
     if upload is None:
         raise ApiError("Choose an image to upload.", status=422, field="file")
+    # AI-generated images are not allowed. The writer says so for each upload;
+    # the file's own metadata is checked below as well.
+    if request.form.get("declaration") != "not-ai":
+        raise ApiError("Confirm that this image is not AI-generated.", status=422,
+                       field="declaration")
 
     # Read one byte past the limit, so an oversized file is refused without
     # holding the whole thing in memory.
     data = upload.stream.read(MAX_UPLOAD_BYTES + 1)
+    # Before re-encoding, which drops the metadata this reads.
+    markers = ai_markers(data[:MAX_UPLOAD_BYTES])
+    if markers:
+        raise ApiError(
+            f"This image looks AI-generated: {markers[0]}. AI-generated images are not "
+            "allowed on Wollongong News.", status=422, field="file")
     try:
         processed = process(data)
     except ImageRejected as e:

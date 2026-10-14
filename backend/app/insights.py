@@ -274,10 +274,87 @@ def writing_signals(body_html: str) -> dict:
     ))
 
     flagged = sum(s.flagged for s in signals)
-    level = "few" if flagged <= 1 else "some" if flagged == 2 else "many"
+    share, passages = ai_share(body_html)
+    if flagged >= 3 or share >= 50:
+        level = "many"
+    elif flagged == 2 or share >= 20:
+        level = "some"
+    else:
+        level = "few"
     return {
         "level": level,
         "words": n,
         "flagged": flagged,
+        "aiShare": share,
+        "passages": passages,
         "signals": [s.as_dict() for s in signals],
     }
+
+
+# --------------------------------------------------------------------------- #
+#  Share of AI-like text
+# --------------------------------------------------------------------------- #
+
+PASSAGE_WORDS = 110
+
+
+def _passages(body_html: str) -> list[str]:
+    """The article in passages of about PASSAGE_WORDS words, at paragraph breaks."""
+    paras = [p.text for p in paragraphs(body_html) if not p.heading]
+    out, current = [], []
+    for para in paras:
+        current.append(para)
+        if len(words(" ".join(current))) >= PASSAGE_WORDS:
+            out.append(" ".join(current))
+            current = []
+    if current:
+        tail = " ".join(current)
+        if out and len(words(tail)) < PASSAGE_WORDS / 2:
+            out[-1] = f"{out[-1]} {tail}"
+        else:
+            out.append(tail)
+    return out
+
+
+def _passage_reasons(text: str) -> list[str]:
+    """Which AI-like patterns one passage shows."""
+    sents = sentences(text)
+    lengths = [len(words(s)) for s in sents]
+    n = max(1, len(words(text)))
+    lower = text.lower()
+    reasons = []
+    if len(lengths) >= 3 and _cv(lengths) < 0.30:
+        reasons.append("even sentence lengths")
+    stock = sum(len(re.findall(rf"(?<![a-z]){re.escape(p)}(?![a-z])", lower)) for p in STOCK_PHRASES)
+    if stock >= 2:
+        reasons.append("stock phrases")
+    numbers = len(re.findall(r"\b\d[\d,.%]*\b", text))
+    names = sum(1 for s in sents for w in words(s)[1:] if w[:1].isupper() and w.lower() not in STOPWORDS)
+    quotes = len(re.findall(r"[\"“][^\"“”]{12,}[\"”]", text))
+    if (numbers + names + 3 * quotes) * 100 / n < 3:
+        reasons.append("few concrete details")
+    return reasons
+
+
+def ai_share(body_html: str) -> tuple[int, list[dict]]:
+    """Estimated share of the text (by words) in passages that read as AI-like.
+
+    A passage counts when it shows at least two of: very even sentence
+    lengths, repeated stock phrases, and almost no names, numbers or quotes.
+    An estimate of how much of the writing has the patterns of generated text,
+    never a measure of who or what wrote it.
+    """
+    total, flagged, out = 0, 0, []
+    for text in _passages(body_html):
+        n = len(words(text))
+        reasons = _passage_reasons(text)
+        ai_like = len(reasons) >= 2
+        total += n
+        flagged += n if ai_like else 0
+        out.append({
+            "excerpt": text[:140].rsplit(" ", 1)[0] + "…" if len(text) > 140 else text,
+            "words": n,
+            "aiLike": ai_like,
+            "reasons": reasons,
+        })
+    return (round(100 * flagged / total) if total else 0), out

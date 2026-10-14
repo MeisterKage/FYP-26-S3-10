@@ -156,6 +156,10 @@ export function TermsPage() {
           Editors may send an article back, publish it, correct it, or retract it. Corrections and
           retractions are public and affect your accuracy rate. You can dispute a correction.
         </li>
+        <li>
+          AI-generated images are not allowed. You confirm each image you upload is not one, and
+          uploads are checked for the marks AI image tools leave in their files.
+        </li>
         <li>You keep the rights to your work and let the site publish and display it.</li>
       </ul>
 

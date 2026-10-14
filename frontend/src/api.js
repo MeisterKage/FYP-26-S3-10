@@ -108,6 +108,8 @@ export const api = {
   uploadImage: (file) => {
     const form = new FormData();
     form.append("file", file);
+    // The writer has confirmed the image is not AI-generated (see CoverImage).
+    form.append("declaration", "not-ai");
     return request("/images", { method: "POST", body: form }).then((d) => d.image);
   },
 

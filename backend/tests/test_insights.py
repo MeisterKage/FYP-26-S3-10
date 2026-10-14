@@ -133,3 +133,10 @@ def test_writing_signals_never_touch_the_score(client, world):
     client.get(f"/api/articles/{world['long'].id}/writing-signals",
                headers=auth(client, "editor@example.com"))
     assert read(client, "long")["credibility"]["score"] == before
+
+
+def test_the_ai_share_estimate_separates_generated_from_reported_text():
+    share, passages = insights.ai_share(GENERATED)
+    assert share >= 80 and all(p["aiLike"] for p in passages)
+    assert insights.ai_share(body_for(LONG))[0] <= 20
+    assert insights.writing_signals(GENERATED)["level"] == "many"
