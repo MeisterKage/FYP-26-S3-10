@@ -18,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from ..enums import AUTHORING_ROLES, ArticleStatus, Role, SubscriptionStatus
 from ..payment_service import SUBSCRIPTION_PRICE_CENTS
 from ..insights_service import in_brief
+from ..similar_service import similar_to
 from ..errors import ApiError
 from ..extensions import db
 from ..models import (
@@ -427,6 +428,12 @@ def read_article(slug: str):
     # "In brief" key points, with narration, for long articles. Not for a
     # reader who cannot open the article: the points are its own sentences.
     payload["inBrief"] = None if payload.get("paywalled") else in_brief(article)
+
+    # "More like this", shown after the article: the published articles closest
+    # in subject (app/similar.py).
+    payload["similar"] = [
+        serialize(a, include_body=False, viewer=viewer) for a in similar_to(article)
+    ]
 
     if viewer is None and article.status == ArticleStatus.PUBLISHED:
         response_cache.put(cache_key, copy.deepcopy(payload))

@@ -25,6 +25,7 @@ import { ArticleAudio } from "../components/ArticleAudio";
 import Corrections from "../components/Corrections";
 import { SourceList } from "../components/Sources";
 import { WriterCard } from "../components/WriterCard";
+import { SimilarArticles } from "../components/SimilarArticles";
 import ReportPanel from "../components/ReportPanel";
 import Discussion from "../components/Discussion";
 import { FlagIcon, SourceIcon } from "../components/Icon";
@@ -327,6 +328,8 @@ export default function ArticlePage() {
           </div>
         </aside>
       </div>
+
+      <SimilarArticles articles={article.similar} />
     </article>
   );
 }
