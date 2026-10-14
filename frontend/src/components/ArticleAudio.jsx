@@ -139,7 +139,7 @@ export function ArticleAudio({ title, brief, proseRef, bodyKey, voiceLang = "en-
             </button>
           )}
           <label className="listen-speed">
-            <span className="sr-only">Speed</span>
+            <span className="sr-only">{t("listen.speed")}</span>
             <select value={speech.rate} onChange={(e) => speech.setRate(Number(e.target.value))}
               aria-label={t("listen.speed")}>
               {SPEEDS.map((s) => <option key={s} value={s}>{s}×</option>)}

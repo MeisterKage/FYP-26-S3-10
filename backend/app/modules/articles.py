@@ -33,7 +33,9 @@ from ..source_service import rate_sources, serialize as serialize_source
 from ..models import Article, ArticleRevision, ArticleSource, Category, utcnow
 from ..sanitize import clean_article_body, clean_plain_text, preview_text
 from ..review_service import category_problem
-from ..translation_service import fresh as fresh_translation, note as translation_note, request_lang
+from ..translation_service import (
+    fresh as fresh_translation, note as translation_note, pending as translation_pending, request_lang,
+)
 from ..scoring_service import load_settings, rescore_article
 from ..security import login_required, roles_required
 from ..validation import json_body, require_int, require_list, require_str
@@ -268,7 +270,9 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
     lang = request_lang()
     translation = fresh_translation(article, lang) if lang != "en" else None
     if lang != "en":
-        payload["translation"] = translation_note(lang, translation)
+        # None yet: where the site translates articles itself, one is on its way.
+        preparing = translation is None and translation_pending(article, lang)
+        payload["translation"] = translation_note(lang, translation, preparing)
         if translation is not None:
             payload["title"] = translation.title
             payload["summary"] = translation.summary

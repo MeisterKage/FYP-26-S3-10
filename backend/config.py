@@ -71,11 +71,19 @@ class Config:
     WRITING_SIGNALS_PROVIDER = os.environ.get("WRITING_SIGNALS_PROVIDER", "stylometric")
     IN_BRIEF_MIN_WORDS = int(os.environ.get("IN_BRIEF_MIN_WORDS", "350"))
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-    SUMMARY_MODEL = os.environ.get("SUMMARY_MODEL", "claude-sonnet-5")
+    SUMMARY_MODEL = os.environ.get("SUMMARY_MODEL", "claude-sonnet-5-5")
     NARRATION_API_KEY = os.environ.get("NARRATION_API_KEY")
     NARRATION_VOICE = os.environ.get("NARRATION_VOICE")
     WRITING_SIGNALS_API_URL = os.environ.get("WRITING_SIGNALS_API_URL")
     WRITING_SIGNALS_API_KEY = os.environ.get("WRITING_SIGNALS_API_KEY")
+
+    # Where article translations come from (app/translation_service.py).
+    # "auto" translates new articles with Claude once ANTHROPIC_API_KEY is set,
+    # and otherwise serves only the translations already saved ("stored").
+    TRANSLATION_PROVIDER = os.environ.get("TRANSLATION_PROVIDER", "auto")
+    TRANSLATION_MODEL = os.environ.get("TRANSLATION_MODEL", "claude-sonnet-5-5")
+    # Translate in a background thread, so publishing never waits for it.
+    TRANSLATE_IN_BACKGROUND = True
 
     # How long a public page is remembered for signed-out visitors
     # (app/response_cache.py). 0 turns the cache off.
@@ -94,6 +102,10 @@ class TestConfig(Config):
     # would hide that. The cache has its own tests, which switch it on.
     RESPONSE_CACHE_SECONDS = 0
     ORIGINALITY_FETCH_SOURCES = False
+    # Never call a translation service from the tests; the translation tests
+    # supply their own and run the jobs themselves.
+    TRANSLATION_PROVIDER = "stored"
+    TRANSLATE_IN_BACKGROUND = False
     SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:")
     SQLALCHEMY_ENGINE_OPTIONS = {}
     # Off by default: the suite signs in repeatedly and would trip its own

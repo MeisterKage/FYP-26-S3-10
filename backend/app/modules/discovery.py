@@ -20,7 +20,8 @@ from ..payment_service import SUBSCRIPTION_PRICE_CENTS
 from ..insights_service import in_brief
 from ..similar_service import similar_to
 from ..translation_service import (
-    VOICE_LANG, fresh as fresh_translation, points as translation_points, request_lang,
+    VOICE_LANG, fresh as fresh_translation, note as translation_note, pending as translation_pending,
+    points as translation_points, request_lang,
 )
 from ..errors import ApiError
 from ..extensions import db
@@ -382,7 +383,8 @@ def read_article(slug: str):
     if viewer is None:
         cached = response_cache.cached_copy(cache_key)
         if cached is not None:
-            _count_view(cached["id"])
+            if not _already_counted():
+                _count_view(cached["id"])
             return jsonify({"article": cached})
 
     article = Article.query.options(*list_loads()).filter_by(slug=slug).first()
@@ -459,9 +461,31 @@ def read_article(slug: str):
 
     if viewer is None and article.status == ArticleStatus.PUBLISHED:
         response_cache.put(cache_key, copy.deepcopy(payload))
-    _count_view(article.id)
+    if not _already_counted():
+        _count_view(article.id)
 
     return jsonify({"article": payload})
+
+
+def _already_counted() -> bool:
+    """The page reloading itself (?seen=1, when its translation arrives) is not another view."""
+    return request.args.get("seen") == "1"
+
+
+@bp.get("/articles/<slug>/translation")
+def translation_status(slug: str):
+    """Whether the article is ready in the language asked for (?lang=zh).
+
+    The article page asks this while a translation is being made, and reloads
+    the article once it is ready.
+    """
+    lang = request_lang()
+    article = Article.query.filter_by(slug=slug, status=ArticleStatus.PUBLISHED).first()
+    if article is None:
+        raise ApiError("Article not found.", status=404)
+    translation = fresh_translation(article, lang)
+    preparing = translation is None and translation_pending(article, lang)
+    return jsonify({"translation": translation_note(lang, translation, preparing)})
 
 
 @bp.get("/scoring/formula")

@@ -150,6 +150,11 @@ def publish_article(
 
     breakdown = rescore_article(article)
 
+    # Into Mandarin and Malay, in the background once this is committed, where
+    # the site translates articles itself.
+    from .translation_service import translate_when_published
+    translate_when_published(article)
+
     if auto:
         title = "Your article was published automatically"
         body = (

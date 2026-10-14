@@ -11,12 +11,14 @@ import { api } from "../api";
 import { CredibilityInline } from "../components/Credibility";
 import { SearchIcon } from "../components/Icon";
 import { ArticleEntry, Button, Empty, EntrySkeleton, Notice } from "../components/UI";
+import { useI18n } from "../i18n";
 import { usePageTitle } from "../usePageTitle";
 
 export default function SearchPage() {
   const [params, setParams] = useSearchParams();
   const query = params.get("q") || "";
-  usePageTitle(query ? `Search: ${query}` : "Search");
+  const { t } = useI18n();
+  usePageTitle(query ? `${t("nav.search")}: ${query}` : t("nav.search"));
 
   const [draft, setDraft] = useState(query);
   const [result, setResult] = useState(null);
@@ -56,11 +58,11 @@ export default function SearchPage() {
 
   return (
     <div className="wide">
-      <h1 className="title">Search</h1>
+      <h1 className="title">{t("nav.search")}</h1>
 
       <form className="search-form mt-6" onSubmit={submit} role="search">
         <label className="sr-only" htmlFor="q">
-          Search articles by title, tag, or category
+          {t("search.label")}
         </label>
         <span className="search-icon" aria-hidden="true">
           <SearchIcon size={18} />
@@ -71,19 +73,15 @@ export default function SearchPage() {
           className="input search-input"
           type="search"
           value={draft}
-          placeholder="Title, tag, or category"
+          placeholder={t("search.placeholder")}
           onChange={(e) => setDraft(e.target.value)}
         />
         <Button variant="primary" type="submit" busy={busy}>
-          Search
+          {t("nav.search")}
         </Button>
       </form>
 
-      <p className="meta mt-4">
-        Keyword matching only. There is no semantic search and no personalised
-        ranking.
-        Results are ordered by credibility, then recency.
-      </p>
+      <p className="meta mt-4">{t("search.how")}</p>
 
       <div className="mt-7">
         {error && <Notice>{error}</Notice>}
@@ -91,16 +89,15 @@ export default function SearchPage() {
         {busy && !result && <EntrySkeleton rows={3} />}
 
         {result && result.articles.length === 0 && (
-          <Empty title="No results found">
-            Nothing matched &ldquo;{result.query}&rdquo;. Try a broader word, or a
-            category name.
-          </Empty>
+          <Empty title={t("search.none")}>{t("search.noneText", { q: result.query })}</Empty>
         )}
 
         {result && result.articles.length > 0 && (
           <>
             <p className="label">
-              {result.articles.length} result{result.articles.length === 1 ? "" : "s"}
+              {result.articles.length === 1
+                ? t("search.countOne")
+                : t("search.count", { n: result.articles.length })}
             </p>
             <div className="stack mt-5">
               {result.articles.map((article) => (
@@ -115,9 +112,7 @@ export default function SearchPage() {
         )}
 
         {!query && !busy && (
-          <Empty title="What are you looking for?">
-            Search matches article titles, their tags, and category names.
-          </Empty>
+          <Empty title={t("search.prompt")}>{t("search.promptText")}</Empty>
         )}
       </div>
     </div>

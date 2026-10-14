@@ -135,6 +135,30 @@ export default function ArticlePage() {
     };
   }, [slug]);
 
+  // A translation still being made: check now and then, and swap it in when it
+  // is ready. The reload is not counted as another view (?seen=1).
+  const preparing = Boolean(article?.translation?.preparing);
+  useEffect(() => {
+    if (!preparing) return undefined;
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      if (tries > 12) {
+        clearInterval(timer);
+        return;
+      }
+      api
+        .get(`/articles/${slug}/translation`)
+        .then((data) => {
+          if (!data.translation?.available) return undefined;
+          clearInterval(timer);
+          return api.get(`/articles/${slug}?seen=1`).then((fresh) => setArticle(fresh.article));
+        })
+        .catch(() => {});
+    }, 15000);
+    return () => clearInterval(timer);
+  }, [preparing, slug]);
+
   if (error) {
     return (
       <Empty

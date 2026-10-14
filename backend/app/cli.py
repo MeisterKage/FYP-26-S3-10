@@ -160,6 +160,42 @@ def register_cli(app) -> None:
         for article_id, reasons in result["held"].items():
             click.echo(f"  held {article_id}: {'; '.join(reasons)}")
 
+    @app.cli.command("translate-articles")
+    @click.option("--lang", "langs", multiple=True, help="Only this language (zh or ms). Repeatable.")
+    @click.option("--limit", default=0, help="Stop after this many translations (0: no limit).")
+    def translate_articles(langs, limit):
+        """Translate published articles that have no current translation.
+
+        For articles published before automatic translation was switched on.
+        New ones are translated as they are published.
+        """
+        from .enums import ArticleStatus
+        from .extensions import db
+        from .models import Article
+        from .translation_service import LANGS, automatic, fresh, translate_now
+
+        if not automatic():
+            click.echo("Automatic translation is off: set ANTHROPIC_API_KEY first.")
+            return
+        wanted = [lang for lang in (langs or LANGS) if lang in LANGS and lang != "en"]
+        done = failed = 0
+        for article in Article.query.filter_by(status=ArticleStatus.PUBLISHED).order_by(Article.id):
+            for lang in wanted:
+                if fresh(article, lang) is not None:
+                    continue
+                if limit and done >= limit:
+                    break
+                try:
+                    translate_now(article, lang)
+                    db.session.commit()
+                    done += 1
+                    click.echo(f"  {lang} {article.id} {article.title[:60]}")
+                except Exception as exc:  # noqa: BLE001 - report it and carry on with the rest
+                    db.session.rollback()
+                    failed += 1
+                    click.echo(f"  failed {lang} {article.id}: {exc}")
+        click.echo(f"Translated {done}, failed {failed}.")
+
     @app.cli.command("create-admin")
     @click.argument("email")
     @click.argument("password")

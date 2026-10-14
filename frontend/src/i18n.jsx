@@ -23,6 +23,11 @@ const STORE = "wn.lang";
 
 const en = {
   "lang.label": "Language",
+  "search.label": "Search articles by title, tag, or category", "search.placeholder": "Title, tag, or category",
+  "search.how": "Keyword matching only. There is no semantic search and no personalised ranking. Results are ordered by credibility, then recency.",
+  "search.none": "No results found", "search.noneText": "Nothing matched “{q}”. Try a broader word, or a category name.",
+  "search.count": "{n} results", "search.countOne": "1 result",
+  "search.prompt": "What are you looking for?", "search.promptText": "Search matches article titles, their tags, and category names.",
   "nav.browse": "Browse", "nav.search": "Search", "nav.pricing": "Pricing", "nav.signIn": "Sign in",
   "nav.createAccount": "Create account", "nav.yourWriting": "Your writing",
   "nav.reviewQueue": "Review queue", "nav.flagged": "Flagged", "nav.admin": "Administration",
@@ -107,6 +112,11 @@ const en = {
 
 const zh = {
   "lang.label": "语言",
+  "search.label": "按标题、标签或栏目搜索文章", "search.placeholder": "标题、标签或栏目",
+  "search.how": "仅按关键词匹配，没有语义搜索，也没有个性化排序。结果按可信度排序，其次按发布时间。搜索使用文章的英文原文。",
+  "search.none": "没有找到结果", "search.noneText": "没有与“{q}”匹配的内容。请尝试更宽泛的词语或栏目名称。",
+  "search.count": "{n} 条结果", "search.countOne": "1 条结果",
+  "search.prompt": "您想找什么？", "search.promptText": "搜索会匹配文章标题、标签和栏目名称。",
   "nav.browse": "浏览", "nav.search": "搜索", "nav.pricing": "订阅价格", "nav.signIn": "登录",
   "nav.createAccount": "注册账户", "nav.yourWriting": "我的文章", "nav.reviewQueue": "审稿队列",
   "nav.flagged": "被举报内容", "nav.admin": "管理",
@@ -177,6 +187,11 @@ const zh = {
 
 const ms = {
   "lang.label": "Bahasa",
+  "search.label": "Cari artikel mengikut tajuk, tag atau kategori", "search.placeholder": "Tajuk, tag atau kategori",
+  "search.how": "Padanan kata kunci sahaja. Tiada carian semantik dan tiada susunan peribadi. Hasil disusun mengikut kredibiliti, kemudian yang terkini. Carian menggunakan teks asal bahasa Inggeris.",
+  "search.none": "Tiada hasil ditemui", "search.noneText": "Tiada yang sepadan dengan “{q}”. Cuba perkataan yang lebih umum, atau nama kategori.",
+  "search.count": "{n} hasil", "search.countOne": "1 hasil",
+  "search.prompt": "Apa yang anda cari?", "search.promptText": "Carian memadankan tajuk artikel, tag dan nama kategori.",
   "nav.browse": "Layari", "nav.search": "Cari", "nav.pricing": "Harga", "nav.signIn": "Log masuk",
   "nav.createAccount": "Daftar akaun", "nav.yourWriting": "Tulisan anda", "nav.reviewQueue": "Barisan semakan",
   "nav.flagged": "Dilaporkan", "nav.admin": "Pentadbiran",
