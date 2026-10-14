@@ -1365,8 +1365,8 @@
    for matched text elsewhere. */
 
 .brief {
-  margin-block: var(--s-6);
-  padding-block: var(--s-4) var(--s-5);
+  margin-block: var(--s-6) var(--s-7);
+  padding-block: var(--s-5);
   border-top: 2px solid var(--ink);
   border-bottom: 1px solid var(--hair);
   max-width: var(--w-article, var(--w-read));
@@ -2214,10 +2214,11 @@
   outline-offset: 4px;
 }
 .listen + .timeline {
-  margin-top: var(--s-3);
+  margin-top: var(--s-4);
 }
+/* Clear air between the audio line and the summary below it. */
 .timeline + .brief {
-  margin-top: var(--s-5);
+  margin-top: var(--s-7);
 }
 
 /* --- more like this -------------------------------------------------------- */

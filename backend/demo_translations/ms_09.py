@@ -112,6 +112,10 @@ T = {
             "Pakar pengangkutan berkata susunan serupa mungkin diperlukan di seluruh Jepun, di mana bilangan pemandu bas juga semakin berkurangan. Kerajaan pusat telah menawarkan sokongan kepada wilayah yang menyelaraskan perancangan pengangkutan mereka.",
             "Wilayah-wilayah itu akan mengkaji semula susunan tersebut selepas dua tahun.",
         ],
-        "points": [],
+        "points": [
+            "Beberapa wilayah di barat Jepun telah bersetuju mengumpul dana untuk memastikan laluan bas luar bandar terus beroperasi, ketika pengendali swasta mengurangkan perkhidmatan di kawasan yang penduduknya semakin tua dan berkurangan.",
+            "Banyak laluan bas luar bandar di Jepun mengalami kerugian, dan pengendali telah mengurangkan atau menamatkan perkhidmatan apabila bilangan penumpang menurun.",
+            "Pegawai berkata ini akan mengurangkan kos bagi laluan yang basnya sering bergerak hampir kosong.",
+        ],
     },
 }

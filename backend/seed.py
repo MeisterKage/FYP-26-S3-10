@@ -540,7 +540,8 @@ def seed_expansion() -> None:
 
 def translation_problems(article, tr: dict) -> list[str]:
     """Why a stored translation does not line up with its English, if it does not."""
-    from app.insights import key_points, paragraphs, word_count
+    from app.insights import paragraphs
+    from app.translation_service import english_points
 
     english = paragraphs(article.body)
     problems = []
@@ -550,7 +551,7 @@ def translation_problems(article, tr: dict) -> list[str]:
         for i, (para, mine) in enumerate(zip(english, tr["paragraphs"])):
             if para.heading != mine.startswith("## "):
                 problems.append(f"paragraph {i + 1}: subheading in one language only")
-    wanted = len(key_points(article.body)) if word_count(article.body) >= 350 else 0
+    wanted = len(english_points(article))
     if len(tr.get("points") or []) != wanted:
         problems.append(f"{len(tr.get('points') or [])} key points for {wanted} in English")
     return problems

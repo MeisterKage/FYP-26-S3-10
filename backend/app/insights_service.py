@@ -129,7 +129,7 @@ def summariser() -> Summariser:
     if name == "extractive":
         return ExtractiveSummariser()
     if name == "claude":
-        return ClaudeSummariser(cfg.get("ANTHROPIC_API_KEY"), cfg.get("SUMMARY_MODEL", "claude-sonnet-5"))
+        return ClaudeSummariser(cfg.get("ANTHROPIC_API_KEY"), cfg.get("SUMMARY_MODEL", "claude-sonnet-5-5"))
     raise ProviderNotConfigured(f"Unknown summary provider '{name}'.")
 
 
@@ -277,13 +277,13 @@ def signals_provider() -> SignalsProvider:
 def in_brief(article: Article) -> dict | None:
     """The summary block for the article page, or None if it gets none.
 
-    None for short articles (nothing to summarise) and for republished ones:
+    Every article gets one, short ones included, except republished articles:
     their licence (CC BY-ND) forbids adaptations, and a summary is one.
     """
     if article.republication:
         return None
     count = insights.word_count(article.body)
-    if count < current_app.config.get("IN_BRIEF_MIN_WORDS", 350):
+    if count < current_app.config.get("IN_BRIEF_MIN_WORDS", 0):
         return None
     try:
         s = summariser()

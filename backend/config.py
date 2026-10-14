@@ -69,7 +69,8 @@ class Config:
     SUMMARY_PROVIDER = os.environ.get("SUMMARY_PROVIDER", "extractive")
     NARRATION_PROVIDER = os.environ.get("NARRATION_PROVIDER", "browser")
     WRITING_SIGNALS_PROVIDER = os.environ.get("WRITING_SIGNALS_PROVIDER", "stylometric")
-    IN_BRIEF_MIN_WORDS = int(os.environ.get("IN_BRIEF_MIN_WORDS", "350"))
+    # Every article gets an In brief summary; raise this to keep it off short ones.
+    IN_BRIEF_MIN_WORDS = int(os.environ.get("IN_BRIEF_MIN_WORDS", "0"))
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
     SUMMARY_MODEL = os.environ.get("SUMMARY_MODEL", "claude-sonnet-5-5")
     NARRATION_API_KEY = os.environ.get("NARRATION_API_KEY")

@@ -96,8 +96,11 @@ def test_a_long_article_gets_in_brief_with_narration(client, world):
     assert brief["narration"]["text"].startswith("Long. In brief. " + brief["points"][0])
 
 
-def test_short_and_republished_articles_get_none(client, world):
-    assert read(client, "short")["inBrief"] is None
+def test_a_short_article_gets_a_summary_too(client, world):
+    assert read(client, "short")["inBrief"]["points"] == ["One short paragraph."]
+
+
+def test_republished_articles_get_none(client, world):
     world["long"].republication = json.dumps({"publisher": "X", "authors": ["A"], "url": "https://x.org/1"})
     _db.session.commit()
     assert read(client, "long")["inBrief"] is None

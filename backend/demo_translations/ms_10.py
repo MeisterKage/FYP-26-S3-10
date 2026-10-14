@@ -17,7 +17,11 @@ T = {
             "Permintaan bagi cip terkenal sebagai bersifat kitaran, dan ahli ekonomi memberi amaran bahawa kelembapan dalam ekonomi terbesar dunia boleh membalikkan pemulihan itu dengan cepat. Syarikat juga memerhatikan peraturan perdagangan antara kuasa-kuasa besar, yang boleh mengalihkan tempahan dari satu negara ke negara lain hampir dalam sekelip mata.",
             "Buat masa ini, suasana di taman-taman perindustrian adalah optimis. Kumpulan industri menjangkakan eksport barangan elektrik dan elektronik akan terus meningkat sepanjang baki tahun ini.",
         ],
-        "points": [],
+        "points": [
+            "Kilang pemasangan dan pengujian semikonduktor di utara Malaysia sedang meluaskan barisan pengeluaran dan merekrut juruteknik, apabila tempahan daripada syarikat reka bentuk cip pulih selepas dua tahun permintaan yang lemah bagi elektronik pengguna.",
+            "Kumpulan industri berkata beberapa kilang di Pulau Pinang dan Kedah telah membuka semula barisan pengeluaran yang terhenti tahun lalu, dan sekurang-kurangnya tiga syarikat telah mengumumkan kemudahan baharu yang akan dibuka dalam tempoh lapan belas bulan.",
+            "Kumpulan industri menjangkakan eksport barangan elektrik dan elektronik akan terus meningkat sepanjang baki tahun ini.",
+        ],
     },
     "Malaysia widens protection for peat swamp forests in Borneo": {
         "title": "Malaysia meluaskan perlindungan hutan paya gambut di Borneo",
@@ -36,7 +40,11 @@ T = {
             "## Langkah seterusnya",
             "Jabatan perhutanan negeri akan menerbitkan pelan pengurusan bagi setiap rizab tahun depan, selepas berunding dengan komuniti berdekatan dan penyelidik. Pemantau jerebu serantau berkata ujian sebenar akan tiba pada musim kemarau teruk yang akan datang.",
         ],
-        "points": [],
+        "points": [
+            "Pihak berkuasa di Sarawak telah menambah beberapa kawasan hutan paya gambut ke dalam rizab yang dilindungi negeri itu, satu langkah yang menurut kumpulan pemuliharaan akan membantu mencegah kebakaran yang menghantar jerebu ke seluruh rantau pada tahun-tahun kering.",
+            "Hutan paya gambut tumbuh di atas lapisan tebal bahan tumbuhan yang tepu air yang telah terkumpul selama beribu-ribu tahun.",
+            "Rizab baharu itu disertakan dengan peraturan mengenai terusan saliran: terusan sedia ada berhampiran sempadan mesti disekat atau dipasang pintu air supaya paras air kekal tinggi sepanjang musim kemarau.",
+        ],
     },
     "Kuala Lumpur prepares to host a regional badminton championship": {
         "title": "Kuala Lumpur bersiap sedia menjadi tuan rumah kejohanan badminton serantau",
@@ -54,7 +62,11 @@ T = {
             "## Perjalanan dan tiket",
             "Penganjur menggesa penonton menggunakan laluan rel yang berhenti berhampiran arena, kerana tempat letak kereta adalah terhad. Tiket untuk pusingan awal masih ada, dan perlawanan akan disiarkan di televisyen percuma.",
         ],
-        "points": [],
+        "points": [
+            "Kuala Lumpur akan menjadi tuan rumah kejohanan badminton serantau bulan depan, dengan pemain dari seluruh Asia Tenggara bertanding selama enam hari dalam minggu yang dijangka penganjur menjadi minggu sukan dalam dewan paling sibuk di bandar raya itu tahun ini.",
+            "Pemain Malaysia telah memenangi gelaran serantau dan dunia sejak berdekad-dekad, dan pasukan kebangsaan mempunyai skuad muda yang dipercayai jurulatih mampu bersaing untuk pingat.",
+            "Arena itu telah memasang lampu baharu yang direka khas untuk badminton, yang memerlukan cahaya sekata tanpa silau tinggi di atas gelanggang supaya pemain dapat mengikuti bulu tangkis yang bergerak dengan sangat laju.",
+        ],
     },
     "Penang councillors approve a public transit corridor plan for the island": {
         "title": "Ahli majlis Pulau Pinang meluluskan pelan koridor pengangkutan awam untuk pulau itu",
@@ -73,6 +85,10 @@ T = {
             "## Persoalan pembiayaan",
             "Kos membina rel ringan kekal sebagai halangan terbesar, dan negeri itu memerlukan sokongan persekutuan. Ahli majlis berkata kelulusan koridor itu bertujuan menunjukkan bahawa negeri itu sudah bersedia jika pembiayaan tersedia.",
         ],
-        "points": [],
+        "points": [
+            "Ahli majlis di Pulau Pinang telah meluluskan pelan yang merizabkan satu koridor merentasi pulau itu untuk rel ringan dan lorong bas khas pada masa depan, selepas bertahun-tahun perdebatan tentang cara meredakan antara kesesakan lalu lintas paling teruk di Malaysia.",
+            "Pelan itu tidak membiayai pembinaan, tetapi ia melindungi tanah yang diperlukan oleh laluan transit itu dan menetapkan peraturan bagi pembangunan di sepanjangnya, supaya perumahan dan pejabat baharu dibina berhampiran stesen masa depan dan bukannya di tempat yang hanya boleh dikunjungi dengan kereta.",
+            "Sementara itu, pelan itu mencadangkan lorong bas khas di sepanjang sebahagian koridor dalam tempoh dua tahun, yang akan membolehkan perkhidmatan bas lebih pantas dan lebih boleh diharap jauh sebelum mana-mana laluan rel dibina.",
+        ],
     },
 }

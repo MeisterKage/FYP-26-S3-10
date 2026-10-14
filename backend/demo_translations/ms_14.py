@@ -80,6 +80,10 @@ T = {
             "## Langkah seterusnya",
             "Rundingan itu akan berjalan selama lapan minggu. Kerajaan berkata ia akan menerbitkan ringkasan maklum balas dan cadangan muktamadnya pada awal tahun depan.",
         ],
-        "points": [],
+        "points": [
+            "Singapura telah membuka rundingan awam mengenai perlindungan baharu untuk penghantar makanan dan pekerja platform lain, meliputi insurans kemalangan, waktu rehat dan proses bagi penghantar mencabar keputusan yang dibuat oleh aplikasi penghantaran.",
+            "Di bawah cadangan itu, platform perlu menyediakan insurans kemalangan yang melindungi penghantar semasa mereka bekerja, dan penghantar boleh meminta semakan oleh manusia apabila aplikasi menggantung akaun mereka atau menahan bayaran.",
+            "Kumpulan keselamatan jalan raya menegaskan bahawa penghantar makanan berdepan tekanan untuk menyiapkan pesanan dengan cepat, dan bertanya sama ada aplikasi patut diwajibkan menunjukkan bahawa anggaran masa penghantaran mereka realistik.",
+        ],
     },
 }

@@ -15,7 +15,11 @@ T = {
             "## Langkah seterusnya",
             "Majlis akan menulis kepada menteri pengangkutan negeri untuk memohon dana bagi percubaan selama dua belas bulan. Jika diluluskan, perkhidmatan itu boleh bermula awal tahun depan, dengan bilangan penumpang dilaporkan kepada majlis setiap suku tahun.",
         ],
-        "points": [],
+        "points": [
+            "Ahli majlis Wollongong telah mengundi untuk menyokong percubaan perkhidmatan bas lewat malam di dua laluan yang menghubungkan pusat bandar dengan pinggir bandar utara dan Dapto, dan akan meminta kerajaan negeri membiayainya.",
+            "Percubaan itu akan menjalankan bas sehingga selepas tengah malam pada malam Khamis, Jumaat dan Sabtu, sedangkan perkhidmatan terakhir kini meninggalkan pusat bandar jauh sebelum banyak restoran dan bar ditutup.",
+            "Perniagaan hospitaliti menyokong cadangan itu, dengan berkata pengangkutan lewat malam akan membantu mereka mengambil pekerja dan menggalakkan orang ramai berada lebih lama di pusat bandar.",
+        ],
     },
     "Chinese electric car makers expand battery swap station networks": {
         "title": "Pengeluar kereta elektrik China meluaskan rangkaian stesen tukar bateri",
@@ -34,7 +38,11 @@ T = {
             "## Piawaian",
             "Kumpulan industri sedang mengusahakan piawaian bersama bagi pek bateri, yang akan membolehkan stesen melayan kereta daripada lebih daripada satu pengeluar. Penganalisis berkata persetujuan tentang piawaian akan menentukan sama ada penukaran bateri kekal sebagai kaedah khusus atau menjadi cara biasa untuk mengisi tenaga.",
         ],
-        "points": [],
+        "points": [
+            "Beberapa pengeluar kereta elektrik China sedang meluaskan rangkaian stesen tukar bateri, di mana pemandu boleh menukar bateri yang kehabisan cas dengan bateri yang dicas penuh dalam beberapa minit tanpa perlu menunggu mengecas.",
+            "Pemandu memasuki stesen dan sebuah mesin di bawah kereta menanggalkan pek bateri lalu memasang bateri yang telah dicas, biasanya dalam masa kurang daripada lima minit.",
+            "Kumpulan industri sedang mengusahakan piawaian bersama bagi pek bateri, yang akan membolehkan stesen melayan kereta daripada lebih daripada satu pengeluar.",
+        ],
     },
     "Chinese city trials sponge park design to absorb summer floods": {
         "title": "Bandar di China mencuba reka bentuk taman span untuk menyerap banjir musim panas",
@@ -53,7 +61,11 @@ T = {
             "## Langkah seterusnya",
             "Bandar itu merancang untuk mengubah lebih banyak kawasan sekolah, tempat letak kereta dan bahu jalan dalam tempoh lima tahun akan datang serta menerbitkan data hujan dan banjir supaya hasilnya dapat dibandingkan dengan bandar lain.",
         ],
-        "points": [],
+        "points": [
+            "Sebuah bandar di selatan China telah membuka taman span terbaharu daripada beberapa buah taman yang direka untuk menyerap hujan lebat musim panas dan melepaskannya secara perlahan, sebagai sebahagian daripada usaha mengurangkan banjir kilat di kawasan kejiranan yang padat.",
+            "Taman-taman itu menggabungkan tanah lembap, kolam dan lekukan bertanam yang dipenuhi air semasa ribut, dan disambungkan ke jalan yang diturap dengan bahan yang membolehkan air meresap ke dalam tanah dan bukannya mengalir ke longkang yang melimpah.",
+            "Bandar itu merancang untuk mengubah lebih banyak kawasan sekolah, tempat letak kereta dan bahu jalan dalam tempoh lima tahun akan datang serta menerbitkan data hujan dan banjir supaya hasilnya dapat dibandingkan dengan bandar lain.",
+        ],
     },
     "Shanghai clinics extend evening hours to ease hospital queues": {
         "title": "Klinik di Shanghai melanjutkan waktu operasi petang untuk mengurangkan barisan hospital",
@@ -71,6 +83,10 @@ T = {
             "## Kakitangan",
             "Waktu operasi yang lebih panjang memerlukan lebih ramai kakitangan, dan sesetengah doktor menyuarakan kebimbangan tentang beban kerja. Pihak berkuasa kesihatan daerah berkata mereka sedang mengambil lebih ramai doktor am dan akan mengkaji semula skim itu selepas setahun.",
         ],
-        "points": [],
+        "points": [
+            "Pusat kesihatan komuniti di beberapa daerah di Shanghai telah mula dibuka hingga waktu petang dan pada hujung minggu, dalam usaha menarik pesakit dengan penyakit ringan menjauhi jabatan pesakit luar hospital yang sesak.",
+            "Pengurus klinik berkata ramai pesakit dalam usia bekerja tidak dapat datang pada waktu pejabat dan akhirnya pergi ke jabatan kecemasan hospital pada waktu malam.",
+            "Klinik-klinik itu boleh menempah temu janji pakar hospital secara terus untuk pesakit apabila perlu, dan berkongsi rekod dengan hospital daerah.",
+        ],
     },
 }

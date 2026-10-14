@@ -107,7 +107,7 @@ def key_points(body_html: str, limit: int | None = None) -> list[str]:
 
     total = sum(len(words(s)) for _, _, s in candidates)
     if limit is None:
-        limit = 3 if total < 600 else 4
+        limit = 2 if total < 150 else 3 if total < 600 else 4
 
     freq: dict[str, int] = {}
     for _, _, s in candidates:
@@ -129,6 +129,10 @@ def key_points(body_html: str, limit: int | None = None) -> list[str]:
         if pi == 0:
             score *= 1.6 if pos == 0 else 1.25
         scored.append((score, pos, s, terms))
+    if not scored:
+        # Nothing passes the filters (a very short piece, or one made of
+        # quotes): its opening sentences still say what it is about.
+        return [s for _, _, s in candidates[:limit]]
 
     chosen: list[tuple[int, str, set[str]]] = []
     for score, pos, s, terms in sorted(scored, key=lambda x: -x[0]):

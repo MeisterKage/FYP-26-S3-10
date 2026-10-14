@@ -16,7 +16,11 @@ T = {
             "## Berhati-hati",
             "Penyelidik pertanian mengalu-alukan alat-alat itu tetapi memberi amaran bahawa nasihat automatik boleh salah, terutamanya untuk mengenal pasti perosak daripada gambar, dan menyeru supaya aplikasi diuji berbanding nasihat pegawai pertanian tempatan.",
         ],
-        "points": [],
+        "points": [
+            "Semakin banyak syarikat pemula di Bengaluru membina alat telefon untuk petani kecil, menawarkan amaran cuaca, nasihat tentang perosak dan baja, serta harga terkini di pasar berdekatan, dalam bahasa tempatan dan selalunya melalui suara.",
+            "Banyak alat itu berfungsi melalui mesej suara atau menu ringkas dan bukannya teks, supaya petani yang kurang selesa membaca juga boleh menggunakannya.",
+            "Seorang petani yang menanam tomato berhampiran Kolar berkata amaran harga telah mengubah cara dia menjual hasil tanamannya.",
+        ],
     },
     "Kerala expands home visits for elderly patients with chronic illness": {
         "title": "Kerala meluaskan lawatan ke rumah bagi pesakit warga emas yang menghidap penyakit kronik",
@@ -35,7 +39,11 @@ T = {
             "## Perluasan",
             "Perluasan itu akan membawa program tersebut ke lebih banyak daerah dalam tempoh dua tahun akan datang. Pegawai berkata merekrut jururawat yang mencukupi akan menjadi cabaran utama, kerana ramai jururawat terlatih meninggalkan negeri itu untuk pekerjaan bergaji lebih tinggi di tempat lain.",
         ],
-        "points": [],
+        "points": [
+            "Pihak berkuasa kesihatan di Kerala sedang meluaskan program lawatan ke rumah bagi warga emas yang menghidap penyakit kronik, menghantar jururawat dan sukarelawan terlatih untuk memeriksa tekanan darah, gula dalam darah dan ubat-ubatan pesakit yang sukar bergerak.",
+            "Program itu berasaskan tradisi panjang Kerala dalam pekerja kesihatan komuniti dan kerajaan tempatan, dengan majlis kampung membantu mengenal pasti pesakit dan merekrut sukarelawan.",
+            "Pegawai kesihatan berkata pesakit dalam program itu kurang dimasukkan ke wad kecemasan akibat komplikasi diabetes dan tekanan darah tinggi, walaupun penilaian bebas masih sedang dijalankan.",
+        ],
     },
     "Mumbai marathon adds a wheelchair race to its programme": {
         "title": "Maraton Mumbai menambah perlumbaan kerusi roda dalam programnya",
@@ -54,6 +62,10 @@ T = {
             "## Melihat ke hadapan",
             "Penganjur berkata mereka berharap perlumbaan bandar lain akan menyusul, dan acara itu akan berkembang menjadi maraton kerusi roda penuh dalam beberapa tahun.",
         ],
-        "points": [],
+        "points": [
+            "Penganjur sebuah maraton bandar di Mumbai telah menambah perlumbaan kerusi roda dalam program tahun depan, selepas kempen oleh kumpulan orang kurang upaya dan atlet yang berkata perlumbaan jalan raya di India telah terlalu lama meminggirkan mereka.",
+            "Perlumbaan itu akan mengikuti sebahagian laluan separuh maraton, dengan masa mula yang berasingan supaya atlet berkerusi roda lumba dapat bertanding dengan selamat sebelum peserta utama bermula.",
+            "Kerusi roda lumba mahal, dan kumpulan orang kurang upaya telah menubuhkan dana untuk meminjamkan kerusi kepada atlet baharu.",
+        ],
     },
 }

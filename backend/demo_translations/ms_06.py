@@ -81,6 +81,10 @@ T = {
             "## Terbuka untuk diteliti",
             "Majlis-majlis itu telah menerbitkan pengiraan penuh dan akan melaporkan kemajuan setiap tahun. Majlis lain telah meminta untuk melihat kaedah itu, dan lima majlis tersebut berkata mereka akan berkongsinya secara percuma.",
         ],
-        "points": [],
+        "points": [
+            "Lima majlis tempatan Scotland telah menerbitkan belanjawan iklim bersama, yang memperincikan sejauh mana perbelanjaan setiap jabatan dijangka menambah atau mengurangkan pelepasan gas rumah hijau, dalam apa yang mereka sifatkan sebagai percubaan pertama untuk meletakkan karbon seiring dengan kos dalam keputusan majlis.",
+            "Belanjawan itu meliputi pengangkutan, perumahan, sisa dan bangunan milik majlis sendiri, serta menetapkan had karbon bagi setiap bidang untuk lima tahun akan datang.",
+            "Majlis-majlis itu berkata belanjawan itu telah pun mengubah beberapa keputusan, termasuk pilihan untuk mengubah suai sebuah sekolah lama dan bukannya merobohkan dan membinanya semula, serta membeli lori sampah elektrik apabila armada sedia ada diganti.",
+        ],
     },
 }
