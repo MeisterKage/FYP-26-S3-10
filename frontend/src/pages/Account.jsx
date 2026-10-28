@@ -43,6 +43,8 @@ function Profile({ onNotice }) {
   const [form, setForm] = useState({ displayName: "", bio: "" });
   const [categories, setCategories] = useState([]);
   const [selected, setSelected] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [selectedCountries, setSelectedCountries] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
@@ -50,10 +52,16 @@ function Profile({ onNotice }) {
     setForm({ displayName: user?.displayName || "", bio: user?.bio || "" });
     // Tick the sections already chosen, so a save visibly sticks.
     setSelected(user?.categoryIds || []);
+    setSelectedCountries(user?.countryCodes || []);
     api
       .get("/categories")
-      .then((d) => setCategories(d.categories || []))
+      // Uncategorised only holds articles whose section was deleted: not a topic.
+      .then((d) => setCategories((d.categories || []).filter((c) => c.slug !== "uncategorised")))
       .catch(() => setCategories([]));
+    api
+      .get("/countries")
+      .then((d) => setCountries(d.countries || []))
+      .catch(() => setCountries([]));
   }, [user]);
 
   async function save(event) {
@@ -61,7 +69,7 @@ function Profile({ onNotice }) {
     setBusy(true);
     setError(null);
     try {
-      await api.patch("/me", { ...form, categoryIds: selected });
+      await api.patch("/me", { ...form, categoryIds: selected, countryCodes: selectedCountries });
       onNotice("Profile saved. Your personalised feed reflects it immediately.");
       refresh?.();
     } catch (e) {
@@ -106,7 +114,7 @@ function Profile({ onNotice }) {
       <fieldset className="fieldset profile-side">
         <legend className="field-label">Sections you follow</legend>
         <p className="field-hint">
-          These shape your front page. Leaving them empty falls back to trending.
+          These shape your front page, with the countries below. Leaving both empty falls back to trending.
         </p>
         <div className="checkbox-grid mt-4">
           {categories.map((c) => (
@@ -117,6 +125,28 @@ function Profile({ onNotice }) {
                 onChange={() =>
                   setSelected((s) =>
                     s.includes(c.id) ? s.filter((x) => x !== c.id) : [...s, c.id],
+                  )
+                }
+              />
+              <span>{c.name}</span>
+            </label>
+          ))}
+        </div>
+
+        <p className="field-label mt-6">Countries you follow</p>
+        <p className="field-hint">
+          Their news joins your front page too. You can also follow a country
+          from its page.
+        </p>
+        <div className="checkbox-grid mt-4">
+          {countries.map((c) => (
+            <label className="checkbox" key={c.code}>
+              <input
+                type="checkbox"
+                checked={selectedCountries.includes(c.code)}
+                onChange={() =>
+                  setSelectedCountries((s) =>
+                    s.includes(c.code) ? s.filter((x) => x !== c.code) : [...s, c.code],
                   )
                 }
               />

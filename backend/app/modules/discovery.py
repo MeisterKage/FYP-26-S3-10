@@ -27,7 +27,7 @@ from ..errors import ApiError
 from ..extensions import db
 from ..models import (
     Article, ArticleDailyView, Category, Correction, Follow, Like, SavedArticle, User,
-    UserCategoryPreference, utcnow,
+    UserCategoryPreference, UserCountryPreference, utcnow,
 )
 from ..countries import COUNTRIES, DEFAULT_COUNTRY, codes_matching
 from ..credibility import DEFAULTS, credibility_score
@@ -129,8 +129,8 @@ def trending():
 def personalised():
     """PDD Figure 5.16.
 
-    Two rows: articles matching stated interests, and articles from followed
-    contributors. A signed-out or preference-less user gets trending instead of an
+    Two rows: articles in the sections or countries the reader follows, and
+    articles from followed contributors. A signed-out or preference-less user gets trending instead of an
     empty page, which the figure requires explicitly.
     """
     user = current_user()
@@ -140,16 +140,20 @@ def personalised():
     interest_ids = [
         p.category_id for p in UserCategoryPreference.query.filter_by(user_id=user.id)
     ]
+    country_codes = [
+        p.country_code for p in UserCountryPreference.query.filter_by(user_id=user.id)
+    ]
     followed_ids = [
         f.contributor_id for f in Follow.query.filter_by(follower_id=user.id)
     ]
 
-    if not interest_ids and not followed_ids:
+    if not interest_ids and not country_codes and not followed_ids:
         return trending()
 
     by_interest = (
         _published()
-        .filter(Article.category_id.in_(interest_ids or [-1]))
+        .filter(or_(Article.category_id.in_(interest_ids or [-1]),
+                    Article.country_code.in_(country_codes or ["--"])))
         .order_by(Article.published_at.desc())
         .limit(PAGE_SIZE)
         .all()

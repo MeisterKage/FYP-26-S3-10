@@ -12,6 +12,7 @@ import { api } from "../api";
 import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
+import { FollowButton } from "../components/FollowButton";
 import { usePageTitle } from "../usePageTitle";
 import { useI18n } from "../i18n";
 
@@ -68,6 +69,7 @@ export default function CategoryPage() {
         </div>
 
         <div className="row gap-4">
+          <FollowButton kind="category" id={data?.category?.id} name={name} />
           <label className="sr-only" htmlFor="sort">
             Sort by
           </label>

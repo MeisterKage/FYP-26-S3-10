@@ -218,7 +218,17 @@ export default function HomePage() {
       {forYou.length > 0 ? (
         <Front articles={forYou} sections={sections} latestTitle={t("home.inYourCategories")} />
       ) : (
-        <Empty title={t("home.nothingCats")}>{t("home.nothingCatsNote")}</Empty>
+        <Empty
+          title={t("home.nothingCats")}
+          action={
+            <div className="row gap-4 mt-5">
+              <Link className="btn btn-primary btn-sm" to="/topics">{t("home.browseTopics")}</Link>
+              <Link className="btn btn-outline btn-sm" to="/countries">{t("home.browseCountries")}</Link>
+            </div>
+          }
+        >
+          {t("home.nothingCatsNote")}
+        </Empty>
       )}
 
       {fromFollowed.length > 0 && (

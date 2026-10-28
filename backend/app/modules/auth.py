@@ -13,7 +13,7 @@ from ..errors import ApiError
 from ..extensions import db
 from ..integrations import email_service
 from ..models import (
-    AuditLog, Category, PasswordResetToken, User, UserCategoryPreference, utcnow,
+    AuditLog, Category, PasswordResetToken, User, UserCategoryPreference, UserCountryPreference, utcnow,
 )
 from ..sanitize import clean_plain_text
 from ..security import (
@@ -42,6 +42,10 @@ def _serialize(user: User) -> dict:
         "categoryIds": [
             p.category_id for p in UserCategoryPreference.query.filter_by(user_id=user.id)
         ],
+        # And the countries whose news they follow, for the follow buttons.
+        "countryCodes": sorted(
+            p.country_code for p in UserCountryPreference.query.filter_by(user_id=user.id)
+        ),
     }
 
 

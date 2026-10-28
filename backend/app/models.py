@@ -142,6 +142,18 @@ class UserCategoryPreference(db.Model):
     notify: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
+class UserCountryPreference(db.Model):
+    """A country whose news a reader follows, beside the sections they follow."""
+
+    __tablename__ = "user_country_preferences"
+    __table_args__ = (UniqueConstraint("user_id", "country_code"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    #: ISO 3166-1 alpha-2, as on Article.country_code.
+    country_code: Mapped[str] = mapped_column(String(2))
+
+
 class ContributorApplication(TimestampMixin, db.Model):
     __tablename__ = "contributor_applications"
 

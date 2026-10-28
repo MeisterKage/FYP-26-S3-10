@@ -13,6 +13,7 @@ import { api } from "../api";
 import { EntryThumb } from "../components/CoverImage";
 import { CredibilityInline } from "../components/Credibility";
 import { Empty, EntrySkeleton, Notice, SectionHead, formatDate } from "../components/UI";
+import { FollowButton } from "../components/FollowButton";
 import { usePageTitle } from "../usePageTitle";
 import { useI18n } from "../i18n";
 
@@ -132,6 +133,7 @@ export function CountryPage() {
         </div>
 
         <div className="row gap-4">
+          <FollowButton kind="country" id={data?.country?.code} name={countryName} />
           <label className="sr-only" htmlFor="sort">
             Sort by
           </label>

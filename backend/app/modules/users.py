@@ -12,8 +12,9 @@ from ..errors import ApiError
 from ..extensions import db
 from ..models import (
     Category, ContributorApplication, NotificationPreference,
-    UserCategoryPreference, utcnow,
+    UserCategoryPreference, UserCountryPreference, utcnow,
 )
+from ..countries import normalise
 from ..sanitize import clean_plain_text
 from ..security import login_required, roles_required
 from ..validation import json_body, require_str
@@ -56,8 +57,96 @@ def update_profile():
                 UserCategoryPreference(user_id=user.id, category_id=category.id)
             )
 
+    if "countryCodes" in data:
+        codes = data["countryCodes"] or []
+        if not isinstance(codes, list):
+            raise ApiError("Countries must be a list.", status=422, field="countryCodes")
+        try:
+            wanted = {normalise(c) for c in codes} - {None}
+        except ValueError:
+            raise ApiError("One of those is not a country.", status=422, field="countryCodes")
+        UserCountryPreference.query.filter_by(user_id=user.id).delete()
+        for code in sorted(wanted):
+            db.session.add(UserCountryPreference(user_id=user.id, country_code=code))
+
     db.session.commit()
     return jsonify({"message": "Profile updated."})
+
+
+# --------------------------------------------------------------------------- #
+#  Following a section or a country, one at a time (the follow buttons)
+# --------------------------------------------------------------------------- #
+
+def _interests(user) -> dict:
+    return {
+        "categoryIds": [
+            p.category_id for p in UserCategoryPreference.query.filter_by(user_id=user.id)
+        ],
+        "countryCodes": sorted(
+            p.country_code for p in UserCountryPreference.query.filter_by(user_id=user.id)
+        ),
+    }
+
+
+def _followable_category(category_id: int) -> Category:
+    # Uncategorised only holds articles whose section was deleted: not a topic.
+    category = Category.query.filter_by(id=category_id, deleted_at=None, is_system=False).first()
+    if category is None:
+        raise ApiError("That section was not found.", status=404)
+    return category
+
+
+def _followable_country(code: str) -> str:
+    try:
+        normalised = normalise(code)
+    except ValueError:
+        normalised = None
+    if not normalised:
+        raise ApiError("That country was not found.", status=404)
+    return normalised
+
+
+@bp.put("/me/interests/categories/<int:category_id>")
+@login_required
+def follow_category(category_id: int):
+    """Follow a section: its articles join your front page."""
+    user = g.current_user
+    category = _followable_category(category_id)
+    if not UserCategoryPreference.query.filter_by(user_id=user.id, category_id=category.id).first():
+        db.session.add(UserCategoryPreference(user_id=user.id, category_id=category.id))
+        db.session.commit()
+    return jsonify(_interests(user))
+
+
+@bp.delete("/me/interests/categories/<int:category_id>")
+@login_required
+def unfollow_category(category_id: int):
+    user = g.current_user
+    UserCategoryPreference.query.filter_by(user_id=user.id, category_id=category_id).delete()
+    db.session.commit()
+    return jsonify(_interests(user))
+
+
+@bp.put("/me/interests/countries/<code>")
+@login_required
+def follow_country(code: str):
+    """Follow a country: its articles join your front page."""
+    user = g.current_user
+    country = _followable_country(code)
+    if not UserCountryPreference.query.filter_by(user_id=user.id, country_code=country).first():
+        db.session.add(UserCountryPreference(user_id=user.id, country_code=country))
+        db.session.commit()
+    return jsonify(_interests(user))
+
+
+@bp.delete("/me/interests/countries/<code>")
+@login_required
+def unfollow_country(code: str):
+    user = g.current_user
+    country = _followable_country(code)
+    UserCountryPreference.query.filter_by(user_id=user.id, country_code=country).delete()
+    db.session.commit()
+    return jsonify(_interests(user))
 
 
 @bp.get("/me/notification-preferences")
