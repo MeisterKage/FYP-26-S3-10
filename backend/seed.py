@@ -13,6 +13,7 @@ corrections, and reports.
     py seed.py --long-bodies # full-length bodies for articles already seeded
     py seed.py --daily-views # a history of daily views behind each demo total
     py seed.py --expansion   # more editors, writers and articles; right sections (internet)
+    py seed.py --more        # ten more articles per country (internet)
     py seed.py --translations # the demo articles in Mandarin and Malay
     flask rate-sources       # then grade every cited source (needs internet)
 
@@ -538,6 +539,64 @@ def seed_expansion() -> None:
           f"moved {moved} article(s) to their right section; added {added} article(s).")
 
 
+def seed_more() -> None:
+    """Ten more published articles for every country (demo_more/).
+
+    Safe to run again and on the live database: an article whose title already
+    exists is skipped. Each new article is approved by an editor of its own
+    section, its sources are rated (this needs internet access), and its
+    writer's scores are recalculated.
+    """
+    from demo_bodies import render
+    from demo_more import ARTICLES
+    from app.originality_service import index_article
+    from app.source_service import rate_sources
+
+    sections = {c.name: c for c in Category.query.filter_by(deleted_at=None)}
+    editors_of: dict[int, list[int]] = {}
+    for row in EditorCategory.query.order_by(EditorCategory.editor_id):
+        editors_of.setdefault(row.category_id, []).append(row.editor_id)
+    admin = User.query.filter_by(email="admin@newsrelease.test").one()
+    now = utcnow()
+
+    added, writers = [], set()
+    for n, (code, section_name, email, title, standfirst, paragraphs) in enumerate(ARTICLES):
+        if Article.query.filter_by(title=title).first():
+            continue
+        writer = User.query.filter_by(email=email).one()
+        category = sections[section_name]
+        # Spread over the last eight weeks so every page mixes old and new.
+        published_at = now - timedelta(days=1 + (n * 23) % 56, hours=(n * 7) % 18)
+        editors = editors_of.get(category.id) or [admin.id]
+        article = Article(
+            contributor_id=writer.id, category_id=category.id, country_code=code,
+            title=title, slug=slugify(title), summary=standfirst, body=render(paragraphs),
+            tags="regional,analysis", status=ArticleStatus.PUBLISHED,
+            published_at=published_at, submitted_at=published_at - timedelta(hours=5),
+            reviewed_by_id=editors[n % len(editors)],
+            view_count=120 + (n * 149) % 1700,
+        )
+        db.session.add(article)
+        db.session.flush()
+        article.slug = slugify(title, article.id)
+        for url, label in sources_for(title, code, section_name, email):
+            db.session.add(ArticleSource(article_id=article.id, url=url, label=label))
+        added.append(article)
+        writers.add(writer)
+    db.session.flush()
+
+    for article in added:
+        db.session.expire(article, ["sources"])
+        rate_sources(article)
+        index_article(article)
+    db.session.flush()
+    for writer in writers:
+        rescore_contributor_articles(writer)
+    db.session.commit()
+    seed_daily_views()
+    print(f"More: added {len(added)} of {len(ARTICLES)} article(s).")
+
+
 def translation_problems(article, tr: dict) -> list[str]:
     """Why a stored translation does not line up with its English, if it does not."""
     from app.insights import paragraphs
@@ -1032,6 +1091,9 @@ if __name__ == "__main__":
             sys.exit(0)
         if "--expansion" in sys.argv:
             seed_expansion()
+            sys.exit(0)
+        if "--more" in sys.argv:
+            seed_more()
             sys.exit(0)
         if "--translations" in sys.argv:
             seed_translations()
