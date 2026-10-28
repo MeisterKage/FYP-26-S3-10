@@ -69,14 +69,16 @@ function Bars({ data, label, diverging = false, describe }) {
           );
         })}
       </div>
-      <table className="sr-only">
-        <caption>{label}</caption>
-        <tbody>
-          {data.map((d, i) => (
-            <tr key={i}><td>{describe(d)}</td></tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="sr-only">
+        <table>
+          <caption>{label}</caption>
+          <tbody>
+            {data.map((d, i) => (
+              <tr key={i}><td>{describe(d)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   );
 }

@@ -2,75 +2,63 @@
 
 The visual world for Sterling Wire.
 
-The client pinned this to the **Medium design system** (styles.refero.design),
-rebased on **#133955** as the sole hue. The structure is Medium's; the colour is
-the client's.
+Refined and premium, the way a quality weekly is: a cool porcelain page,
+graphite type, generous air, photographs given room. The client approved this
+direction from a mock-up of the home and article pages; it replaces the earlier
+Medium-based look, keeping the client's navy (#133955) as the accent.
 
 ## Colour and the credibility bands
 
-The reference forbids chromatic colour in UI: *"no blue links, no green buttons,
-no red errors."* That is awkward here, because the product's centrepiece is a
-Credibility Score with four bands, and four bands invite a green/amber/red badge.
+A publication that colour-codes its own trustworthiness ends up looking like a
+browser security warning, so there is no green/amber/red anywhere. The score is
+Sterling Wire's one bold mark: a **ring**, a hairline track with the reading drawn
+round it in navy and the numeral set inside, like the gauge on an instrument.
+Every reading is encoded three ways, none of them colour alone:
 
-We kept the prohibition. A publication that colour-codes its own trustworthiness
-ends up looking like a browser security warning, so an instrument reading suits
-the product better anyway. Every credibility state is encoded three ways, none of
-them colour:
-
-1. fill length, for the quantity
-2. ink value, for the band, as weight within one hue
+1. the arc's length round the ring, for the quantity
+2. the numeral, for the exact score
 3. the band word, always rendered, and always the authority
 
-`Disputed` also switches to a hatched fill, so the most consequential state
+`Disputed` also dashes the ring's track, so the most consequential state
 survives grayscale printing and colour-blind vision.
 
-The same reasoning governs two later additions. The notification bell shows a
-count, not a dot, and repeats it in the button's accessible name. The revenue
-tier meter is a plain ruled track rather than the credibility meter, because
-that component means one thing and should keep meaning it.
-
-For the same reason there is no red error state anywhere. Errors are marked by a
-full-weight rule and an icon, and they carry `role="alert"` so the urgency
-reaches a screen reader, which a colour never did.
+There is still no red error state. Errors are marked by a full-weight rule and
+an icon, and carry `role="alert"`.
 
 ## Palette
 
-One hue (205 degrees) at ten lightnesses. Nothing on screen is a true gray, so
-the shadows in the paper are the same colour as the ink in the type. Contrast was
-computed rather than eyeballed. Ratios are against `--canvas` / `--paper`.
+Cool neutrals, never cream: "sterling" is silver. Contrast ratios are against
+`--canvas` / `--paper`.
 
-| Token      | Value     | Use                          | Contrast      |
-| ---------- | --------- | ---------------------------- | ------------- |
-| `--paper`  | `#fcfdfd` | cards, article body          | n/a           |
-| `--canvas` | `#f2f5f8` | the page: stock, not white   | n/a           |
-| `--sunken` | `#e5ecf0` | wells, meter troughs         | n/a           |
-| `--hair`   | `#ccd8e0` | default 1px rule             | n/a           |
-| `--rule`   | `#9ab1c1` | emphatic divider, meter ticks| 2.03, **non-text only** |
-| `--mute`   | `#587184` | captions, metadata           | 4.67 / 5.01   |
-| `--quiet`  | `#446074` | secondary text               | 6.05 / 6.50   |
-| `--body`   | `#294c65` | running body copy            | 8.29 / 8.90   |
-| `--ink`    | `#133955` | headings, primary (brand)    | 11.00 / 11.82 |
-| `--deep`   | `#0a2233` | filled buttons only          | 15.98         |
+| Token      | Value     | Use                               | Contrast      |
+| ---------- | --------- | --------------------------------- | ------------- |
+| `--paper`  | `#ffffff` | panels, inputs, lifted things     | n/a           |
+| `--canvas` | `#f4f5f6` | the page: porcelain, not white    | n/a           |
+| `--sunken` | `#edeff1` | wells, footer, meter troughs      | n/a           |
+| `--hair`   | `#d3d8dd` | silver hairline                   | n/a           |
+| `--rule`   | `#a9b2ba` | emphatic divider, ring dashes     | **non-text only** |
+| `--mute`   | `#5b6772` | captions, metadata                | 5.3 / 5.7     |
+| `--quiet`  | `#4a5560` | secondary text, standfirsts       | 7.0 / 7.6     |
+| `--body`   | `#2a3640` | running body copy                 | 11.6 / 12.6   |
+| `--ink`    | `#18232d` | headings, primary text            | 14.6 / 15.9   |
+| `--deep`   | `#133955` | filled buttons                    | 12.1 on white |
+| `--accent` | `#133955` | links that act, the ring, focus   | 10.9 / 11.8   |
 
-Every text token clears WCAG AA. `--rule` does not, so it must never carry text.
-The inspection pass catches it if it ever does.
-
-Surfaces are separated by a shift in colour value plus a hairline. There is no
+Surfaces are separated by a shift in value plus a hairline. There is no
 `box-shadow` in this system.
 
 ## Type
 
-| Role    | Face                | Why                                              |
-| ------- | ------------------- | ------------------------------------------------ |
-| Display | Playfair Display    | the reference's own named fallback for GT Super  |
-| UI      | Inter               | its named fallback for Söhne                     |
-| Body    | Source Serif 4      | a transitional book serif cut for screen reading |
+| Role          | Face            | Why                                                   |
+| ------------- | --------------- | ----------------------------------------------------- |
+| Display, body | Newsreader      | drawn for news; light at large optical sizes for headlines, a sturdy reading face below |
+| UI            | Hanken Grotesk  | navigation, bylines and metadata, in sentence case    |
 
-Self-hosted via `@fontsource` rather than a CDN, so the pages render identically
-offline and nothing third-party runs on first paint.
-
-Minor-third scale from a 16px base. Display sizes are fluid (`clamp`) so the
-masthead never overflows at 360px, which the reference's fixed 120px would.
+One serif family carries both headlines and reading, set light (300) and large
+for headlines; the grotesque does the interface. Labels are sentence case, never
+letterspaced capitals. Self-hosted via `@fontsource-variable` (Newsreader with
+its optical-size axis), so nothing third-party runs on first paint. Chinese text
+falls back to the system's serif and sans faces.
 
 ## Shape and motion
 
@@ -85,19 +73,25 @@ the animation never runs. Everything else is state feedback under 260ms.
 
 ## Structural rules
 
-The front page is laid out as a newspaper front rather than a card grid: one lead
-article at display scale, then a ruled index. Identical cards would flatten the
-hierarchy the scores create. Listings follow the same idea and use rules rather
-than boxes, because a newspaper index reads down a column.
+The masthead has two tiers: a dateline, the wordmark centred and the account at
+the top; the sections on a ruled line beneath, followed by the tools for writers
+and editors. It is not sticky. On phones the dateline goes and the section line
+scrolls sideways.
 
-The score travels with the reader, in a sticky margin column on the article page
-that folds above the body below 64rem.
+The front page is a quality paper's front rather than a card grid: the lead story
+with a large photograph and its ring, three top stories with photographs, then the
+latest as a ruled list beside a short note on what the rings mean.
+
+The article is one centred column. The headline block and the reading column
+share a measure; only the photograph runs wider. The score sits in the byline as
+a ring and opens out after the text into the full breakdown and its sources.
 
 Tables stack below 46rem. A four-column table on a phone is either clipped or a
 swipe nobody discovers, so each row becomes a block instead.
 
-Links are typographic: the same colour as body text, underlined on hover. Colour
-carries no meaning anywhere in this system.
+Headline links are the colour of the text and turn navy on hover; links that act
+("How this was scored") are navy with a hairline underline. Colour never carries
+meaning on its own.
 
 The filled button is the only solid ink on a page. One per view, on the action
 that view exists for.

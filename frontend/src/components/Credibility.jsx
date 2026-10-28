@@ -6,12 +6,12 @@
  * that colour-codes its own trustworthiness ends up looking like a browser
  * security warning.
  *
- * Every reading carries three independent encodings, none of them colour:
- *   1. fill length, the quantity
- *   2. ink value, the band, expressed as weight within one hue
+ * Every reading carries independent encodings, none of them colour alone:
+ *   1. the arc's length round the ring, the quantity
+ *   2. the numeral, the exact score
  *   3. the band word, always rendered and always the authority
  *
- * "Disputed" also switches to a hatched fill, so the state that matters most
+ * "Disputed" also dashes the ring's track, so the state that matters most
  * survives grayscale printing and colour-blind vision.
  */
 import { InfoIcon, ScaleIcon } from "./Icon";
@@ -41,42 +41,62 @@ function ReviewFlag({ review, compact = false }) {
   );
 }
 
-/** Full readout: score, band, meter. Used where the score is the subject. */
-export function CredibilityMeter({ credibility, review, animate = true }) {
+/**
+ * The ring: Sterling Wire's mark. A fine track with the score drawn round it,
+ * like the gauge on an instrument. Strokes stay hairline at every size
+ * (non-scaling), and "Disputed" dashes the track as well, so the state that
+ * matters most survives grayscale and colour-blind vision.
+ */
+function Ring({ score, band, size, numeral = false }) {
+  const value = Math.max(0, Math.min(100, score));
+  return (
+    <svg className="ring" data-band={band} width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
+      <circle className="ring-track" cx="50" cy="50" r="46" />
+      <circle
+        className="ring-arc"
+        cx="50"
+        cy="50"
+        r="46"
+        pathLength="100"
+        strokeDasharray={`${value} 100`}
+        transform="rotate(-90 50 50)"
+      />
+      {numeral && (
+        <text className="ring-num" x="50" y="51" textAnchor="middle" dominantBaseline="central">
+          {Math.round(score)}
+        </text>
+      )}
+    </svg>
+  );
+}
+
+/** Full readout: the ring with its score, the band word. Where the score is the subject. */
+export function CredibilityMeter({ credibility, review, size = 88 }) {
   const { t } = useI18n();
   if (!credibility || credibility.score == null) return null;
   const { score, band } = credibility;
+  const rounded = Math.round(score);
 
   return (
-    <div className="cred">
-      <div className="cred-readout">
-        <span className="cred-score">{Math.round(score)}</span>
-        <span className="cred-outof">/ 100</span>
+    <div
+      className="cred"
+      role="meter"
+      aria-valuenow={rounded}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Credibility score ${rounded} out of 100, rated ${band}`}
+    >
+      <Ring score={score} band={band} size={size} numeral />
+      <div className="cred-words">
         <span className="cred-band">{t(`band.${band}`)}</span>
+        <span className="cred-outof">{t("cred.score")}: {rounded} / 100</span>
+        <ReviewFlag review={review} />
       </div>
-      <div
-        className="cred-track"
-        role="meter"
-        aria-valuenow={Math.round(score)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`Credibility score ${Math.round(score)} out of 100, rated ${band}`}
-      >
-        <div
-          className="cred-fill"
-          data-band={band}
-          style={{
-            width: `${Math.max(0, Math.min(100, score))}%`,
-            animation: animate ? undefined : "none",
-          }}
-        />
-      </div>
-      <ReviewFlag review={review} />
     </div>
   );
 }
 
-/** Compact reading for listings, where the score is a column, not the subject. */
+/** Compact reading for listings: a small ring, the number, the band word. */
 export function CredibilityInline({ credibility, review }) {
   const { t } = useI18n();
   if (!credibility || credibility.score == null) return null;
@@ -85,10 +105,8 @@ export function CredibilityInline({ credibility, review }) {
 
   return (
     <span className="cred-inline">
+      <Ring score={score} band={band} size={20} />
       <span className="cred-inline-num">{rounded}</span>
-      <span className="cred-inline-bar" aria-hidden="true">
-        <i data-band={band} style={{ width: `${Math.max(0, Math.min(100, score))}%` }} />
-      </span>
       <span>{t(`band.${band}`)}</span>
       <span className="sr-only">
         Credibility {rounded} out of 100, rated {band}

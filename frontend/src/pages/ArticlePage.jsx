@@ -112,7 +112,14 @@ export default function ArticlePage() {
 
   const [article, setArticle] = useState(null);
   const proseRef = useRef(null);
-  const { t, lang, country } = useI18n();
+  const { t, lang, country, section } = useI18n();
+  const [sections, setSections] = useState({});
+  useEffect(() => {
+    api
+      .get("/categories")
+      .then((d) => setSections(Object.fromEntries((d.categories || []).map((c) => [c.id, c]))))
+      .catch(() => {});
+  }, [lang]);
   usePageTitle(article?.title);
   const [error, setError] = useState(null);
   const [reported, setReported] = useState(false);
@@ -187,13 +194,28 @@ export default function ArticlePage() {
   }
 
   const date = formatDate(article.publishedAt);
+  const cat = sections[article.categoryId];
 
   return (
     <article className="article">
       <header className="article-head">
-        <h1 className="title">{article.title}</h1>
+        {(cat || article.country) && (
+          <p className="article-kicker">
+            {cat && (
+              <Link to={`/categories/${cat.slug}`}>{section(cat.slug, cat.name)}</Link>
+            )}
+            {cat && article.country && ", "}
+            {article.country && (
+              <Link to={`/countries/${article.country.code.toLowerCase()}`}>
+                {country(article.country.code, article.country.name)}
+              </Link>
+            )}
+          </p>
+        )}
 
-        {article.summary && <p className="lead mt-5">{article.summary}</p>}
+        <h1 className="article-title">{article.title}</h1>
+
+        {article.summary && <p className="article-standfirst">{article.summary}</p>}
 
         {article.republication && <Republished info={article.republication} />}
 
@@ -206,167 +228,171 @@ export default function ArticlePage() {
         )}
 
         <div className="article-byline">
-          {article.republication ? (
-            // The authors, with their institutions, as the licence asks.
-            <span className="republished-authors">
-              By {article.republication.authors.join("; ")}
-            </span>
-          ) : (
-            <>
-              <Link
-                className="link-quiet"
-                style={{ color: "var(--ink)" }}
-                to={`/contributors/${article.contributor.id}`}
-              >
-                {article.contributor.name}
-              </Link>
-              <AccuracyRate rate={article.contributor.accuracyRate} />
-            </>
-          )}
-          {date && <span>{date}</span>}
-          {article.country && (
-            <Link className="link-quiet" to={`/countries/${article.country.code.toLowerCase()}`}>
-              {country(article.country.code, article.country.name)}
-            </Link>
-          )}
-          <ApprovedBy review={article.review} />
+          <div className="article-byline-text">
+            <p>
+              {article.republication ? (
+                // The authors, with their institutions, as the licence asks.
+                <span className="republished-authors">
+                  By {article.republication.authors.join("; ")}
+                </span>
+              ) : (
+                <>
+                  <Link className="article-author" to={`/contributors/${article.contributor.id}`}>
+                    {article.contributor.name}
+                  </Link>
+                  <span className="article-accuracy">
+                    <AccuracyRate rate={article.contributor.accuracyRate} />
+                  </span>
+                </>
+              )}
+            </p>
+            <p className="article-byline-meta">
+              <ApprovedBy review={article.review} />
+              {date && <span>{date}</span>}
+            </p>
+          </div>
+          <div className="article-byline-score">
+            <CredibilityMeter credibility={article.credibility} review={article.review} size={72} />
+            <a className="article-scored-link" href="#credibility">{t("article.howScored")}</a>
+          </div>
         </div>
       </header>
 
-      <div className="article-grid">
-        <div className="article-body">
-          <CoverFigure image={article.coverImage} priority />
-          {!article.paywalled && (
-            <ArticleAudio title={article.title} brief={article.inBrief} proseRef={proseRef}
-              bodyKey={`${article.id}-${lang}`}
-              voiceLang={article.translation?.available ? VOICE_LANGS[lang] : "en-AU"} />
-          )}
-          {article.paywalled ? (
-            <>
-              <div className="prose">
-                <p>{article.bodyPreview}</p>
-              </div>
-              <div className="paywall">
-                <h2 className="heading">{t("article.continueReading")}</h2>
-                <p className="lead mt-4">
-                  {t("article.forSubscribers", { name: article.contributor.name })}
-                </p>
-                <div className="row gap-4 mt-5">
-                  {user ? (
-                    <Button
-                      variant="primary"
-                      onClick={() =>
-                        startSubscription(article.contributor.id, navigate).catch((e) =>
-                          setSubscribeError(e.message),
-                        )
-                      }
-                    >
-                      {t("article.subscribeToRead")}
+      <div className="article-cover">
+        <CoverFigure image={article.coverImage} priority />
+      </div>
+
+      <div className="article-body">
+        {!article.paywalled && (
+          <ArticleAudio title={article.title} brief={article.inBrief} proseRef={proseRef}
+            bodyKey={`${article.id}-${lang}`}
+            voiceLang={article.translation?.available ? VOICE_LANGS[lang] : "en-AU"} />
+        )}
+        {article.paywalled ? (
+          <>
+            <div className="prose">
+              <p>{article.bodyPreview}</p>
+            </div>
+            <div className="paywall">
+              <h2 className="heading">{t("article.continueReading")}</h2>
+              <p className="lead mt-4">
+                {t("article.forSubscribers", { name: article.contributor.name })}
+              </p>
+              <div className="row gap-4 mt-5">
+                {user ? (
+                  <Button
+                    variant="primary"
+                    onClick={() =>
+                      startSubscription(article.contributor.id, navigate).catch((e) =>
+                        setSubscribeError(e.message),
+                      )
+                    }
+                  >
+                    {t("article.subscribeToRead")}
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="primary" as={Link} to="/register">
+                      {t("article.createAccount")}
                     </Button>
-                  ) : (
-                    <>
-                      <Button variant="primary" as={Link} to="/register">
-                        {t("article.createAccount")}
-                      </Button>
-                      <Link className="link-quiet" to="/login">
-                        {t("article.haveAccount")}
-                      </Link>
-                      <Link className="link-quiet" to="/pricing">
-                        {t("article.whatCosts")}
-                      </Link>
-                    </>
-                  )}
-                </div>
-                {subscribeError && (
-                  <div className="mt-4">
-                    <Notice>{subscribeError}</Notice>
-                  </div>
+                    <Link className="link-quiet" to="/login">
+                      {t("article.haveAccount")}
+                    </Link>
+                    <Link className="link-quiet" to="/pricing">
+                      {t("article.whatCosts")}
+                    </Link>
+                  </>
                 )}
               </div>
-            </>
-          ) : (
-            // Safe: the server sanitises against an allowlist on write, so
-            // nothing reaches here that was not already filtered.
-            <div
-              ref={proseRef}
-              className="prose"
-              dangerouslySetInnerHTML={{ __html: article.body }}
-            />
-          )}
+              {subscribeError && (
+                <div className="mt-4">
+                  <Notice>{subscribeError}</Notice>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          // Safe: the server sanitises against an allowlist on write, so
+          // nothing reaches here that was not already filtered.
+          <div
+            ref={proseRef}
+            className="prose"
+            dangerouslySetInnerHTML={{ __html: article.body }}
+          />
+        )}
 
-          {/* Where a reader who liked it decides to follow or subscribe. Left out
-              behind a paywall, which has its own subscribe button in place. */}
-          {!article.paywalled && article.writer && !article.republication && (
-            <WriterCard writer={article.writer} />
-          )}
-          {article.republication && <RepublishedFooter info={article.republication} />}
+        {/* Where a reader who liked it decides to follow or subscribe. Left out
+            behind a paywall, which has its own subscribe button in place. */}
+        {!article.paywalled && article.writer && !article.republication && (
+          <WriterCard writer={article.writer} />
+        )}
+        {article.republication && <RepublishedFooter info={article.republication} />}
+
+        {/* The score opened out: the ring, the arithmetic, and the sources that
+            went into it. PRD 1.3.3: a reader can trace exactly why. */}
+        <section className="score-panel" id="credibility" aria-labelledby="score-panel-title">
+          <div className="score-panel-head">
+            <CredibilityMeter credibility={article.credibility} review={article.review} size={96} />
+            <div>
+              <h2 className="score-panel-title" id="score-panel-title">{t("article.howScored")}</h2>
+              <p className="meta mt-2">
+                {t("cred.arithmetic")}{" "}
+                <Link className="link-quiet" to="/about">{t("cred.howCalculated")}</Link>
+              </p>
+            </div>
+          </div>
+          <CredibilityLedger credibility={article.credibility} />
 
           {article.sources?.length > 0 && (
-            <section className="sources">
-              <h2 className="label">
+            <div className="sources">
+              <h3 className="score-panel-sub">
                 {t("article.sources")}
                 <span className="sources-count">{article.sources.length}</span>
-              </h2>
+              </h3>
               <SourceList sources={article.sources} />
               <p className="meta mt-4">
                 <SourceIcon size={14} style={{ display: "inline", verticalAlign: "-2px" }} />{" "}
                 {t("article.sourcesNote")}{" "}
                 <Link className="link-quiet" to="/about#sources">{t("article.howGraded")}</Link>
               </p>
-            </section>
-          )}
-
-          {article.status === "published" && <ArticleAnalysis slug={article.slug} />}
-
-          <Corrections article={article} />
-
-          <footer className="article-foot">
-            {reported ? (
-              <Notice tone="quiet">
-                Thank you. An editor will review this article.
-              </Notice>
-            ) : (
-              user &&
-              (reporting ? (
-                <ReportPanel
-                  article={article}
-                  onDone={() => {
-                    setReporting(false);
-                    setReported(true);
-                  }}
-                  onCancel={() => setReporting(false)}
-                />
-              ) : (
-                <Button variant="quiet" size="sm" onClick={() => setReporting(true)}>
-                  <FlagIcon size={16} />
-                  Report an inaccuracy
-                </Button>
-              ))
-            )}
-            <ArticleExtras article={article} />
-          </footer>
-
-          {/* Only a published article has a discussion: the server rejects
-              comments on anything else, so an author previewing their own draft
-              should not be shown a form that cannot work. */}
-          {article.status === "published" && <Discussion article={article} />}
-        </div>
-
-        <aside className="article-margin">
-          <div className="margin-card">
-            <p className="label">{t("home.credibility")}</p>
-            <div className="mt-4">
-              <CredibilityMeter credibility={article.credibility} review={article.review} />
             </div>
-            <CredibilityLedger credibility={article.credibility} />
-            <p className="meta mt-5">
-              {t("cred.arithmetic")}{" "}
-              <Link className="link-quiet" to="/about">
-                {t("cred.howCalculated")}
-              </Link>
-            </p>
-          </div>
-        </aside>
+          )}
+        </section>
+
+        {article.status === "published" && <ArticleAnalysis slug={article.slug} />}
+
+        <Corrections article={article} />
+
+        <footer className="article-foot">
+          {reported ? (
+            <Notice tone="quiet">
+              Thank you. An editor will review this article.
+            </Notice>
+          ) : (
+            user &&
+            (reporting ? (
+              <ReportPanel
+                article={article}
+                onDone={() => {
+                  setReporting(false);
+                  setReported(true);
+                }}
+                onCancel={() => setReporting(false)}
+              />
+            ) : (
+              <Button variant="quiet" size="sm" onClick={() => setReporting(true)}>
+                <FlagIcon size={16} />
+                Report an inaccuracy
+              </Button>
+            ))
+          )}
+          <ArticleExtras article={article} />
+        </footer>
+
+        {/* Only a published article has a discussion: the server rejects
+            comments on anything else, so an author previewing their own draft
+            should not be shown a form that cannot work. */}
+        {article.status === "published" && <Discussion article={article} />}
       </div>
 
       <SimilarArticles articles={article.similar} />

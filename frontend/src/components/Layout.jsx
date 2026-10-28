@@ -14,59 +14,53 @@ import Notifications from "./Notifications";
 import { Button, Notice } from "./UI";
 import { useI18n } from "../i18n";
 
+/** Today's date, in the reader's language: the masthead's dateline. */
+function useDateline(lang) {
+  const locale = { zh: "zh-CN", ms: "ms-MY" }[lang] || "en-AU";
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  }).format(new Date());
+}
+
 export function Masthead() {
   const { user, has } = useAuth();
-  const { t } = useI18n();
+  const { t, lang, section } = useI18n();
+  const dateline = useDateline(lang);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("/categories")
+      .then((d) => setCategories((d.categories || []).filter((c) => c.slug !== "uncategorised")))
+      .catch(() => setCategories([]));
+  }, [lang]);
+
+  const staff = has(...CAN_AUTHOR) || has(...CAN_REVIEW) || has(...CAN_ADMIN);
 
   return (
     <header className="masthead">
-      <div className="shell masthead-inner">
-        {/* First on the left, beside the wordmark: the panel it opens slides in
-            from this side. */}
+      <div className="shell masthead-top">
+        {/* First on the left: the panel it opens slides in from this side. */}
         <div className="masthead-browse">
           <BrowseMenu />
+          <span className="masthead-date">{dateline}</span>
         </div>
+
         <Link className="wordmark" to="/">
           Sterling Wire
         </Link>
 
-        <nav className="nav" aria-label="Main">
-          <NavLink className="nav-link" to="/search">
+        {/* The way to your account or to sign in is never scrolled out of view. */}
+        <div className="masthead-account">
+          <NavLink className="nav-link masthead-search" to="/search">
             {t("nav.search")}
           </NavLink>
-
-          {has(...CAN_AUTHOR) && (
-            <NavLink className="nav-link" to="/dashboard">
-              {t("nav.yourWriting")}
-            </NavLink>
-          )}
-          {has(...CAN_REVIEW) && (
-            <NavLink className="nav-link" to="/review">
-              {t("nav.reviewQueue")}
-            </NavLink>
-          )}
-          {has(...CAN_REVIEW) && (
-            <NavLink className="nav-link" to="/moderation">
-              {t("nav.flagged")}
-            </NavLink>
-          )}
-          {has(...CAN_ADMIN) && (
-            <NavLink className="nav-link" to="/admin">
-              {t("nav.admin")}
-            </NavLink>
-          )}
-
-          {user && <Notifications />}
           {!user && (
-            <NavLink className="nav-link" to="/pricing">
+            <NavLink className="nav-link masthead-pricing" to="/pricing">
               {t("nav.pricing")}
             </NavLink>
           )}
-        </nav>
-
-        {/* Outside the nav, which scrolls sideways on narrow screens: the way
-            to your account or to sign in must never be scrolled out of view. */}
-        <div className="masthead-account">
+          {user && <Notifications />}
           <LanguageSwitcher />
           {user ? (
             <AccountMenu />
@@ -75,13 +69,52 @@ export function Masthead() {
               <NavLink className="nav-link" to="/login">
                 {t("nav.signIn")}
               </NavLink>
-              <Button variant="primary" size="sm" as={Link} to="/register">
+              <Button variant="outline" size="sm" className="masthead-cta" as={Link} to="/register">
                 {t("nav.createAccount")}
               </Button>
             </>
           )}
         </div>
       </div>
+
+      {/* Sections, then the tools for writers and editors. Scrolls sideways
+          on a phone rather than wrapping into a second block of links. */}
+      <nav className="masthead-sections" aria-label="Main">
+        <div className="shell masthead-sections-inner">
+          <NavLink className="section-link section-link--narrow" to="/search">
+            {t("nav.search")}
+          </NavLink>
+          <NavLink className="section-link" to="/" end>
+            {t("browse.home")}
+          </NavLink>
+          {categories.map((c) => (
+            <NavLink className="section-link" key={c.id} to={`/categories/${c.slug}`}>
+              {section(c.slug, c.name)}
+            </NavLink>
+          ))}
+          {staff && <span className="section-divider" aria-hidden="true" />}
+          {has(...CAN_AUTHOR) && (
+            <NavLink className="section-link section-link--tool" to="/dashboard">
+              {t("nav.yourWriting")}
+            </NavLink>
+          )}
+          {has(...CAN_REVIEW) && (
+            <NavLink className="section-link section-link--tool" to="/review">
+              {t("nav.reviewQueue")}
+            </NavLink>
+          )}
+          {has(...CAN_REVIEW) && (
+            <NavLink className="section-link section-link--tool" to="/moderation">
+              {t("nav.flagged")}
+            </NavLink>
+          )}
+          {has(...CAN_ADMIN) && (
+            <NavLink className="section-link section-link--tool" to="/admin">
+              {t("nav.admin")}
+            </NavLink>
+          )}
+        </div>
+      </nav>
     </header>
   );
 }
@@ -96,16 +129,17 @@ export function Footer() {
   useEffect(() => {
     api
       .get("/categories")
-      .then((d) => setCategories(d.categories || []))
+      .then((d) => setCategories((d.categories || []).filter((c) => c.slug !== "uncategorised")))
       .catch(() => setCategories([]));
   }, []);
 
   return (
     <footer className="footer">
       <div className="shell footer-inner">
-        <p>
-          {t("footer.tagline")}
-        </p>
+        <div className="footer-brand">
+          <p className="footer-wordmark">Sterling Wire</p>
+          <p>{t("footer.tagline")}</p>
+        </div>
         {categories.length > 0 && (
           <nav className="footer-sections" aria-label="Sections">
             {categories.map((c) => (

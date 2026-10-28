@@ -2,52 +2,165 @@
    Page layouts
    ========================================================================== */
 
-/* --- front page lead ------------------------------------------------------
-   The lead runs against a margin column carrying its score. On narrow screens
-   the score moves below the headline rather than shrinking, because a 40px meter is
-   not a smaller meter, it is an unreadable one. */
+/* --- front page ------------------------------------------------------------
+   Set as a quality paper sets its front: the lead with a large photograph
+   and its ring, three top stories beneath, then the latest beside a note on
+   what the rings mean. Generous air, left-aligned text, no cards.           */
 
-.lead-article {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 15rem;
-  gap: var(--s-8);
-  align-items: start;
-  padding-bottom: var(--s-8);
-  border-bottom: 1px solid var(--ink);
+.front-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  background: var(--sunken);
 }
 
-.lead-aside {
-  padding-top: var(--s-2);
-  border-left: 1px solid var(--hair);
-  padding-left: var(--s-5);
-}
-
-.lead-trace {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  margin-top: var(--s-5);
+.front-kicker {
+  margin: 0;
+  font-family: var(--font-ui);
   font-size: var(--t-caption);
-}
-.lead-trace svg {
-  transition: transform var(--mid) var(--ease);
-}
-.lead-trace:hover svg {
-  transform: translateX(3px);
+  color: var(--mute);
 }
 
-@media (max-width: 60rem) {
-  .lead-article {
-    grid-template-columns: 1fr;
-    gap: var(--s-6);
-  }
-  .lead-aside {
-    border-left: none;
-    border-top: 1px solid var(--hair);
-    padding-left: 0;
-    padding-top: var(--s-5);
-    max-width: 22rem;
-  }
+.front-lead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-6) var(--s-8);
+}
+.front-lead-photo {
+  flex: 3 1 34rem;
+  min-width: 0;
+}
+.front-lead-text {
+  flex: 1 1 20rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  padding-bottom: var(--s-2);
+}
+.front-lead-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--w-display);
+  font-size: clamp(2.25rem, 1.4rem + 2.2vw, 3.25rem);
+  line-height: 1.04;
+  letter-spacing: var(--track-title);
+  text-wrap: balance;
+}
+.front-lead-title a,
+.front-feature-title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+.front-lead-title a:hover,
+.front-feature-title a:hover {
+  color: var(--accent);
+}
+.front-standfirst {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.3125rem;
+  line-height: 1.45;
+  color: var(--quiet);
+}
+.front-byline {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  line-height: 1.6;
+  color: var(--mute);
+}
+.front-lead-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+}
+.front-trace {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--accent);
+  border-bottom: 1px solid currentColor;
+  text-decoration: none;
+}
+
+.front-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--s-7) var(--s-6);
+  margin-top: var(--s-8);
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--hair);
+}
+.front-feature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.front-feature .front-kicker {
+  margin-top: var(--s-2);
+}
+.front-feature-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.6875rem;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.front-feature-summary {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--quiet);
+}
+
+.front-latest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s-7) var(--s-8);
+  margin-top: var(--s-8);
+}
+.front-latest-list {
+  flex: 2 1 34rem;
+  min-width: 0;
+}
+.front-note {
+  flex: 1 1 18rem;
+  padding: var(--s-6);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+}
+.front-note-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.625rem;
+  line-height: 1.2;
+}
+.front-note p {
+  margin: var(--s-4) 0 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--quiet);
+}
+.front-note-link {
+  display: inline-block;
+  margin-top: var(--s-5);
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 500;
+  color: var(--accent);
+  border-bottom: 1px solid currentColor;
+  text-decoration: none;
 }
 
 /* --- article --------------------------------------------------------------
@@ -65,75 +178,169 @@
   }
 }
 
-/* The article uses the full page. The headline, standfirst and byline span it;
-   below them the main column takes everything the score panel does not, so
-   the cover photograph runs wide. Running text alone is held to a readable
-   measure (--w-article, about 75 characters of body serif): past that, lines
-   get long enough to lose your place on the way back. */
+/* The article: one centred column. The headline block and the reading
+   column share a measure; only the photograph runs wider. The score sits in
+   the byline as a ring and opens out after the text, where the arithmetic
+   and the sources can be read in full. */
 .article {
-  --w-article: 44rem;
+  --w-article: 42rem;
 }
 .article-head {
-  padding-bottom: var(--s-6);
+  max-width: 52rem;
+  margin-inline: auto;
+  padding-top: var(--s-6);
 }
-.article-head .title {
-  max-width: 48rem;
+.article-kicker {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--mute);
 }
-.article-head .lead {
-  max-width: var(--w-article);
+.article-kicker a {
+  color: var(--mute);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hair);
+}
+.article-kicker a:hover {
+  color: var(--accent);
+  border-bottom-color: currentColor;
+}
+.article-title {
+  margin: var(--s-5) 0 0;
+  font-family: var(--font-display);
+  font-weight: var(--w-display);
+  font-size: clamp(2.5rem, 1.4rem + 3.4vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: var(--track-display);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.article-standfirst {
+  margin: var(--s-5) 0 0;
+  max-width: 36em;
+  font-family: var(--font-body);
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.4375rem);
+  line-height: 1.45;
+  color: var(--quiet);
 }
 
 .article-byline {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--s-2) var(--s-4);
+  justify-content: space-between;
+  gap: var(--s-5);
   margin-top: var(--s-6);
-  padding-top: var(--s-4);
+  padding-block: var(--s-5);
   border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
   font-family: var(--font-ui);
-  font-size: var(--t-caption);
+  font-size: var(--t-small);
+}
+.article-byline-text {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+.article-byline-text p {
+  margin: 0;
+  line-height: 1.6;
+}
+.article-author {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hair);
+}
+.article-author:hover {
+  color: var(--accent);
+}
+.article-accuracy {
+  margin-left: var(--s-3);
   color: var(--mute);
 }
-
-.article-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 18rem;
-  gap: var(--s-8);
-  align-items: start;
+.article-byline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-4);
+  color: var(--mute);
 }
-.article-body .prose,
-.article-body > .sources,
-.article-body > .paywall,
-.article-body > .article-foot {
-  max-width: var(--w-article);
+.article-byline-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-5);
+}
+.article-scored-link {
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.article-cover {
+  max-width: 74rem;
+  margin: var(--s-7) auto 0;
+}
+.article-cover .cover {
+  margin: 0;
+}
+.article-cover img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
 }
 
 .article-body {
+  max-width: var(--w-article);
+  margin: var(--s-7) auto 0;
   min-width: 0;
 }
-
-/* The score travels with the reader down a long article. */
-.article-margin {
-  position: sticky;
-  top: 6rem;
+.article-body .prose {
+  font-size: 1.3125rem;
+  line-height: var(--lh-body);
+  color: var(--body);
 }
 
-.margin-card {
-  border-top: 2px solid var(--ink);
-  padding-top: var(--s-4);
+/* The score, opened out after the text. */
+.score-panel {
+  margin-top: var(--s-8);
+  padding: var(--s-6);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  scroll-margin-top: var(--s-6);
 }
-
-@media (max-width: 64rem) {
-  .article-grid {
-    grid-template-columns: 1fr;
-    gap: var(--s-7);
-  }
-  .article-margin {
-    position: static;
-    order: -1;
-    max-width: 22rem;
-  }
+.score-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-5);
+}
+.score-panel-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.625rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.score-panel-sub {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--ink);
+}
+.score-panel .ledger {
+  margin-top: var(--s-5);
+}
+.score-panel .ledger-row {
+  font-size: var(--t-small);
+  padding-block: var(--s-2);
+}
+.score-panel .sources {
+  max-width: none;
+  margin-top: var(--s-6);
+  padding-top: var(--s-5);
 }
 
 .paywall {
@@ -837,13 +1044,7 @@
   font-size: var(--t-caption);
   color: var(--mute);
 }
-.lead-cover {
-  margin-bottom: var(--s-6);
-}
-.lead-cover img {
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-}
+
 .review-cover .cover {
   max-width: 28rem;
   margin-bottom: 0;
@@ -1206,7 +1407,6 @@
 .source-tier {
   font-weight: 600;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   font-size: var(--t-micro);
   color: var(--quiet);
 }
@@ -1795,9 +1995,11 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--s-3) var(--s-4);
-  margin-top: var(--s-6);
-  padding-block: var(--s-3);
-  border-block: 1px solid var(--hair);
+  margin-top: 0;
+  padding: var(--s-3) var(--s-4) var(--s-3) var(--s-3);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-pill);
   max-width: var(--w-article, var(--w-read));
 }
 .listen + .brief {
@@ -2339,7 +2541,6 @@
   font-family: var(--font-ui);
   font-size: var(--t-micro);
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   color: var(--mute);
 }
 .analysis-note {

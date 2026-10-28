@@ -7,7 +7,7 @@
 .display {
   font-family: var(--font-display);
   font-size: var(--t-display);
-  font-weight: 400;
+  font-weight: var(--w-display);
   line-height: var(--lh-display);
   letter-spacing: var(--track-display);
   color: var(--ink);
@@ -17,7 +17,7 @@
 .title {
   font-family: var(--font-display);
   font-size: var(--t-title);
-  font-weight: 400;
+  font-weight: var(--w-display);
   line-height: var(--lh-tight);
   letter-spacing: var(--track-title);
   color: var(--ink);
@@ -55,10 +55,9 @@
    place by being the sole way a field name is distinguished from a value. */
 .label {
   font-family: var(--font-ui);
-  font-size: var(--t-micro);
+  font-size: var(--t-caption);
   font-weight: 500;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   color: var(--mute);
   line-height: 1;
 }
@@ -83,7 +82,7 @@
 .prose h2,
 .prose h3 {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 500;
   color: var(--ink);
   letter-spacing: var(--track-tight);
   line-height: var(--lh-heading);
@@ -254,40 +253,60 @@
   }
 }
 
-/* --- masthead ------------------------------------------------------------- */
+/* --- masthead -------------------------------------------------------------
+   Two tiers, as a quality paper sets them: a dateline, the wordmark centred
+   and the account at the top; the sections on a ruled line beneath. Not
+   sticky: two rows pinned over every article would be a toolbar, not a
+   masthead.                                                                  */
 
 .masthead {
-  border-bottom: 1px solid var(--hair);
   background: var(--canvas);
-  position: sticky;
-  top: 0;
-  z-index: 20;
 }
 
-.masthead-inner {
+.masthead-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s-4);
+  padding-block: var(--s-5) var(--s-4);
+}
+
+.masthead-browse {
   display: flex;
   align-items: center;
-  gap: var(--s-5);
-  height: 4.25rem;
+  gap: var(--s-4);
+  min-width: 0;
+  margin-left: calc(-1 * var(--s-3));
+}
+.masthead-date {
+  font-size: var(--t-small);
+  color: var(--mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .wordmark {
   font-family: var(--font-display);
-  font-size: 1.375rem;
-  letter-spacing: -0.02em;
+  font-weight: var(--w-display);
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+  letter-spacing: 0.005em;
+  line-height: 1;
   color: var(--ink);
   text-decoration: none;
   white-space: nowrap;
-  margin-right: auto;
 }
 .wordmark:hover {
   text-decoration: none;
+  color: var(--ink);
 }
 
-.nav {
+.masthead-account {
   display: flex;
   align-items: center;
-  gap: var(--s-1);
+  justify-content: flex-end;
+  gap: var(--s-2);
+  min-width: 0;
 }
 
 .nav-link {
@@ -296,12 +315,7 @@
   text-decoration: none;
   padding: var(--s-2) var(--s-3);
   border-radius: var(--r-pill);
-  /* A label is one phrase and must not break inside itself. Without this the
-     administrator, who sees more nav items than any other role, gets "How
-     scoring / works" and "Platform / Administrator" stacked on two ragged
-     lines: flex shrinks each item below its content width before the row
-     itself overflows, so the text wraps rather than the nav. */
-  white-space: nowrap;
+  white-space: nowrap; /* a label is one phrase and never breaks inside itself */
   transition: color var(--fast) var(--ease), background-color var(--fast) var(--ease);
 }
 .nav-link:hover {
@@ -312,166 +326,175 @@
   color: var(--ink);
 }
 
-.nav-divider {
+.masthead-cta {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The sections: a ruled line, centred, scrolling sideways when it must. */
+.masthead-sections {
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+}
+.masthead-sections-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-1) var(--s-6);
+  min-height: 3rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.masthead-sections-inner::-webkit-scrollbar {
+  display: none;
+}
+.section-link {
+  flex-shrink: 0;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  padding-block: var(--s-3);
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.section-link:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.section-link[aria-current="page"] {
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+.section-link--tool {
+  color: var(--quiet);
+}
+.section-link--narrow {
+  display: none;
+}
+.section-divider {
+  flex-shrink: 0;
   width: 1px;
   height: 1.25rem;
   background: var(--hair);
-  margin-inline: var(--s-2);
 }
 
-/* Between the phone layout and a full desktop the administrator's nav is the
-   first to run out of room, because that role carries six links where a reader
-   carries two. Tightening the horizontal padding recovers 8px an item, and the
-   signed-in name goes for the same reason it goes on a phone: it is the only
-   item here that names nothing the reader can do, and keeping it pushes "Sign
-   out" past the right edge. */
+/* Narrower desktops: the dateline goes before anything that does a job. */
 @media (max-width: 72rem) {
+  .masthead-date {
+    display: none;
+  }
   .nav-link {
     padding-inline: var(--s-2);
   }
-  .nav-name,
-  .nav-divider {
+}
+
+/* Phones: Browse, the wordmark and the account on one row; Search moves to
+   the start of the section line; the line starts at the left and scrolls. */
+@media (max-width: 60rem) {
+  .masthead-top {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--s-2);
+    padding-block: var(--s-3);
+  }
+  .masthead-browse {
+    margin-left: calc(-1 * var(--s-2));
+  }
+  .wordmark {
+    font-size: 1.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .masthead-search,
+  .masthead-pricing {
     display: none;
   }
-  /* Below about 1000px even the trimmed nav is wider than the space left beside
-     the wordmark, but only for the two privileged roles. Letting the nav scroll
-     within itself keeps that off the page: a reader, whose nav fits, sees no
-     change at all, where moving the whole masthead to its stacked layout this
-     early would have restructured the header for everyone. min-width is needed
-     because a flex item will not shrink below its content without it. */
-  .nav {
-    min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
+  .masthead-sections-inner {
+    justify-content: flex-start;
+    gap: var(--s-1) var(--s-5);
   }
-  .nav::-webkit-scrollbar {
-    display: none;
+  .section-link--narrow {
+    display: inline;
   }
 }
 
-@media (max-width: 60rem) {
-  .masthead-inner {
-    height: auto;
-    padding-block: var(--s-3);
-    flex-wrap: wrap;
-    gap: var(--s-2);
-  }
-  .wordmark {
-    margin-right: 0;
-    width: 100%;
-  }
-  .nav {
-    width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .nav::-webkit-scrollbar {
-    display: none;
-  }
-  /* The signed-in name is the first thing to go on a phone: it is the only nav
-     item that names nothing the reader can do, and keeping it pushed "Sign out"
-     off the edge. */
-  .nav-name,
-  .nav-divider {
+/* The narrowest phones: Create account steps back so the wordmark is never
+   cut; Sign in is beside it and the sign-in page links to registration. */
+@media (max-width: 30rem) {
+  .masthead-cta {
     display: none;
   }
 }
 
 /* --- credibility ----------------------------------------------------------
-   The centrepiece, and the reason this palette works. The reference forbids
-   chromatic colour, so the four bands cannot be a traffic light, which is a
-   better answer anyway: red and green badges make a publication look like a
-   virus scanner. Here the score is an instrument reading.
+   The centrepiece, and Sterling Wire's one bold mark: the score as a ring, a
+   fine track with the reading drawn round it, the numeral set inside. The
+   bands are never a traffic light; encodings, none of them colour alone:
+     1. the arc's length, the quantity
+     2. the numeral
+     3. the band word, always present and always the authority
+   Disputed also dashes the track, so it reads in grayscale print.            */
 
-   Three encodings, none of them colour alone:
-     1. fill length, the quantity
-     2. ink value, the band, as weight rather than hue
-     3. the word, always present and always the authority
-   Disputed additionally switches the fill to a hatch, so the most consequential
-   state is distinguishable by texture at a glance and in grayscale print.     */
+.ring {
+  flex-shrink: 0;
+  overflow: visible;
+}
+.ring-track,
+.ring-arc {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.ring-track {
+  stroke: var(--hair);
+  stroke-width: 1px;
+}
+.ring-arc {
+  stroke: var(--accent);
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.cred .ring-arc {
+  stroke-width: 2.5px;
+}
+.ring[data-band="Low"] .ring-arc {
+  stroke: var(--quiet);
+}
+.ring[data-band="Disputed"] .ring-track {
+  stroke: var(--rule);
+  stroke-dasharray: 3 3;
+}
+.ring[data-band="Disputed"] .ring-arc {
+  stroke: var(--ink);
+}
+.ring-num {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: var(--w-display);
+  fill: var(--ink);
+  font-variant-numeric: lining-nums;
+}
 
 .cred {
   display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
+  align-items: center;
+  gap: var(--s-4);
 }
-
-.cred-readout {
+.cred-words {
   display: flex;
-  align-items: baseline;
-  gap: var(--s-2);
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-ui);
+  line-height: 1.4;
 }
-
-.cred-score {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
+.cred-band {
+  font-size: var(--t-small);
+  font-weight: 600;
   color: var(--ink);
-  font-variant-numeric: tabular-nums;
 }
-
 .cred-outof {
   font-size: var(--t-caption);
   color: var(--mute);
-}
-
-.cred-band {
-  margin-left: auto;
-  font-family: var(--font-ui);
-  font-size: var(--t-micro);
-  font-weight: 500;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--quiet);
-}
-
-.cred-track {
-  position: relative;
-  height: 6px;
-  background: var(--sunken);
-  overflow: hidden;
-}
-
-.cred-fill {
-  height: 100%;
-  background: var(--ink);
-  transform-origin: left;
-  animation: fill var(--slow) var(--ease) both;
-}
-@keyframes fill {
-  from {
-    transform: scaleX(0);
-  }
-}
-
-.cred-fill[data-band="Moderate"] {
-  background: var(--quiet);
-}
-.cred-fill[data-band="Low"] {
-  background: var(--mute);
-}
-/* Texture, not colour: legible in grayscale and to a colour-blind reader. */
-.cred-fill[data-band="Disputed"] {
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--ink) 0 2px,
-    transparent 2px 5px
-  );
-}
-
-/* Tick marks every 20, so the bar reads as a measure rather than a progress
-   bar. Drawn on the track, above the fill. */
-.cred-track::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to right,
-    transparent 0 calc(20% - 1px),
-    var(--paper) calc(20% - 1px) 20%
-  );
-  pointer-events: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .cred-inline {
@@ -480,33 +503,13 @@
   gap: var(--s-2);
   font-family: var(--font-ui);
   font-size: var(--t-caption);
-  color: var(--quiet);
+  color: var(--mute);
   white-space: nowrap;
 }
 .cred-inline-num {
   font-weight: 600;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
-}
-.cred-inline-bar {
-  width: 2.5rem;
-  height: 3px;
-  background: var(--sunken);
-  flex: none;
-}
-.cred-inline-bar > i {
-  display: block;
-  height: 100%;
-  background: var(--ink);
-}
-.cred-inline-bar > i[data-band="Moderate"] {
-  background: var(--quiet);
-}
-.cred-inline-bar > i[data-band="Low"] {
-  background: var(--mute);
-}
-.cred-inline-bar > i[data-band="Disputed"] {
-  background: repeating-linear-gradient(-45deg, var(--ink) 0 2px, transparent 2px 4px);
 }
 
 /* The disclosure. PRD 1.3.3 promises a reader can trace exactly why a score is
@@ -648,7 +651,6 @@
   font-size: var(--t-micro);
   font-weight: 500;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   color: var(--quiet);
   border: 1px solid var(--hair);
   border-radius: var(--r-pill);
@@ -860,7 +862,6 @@
   font-size: var(--t-micro);
   font-weight: 500;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   color: var(--mute);
   padding: 0 var(--s-4) var(--s-3) 0;
   border-bottom: 1px solid var(--ink);
@@ -932,7 +933,6 @@
   font-size: var(--t-micro);
   font-weight: 500;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   color: var(--quiet);
   white-space: nowrap;
 }
@@ -991,7 +991,23 @@
    left twelve rems of dead canvas above the rule. */
 .footer {
   border-top: 1px solid var(--hair);
-  padding-block: var(--s-6);
+  background: var(--sunken);
+  padding-block: var(--s-7) var(--s-8);
+}
+.footer-brand {
+  flex: 1 1 18rem;
+  max-width: 26rem;
+}
+.footer-brand p {
+  margin: 0;
+  line-height: 1.6;
+}
+.footer-wordmark {
+  font-family: var(--font-display);
+  font-weight: var(--w-display);
+  font-size: 1.75rem;
+  color: var(--ink);
+  margin-bottom: var(--s-2) !important;
 }
 .footer-inner {
   display: flex;
@@ -1522,7 +1538,6 @@
   font-size: var(--t-micro);
   font-weight: 600;
   letter-spacing: var(--track-label);
-  text-transform: uppercase;
   color: var(--mute);
 }
 .browse-feature-title {
@@ -1574,12 +1589,6 @@
    Outside the nav, so it is never scrolled out of view. On wide screens it
    ends the masthead; on phones it shares the top row with the wordmark. */
 
-.masthead-account {
-  display: flex;
-  align-items: center;
-  gap: var(--s-2);
-  flex-shrink: 0;
-}
 .account-trigger {
   display: inline-flex;
   align-items: center;
@@ -1691,25 +1700,6 @@
     padding: 0.25rem;
   }
 }
-/* Phones: Browse and the wordmark on the first row; the nav, scrolling if it
-   must, and the account area pinned to its right on the second. */
-@media (max-width: 60rem) {
-  .wordmark {
-    width: auto;
-    flex: 1 1 calc(100% - 4rem);
-    min-width: 0;
-  }
-  /* A real starting width, so the nav cannot squeeze onto the first row
-     beside the wordmark; it grows to fill the second and scrolls if needed. */
-  .nav {
-    flex: 1 1 8rem;
-    width: auto;
-    min-width: 0;
-  }
-  .masthead-account {
-    margin-left: auto;
-  }
-}
 @media (max-width: 26rem) {
   .wordmark {
     font-size: 1.2rem;
@@ -1731,18 +1721,6 @@ a.chip {
   color: var(--paper);
 }
 
-/* Browse sits at the far left, before the wordmark, on every width. */
-.masthead-browse {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  margin-left: calc(-1 * var(--s-3));
-}
-@media (max-width: 60rem) {
-  .masthead-browse {
-    margin-left: calc(-1 * var(--s-2));
-  }
-}
 @media (max-width: 26rem) {
   /* On the narrowest phones the icon alone says Browse. */
   .masthead-browse .browse-trigger {

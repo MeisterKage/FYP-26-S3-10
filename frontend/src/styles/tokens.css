@@ -13,52 +13,58 @@
 
 :root {
   /* --- surfaces ------------------------------------------------------------
-     Elevation is a value shift, never a shadow. Three planes only, and they sit
-     close together on purpose: the reference separates surfaces "by colour value
-     alone", so a hairline rule does the work a drop shadow would.             */
-  --paper: #fcfdfd; /* cards, article body, elevated panels */
-  --canvas: #f2f5f8; /* the page itself -- stock, not white */
-  --sunken: #e5ecf0; /* wells, inset panels, meter troughs */
+     Sterling Wire: cool porcelain stock, white paper for what is lifted off
+     it, and a pale pewter well. No cream, no warmth: "sterling" is silver.
+     Elevation is still a value shift plus a hairline, never a shadow.        */
+  --paper: #ffffff; /* panels, inputs, lifted things */
+  --canvas: #f4f5f6; /* the page itself: porcelain, not white */
+  --sunken: #edeff1; /* wells, footer, meter troughs */
 
   /* --- lines --------------------------------------------------------------- */
-  --hair: #ccd8e0; /* default 1px rule between related things */
-  --rule: #9ab1c1; /* emphatic divider, meter ticks (2.03:1 -- non-text only) */
+  --hair: #d3d8dd; /* silver hairline between related things */
+  --rule: #a9b2ba; /* emphatic divider, meter ticks (non-text only) */
 
-  /* --- ink ----------------------------------------------------------------- */
-  --mute: #587184; /* captions, metadata          4.67 canvas / 5.01 paper */
-  --quiet: #446074; /* secondary text              6.05 / 6.50              */
-  --body: #294c65; /* running body copy           8.29 / 8.90              */
-  --ink: #133955; /* headings, primary text      11.00 / 11.82  <- brand   */
-  --deep: #0a2233; /* filled buttons only         15.98 against --paper     */
+  /* --- ink -----------------------------------------------------------------
+     Graphite text; the client's navy is now the accent, kept for the things
+     that act or measure: links, buttons, the credibility ring.  Contrast on
+     --canvas / --paper.                                                       */
+  --mute: #5b6772; /* captions, metadata          5.3 / 5.7  */
+  --quiet: #4a5560; /* secondary text              7.0 / 7.6  */
+  --body: #2a3640; /* running body copy           11.6 / 12.6 */
+  --ink: #18232d; /* headings, primary text      14.6 / 15.9 */
+  --deep: #133955; /* filled buttons: the brand navy, 12.1 on white */
+  --accent: #133955; /* links, rings, focus: the brand navy */
 
   /* --- type ----------------------------------------------------------------
-     Display is a transitional book serif; UI is a humanist grotesque; body is a
-     serif cut for screen reading. Three voices, each with one job.           */
-  --font-display: "Playfair Display", "Libre Caslon Text", Georgia, serif;
-  --font-ui: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
-  --font-body: "Source Serif 4", Charter, Georgia, "Times New Roman", serif;
+     Newsreader, a face drawn for news, carries headlines (light, at large
+     optical sizes) and the reading text. Hanken Grotesk, in sentence case,
+     carries navigation and metadata. CJK falls back to system serif/sans.   */
+  --font-display: "Newsreader Variable", "Newsreader", "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  --font-body: "Newsreader Variable", "Newsreader", "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  --font-ui: "Hanken Grotesk Variable", "Hanken Grotesk", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --w-display: 300; /* headline weight: light */
 
   /* Minor-third scale (1.2). Display sizes are fluid so the masthead never
-     overflows at 360px, which a fixed 120px would.                           */
-  --t-display: clamp(2.75rem, 1.2rem + 7vw, 5.5rem);
-  --t-title: clamp(2rem, 1.1rem + 3.6vw, 3.25rem);
+     overflows at 360px.                                                       */
+  --t-display: clamp(2.75rem, 1.2rem + 6vw, 4.75rem);
+  --t-title: clamp(2.25rem, 1.2rem + 3.6vw, 4rem);
   --t-heading: clamp(1.5rem, 1.1rem + 1.4vw, 2rem);
-  --t-sub: 1.25rem;
-  --t-lead: 1.1875rem;
-  --t-body: 1rem;
+  --t-sub: 1.375rem;
+  --t-lead: 1.3125rem;
+  --t-body: 1.0625rem;
   --t-small: 0.875rem;
   --t-caption: 0.8125rem;
-  --t-micro: 0.6875rem;
+  --t-micro: 0.75rem;
 
-  --lh-display: 0.9;
+  --lh-display: 1.02;
   --lh-tight: 1.15;
   --lh-heading: 1.25;
-  --lh-body: 1.65; /* reading measure wants air; the reference's 1.2 is for cards */
+  --lh-body: 1.72; /* a serif reading column wants air */
 
-  --track-display: -0.035em;
-  --track-title: -0.025em;
-  --track-tight: -0.011em;
-  --track-label: 0.08em; /* letterspaced small caps for labels */
+  --track-display: -0.02em;
+  --track-title: -0.015em;
+  --track-tight: -0.005em;
+  --track-label: 0; /* labels are sentence case now: no letterspacing */
 
   /* --- space ---------------------------------------------------------------
      8px base, doubling. Named by intent so a component asks for "section" and

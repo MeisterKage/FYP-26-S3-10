@@ -4,14 +4,9 @@ import { BrowserRouter } from "react-router-dom";
 
 // Self-hosted, not a CDN: the pages render identically offline and there is no
 // third-party request on first paint. Only the weights actually used are loaded.
-import "@fontsource/playfair-display/400.css";
-import "@fontsource/playfair-display/400-italic.css";
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
-import "@fontsource/source-serif-4/400.css";
-import "@fontsource/source-serif-4/400-italic.css";
-import "@fontsource/source-serif-4/600.css";
+import "@fontsource-variable/newsreader/opsz.css";
+import "@fontsource-variable/newsreader/opsz-italic.css";
+import "@fontsource-variable/hanken-grotesk/index.css";
 
 import "./styles/tokens.css";
 import "./styles/base.css";
