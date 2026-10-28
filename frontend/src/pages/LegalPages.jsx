@@ -29,7 +29,7 @@ export function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy"
-      intro="What Wollongong News keeps about you, why, and who else sees it. In short: only what the site needs to work, no advertising trackers, and no selling of anything."
+      intro="What Sterling Wire keeps about you, why, and who else sees it. In short: only what the site needs to work, no advertising trackers, and no selling of anything."
     >
       <h2>What we keep</h2>
       <ul>
@@ -123,7 +123,7 @@ export function TermsPage() {
   return (
     <LegalPage
       title="Terms of use"
-      intro="The rules for reading, writing and subscribing on Wollongong News. By creating an account you agree to them."
+      intro="The rules for reading, writing and subscribing on Sterling Wire. By creating an account you agree to them."
     >
       <h2>Your account</h2>
       <p>

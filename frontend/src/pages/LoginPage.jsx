@@ -95,7 +95,7 @@ export default function LoginPage() {
       </div>
 
       <AuthAside
-        lead="Every article on Wollongong News carries a credibility score produced by a fixed set of rules. The working sits beside the article, where you can check it."
+        lead="Every article on Sterling Wire carries a credibility score produced by a fixed set of rules. The working sits beside the article, where you can check it."
       />
     </div>
   );

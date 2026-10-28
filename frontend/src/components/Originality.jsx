@@ -197,7 +197,7 @@ export function OriginalityCheck({ articleId, initial = null, beforeCheck, label
           {report ? "Check again" : label}
         </Button>
         <p className="meta">
-          Compares with every article on Wollongong News and the pages you cite. Takes a few
+          Compares with every article on Sterling Wire and the pages you cite. Takes a few
           seconds.
         </p>
       </div>

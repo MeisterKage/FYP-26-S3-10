@@ -23,7 +23,7 @@ from pathlib import Path
 
 API = "https://en.wikipedia.org/w/api.php"
 BASE = "Wikipedia:Reliable sources/Perennial sources"
-USER_AGENT = "WollongongNews-SourceRatings/1.0 (university student project)"
+USER_AGENT = "SterlingWire-SourceRatings/1.0 (university student project)"
 OUT = Path(__file__).parent / "app" / "data" / "perennial_sources.json"
 
 STATUSES = {

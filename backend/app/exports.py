@@ -18,7 +18,7 @@ from . import insights
 
 INK = (0x13, 0x39, 0x55)
 QUIET = (0x44, 0x60, 0x74)
-SITE = "Wollongong News"
+SITE = "Sterling Wire"
 
 
 @dataclass

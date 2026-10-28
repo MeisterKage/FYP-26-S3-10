@@ -27,7 +27,7 @@ from app.extensions import db
 from app.images import process
 from app.models import Article, ArticleImage
 
-USER_AGENT = "WollongongNewsDemo/1.0 (university student project; demo images)"
+USER_AGENT = "SterlingWireDemo/1.0 (university student project; demo images)"
 
 # (article title, Commons file, photographer as credited, licence, alt text)
 PHOTOS = [

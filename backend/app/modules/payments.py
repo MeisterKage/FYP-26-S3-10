@@ -84,7 +84,7 @@ def sandbox_checkout(ref: str):
     contributor = db.session.get(User, payment.contributor_id)
     return jsonify({
         "payment": serialize(payment),
-        "merchant": "Wollongong News",
+        "merchant": "Sterling Wire",
         "item": f"Monthly subscription to {contributor.byline}",
     })
 

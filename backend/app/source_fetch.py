@@ -30,7 +30,7 @@ from dataclasses import dataclass
 TIMEOUT_SECONDS = 5
 MAX_BYTES = 1_000_000
 MAX_REDIRECTS = 3
-USER_AGENT = "WollongongNews-SourceCheck/1.0 (+originality check of cited sources)"
+USER_AGENT = "SterlingWire-SourceCheck/1.0 (+originality check of cited sources)"
 ALLOWED_TYPES = ("text/html", "text/plain", "application/xhtml+xml")
 
 

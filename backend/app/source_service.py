@@ -27,7 +27,7 @@ CROSSREF = "https://api.crossref.org/v1/works/"
 CROSSREF_TIMEOUT = 8
 #: Crossref asks API users to identify themselves; this puts requests in its
 #: faster "polite" pool.
-CROSSREF_AGENT = "WollongongNews-SourceRatings/1.0 (+https://fyp-26-s3-10-web.onrender.com)"
+CROSSREF_AGENT = "SterlingWire-SourceRatings/1.0 (+https://fyp-26-s3-10-web.onrender.com)"
 #: Kinds of fetch failure meaning "there is no such page". Anything else (a
 #: site blocking scripts, a timeout) says nothing against the source.
 MISSING = {"missing", "refused"}

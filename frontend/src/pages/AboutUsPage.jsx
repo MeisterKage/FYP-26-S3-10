@@ -34,7 +34,7 @@ export default function AboutUsPage() {
         <p className="label">About us</p>
         <h1 className="display mt-3">News you can check.</h1>
         <p className="lead mt-6">
-          Wollongong News publishes reporting from independent writers, reviewed by editors,
+          Sterling Wire publishes reporting from independent writers, reviewed by editors,
           and gives every article a credibility score worked out in the open. You can see who
           wrote a story, what it is based on, and every correction made to it.
         </p>

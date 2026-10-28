@@ -25,7 +25,7 @@ from ..models import Article, ArticleImage
 
 bp = Blueprint("share", __name__)
 
-SITE = "Wollongong News"
+SITE = "Sterling Wire"
 
 
 def site_url() -> str:

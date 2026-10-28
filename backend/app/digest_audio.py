@@ -29,7 +29,7 @@ from .enums import ArticleStatus
 from .insights_service import ProviderNotConfigured, narrator, summariser, _cached
 from .models import Article, Category, DigestEdition
 
-SITE = "Wollongong News"
+SITE = "Sterling Wire"
 #: Speaking pace used for the running time, in words per minute at 1x.
 SPOKEN_WPM = 160
 

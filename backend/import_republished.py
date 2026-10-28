@@ -44,7 +44,7 @@ from app.scoring_service import rescore_contributor_articles
 from app.security import hash_password
 from app.source_service import rate_sources
 
-AGENT = "WollongongNews-Republish/1.0 (+https://fyp-26-s3-10-web.onrender.com)"
+AGENT = "SterlingWire-Republish/1.0 (+https://fyp-26-s3-10-web.onrender.com)"
 CONVERSATION_FEED = "https://theconversation.com/au/articles.atom"
 ATOM = {"a": "http://www.w3.org/2005/Atom"}
 

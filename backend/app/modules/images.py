@@ -85,7 +85,7 @@ def upload_image():
     if markers:
         raise ApiError(
             f"This image looks AI-generated: {markers[0]}. AI-generated images are not "
-            "allowed on Wollongong News.", status=422, field="file")
+            "allowed on Sterling Wire.", status=422, field="file")
     try:
         processed = process(data)
     except ImageRejected as e:

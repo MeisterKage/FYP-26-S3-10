@@ -263,7 +263,7 @@ COUNTRIES: dict[str, str] = {
     "ZW": "Zimbabwe",
 }
 
-#: What a new article starts on. The platform is Wollongong News.
+#: What a new article starts on. The platform is Sterling Wire.
 DEFAULT_COUNTRY = "AU"
 
 

@@ -27,7 +27,7 @@ export function Masthead() {
           <BrowseMenu />
         </div>
         <Link className="wordmark" to="/">
-          Wollongong News
+          Sterling Wire
         </Link>
 
         <nav className="nav" aria-label="Main">

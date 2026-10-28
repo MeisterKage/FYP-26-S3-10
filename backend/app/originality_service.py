@@ -311,7 +311,7 @@ def check(article: Article, *, settings: dict | None = None, now: datetime | Non
             {"publisher": republished.get("publisher"), "url": original_url,
              "licence": republished.get("licence")} if republished else None
         ),
-        "scope": "Compared with every article submitted to Wollongong News and with the "
+        "scope": "Compared with every article submitted to Sterling Wire and with the "
                  "pages this article cites. The wider web is not searched.",
     }
     article.originality_percent = percent
