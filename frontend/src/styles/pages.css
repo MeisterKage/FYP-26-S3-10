@@ -1666,19 +1666,27 @@
   color: var(--ink);
   font-weight: 600;
 }
+/* The margin is set here rather than by a utility class: pages.css loads after
+   the utilities, so margin: 0 here would cancel the gap under the list's label. */
 .signals-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: var(--s-4) 0 0;
   display: grid;
-  gap: var(--s-4);
+  gap: var(--s-5);
 }
+/* Same text edge whether the rule is 1px or 3px. */
 .signals-list li {
-  padding-left: var(--s-3);
+  padding: var(--s-1) 0 var(--s-1) calc(var(--s-4) + 2px);
   border-left: 1px solid var(--hair);
 }
 .signals-list li.is-flagged {
+  padding-left: var(--s-4);
   border-left: 3px solid var(--ink);
+}
+.signals-list li > .meta {
+  margin-top: var(--s-2);
+  line-height: 1.6;
 }
 .signals-row {
   display: flex;
@@ -1705,6 +1713,9 @@
   font-weight: 600;
 }
 .signals-disclaimer {
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
   font-family: var(--font-ui);
   font-size: var(--t-small);
   color: var(--quiet);
@@ -2635,14 +2646,17 @@
 }
 .ai-passages {
   list-style: none;
-  margin: 0;
+  margin: var(--s-4) 0 0;
   padding: 0;
   display: grid;
-  gap: var(--s-3);
+  gap: var(--s-5);
 }
 .ai-passages li {
-  padding-left: var(--s-3);
+  padding: var(--s-1) 0 var(--s-1) var(--s-4);
   border-left: 3px solid var(--ink);
+}
+.ai-passages li > .meta {
+  margin-top: var(--s-2);
 }
 .ai-passage-text {
   font-family: var(--font-body);

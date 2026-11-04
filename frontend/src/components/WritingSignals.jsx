@@ -64,7 +64,7 @@ export function WritingSignals({ articleId }) {
 
             {flaggedPassages.length > 0 && (
               <>
-                <p className="label mt-5">Passages that read as AI-generated</p>
+                <p className="label mt-7">Passages that read as AI-generated</p>
                 <ul className="ai-passages mt-3">
                   {flaggedPassages.map((p, i) => (
                     <li key={i}>
@@ -76,7 +76,7 @@ export function WritingSignals({ articleId }) {
               </>
             )}
 
-            <p className="label mt-5">Signals across the whole article</p>
+            <p className="label mt-7">Signals across the whole article</p>
             <ul className="signals-list mt-3">
               {result.signals.map((s) => (
                 <li key={s.key} className={s.flagged ? "is-flagged" : undefined}>
