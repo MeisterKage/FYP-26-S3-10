@@ -13,7 +13,8 @@ from ..errors import ApiError
 from ..extensions import db
 from ..integrations import email_service
 from ..models import (
-    AuditLog, Category, PasswordResetToken, User, UserCategoryPreference, UserCountryPreference, utcnow,
+    AuditLog, Category, PasswordResetToken, User, UserCategoryPreference, UserCountryPreference,
+    _aware, utcnow,
 )
 from ..sanitize import clean_plain_text
 from ..security import (
@@ -180,10 +181,9 @@ def request_password_reset():
     )
     db.session.commit()
 
-    email_service.send(
-        to=user.email,
-        subject="Reset your password",
-        body=f"Use this link within {ttl} minutes: /reset-password?token={raw}",
+    site = current_app.config["SITE_URL"].rstrip("/")
+    email_service.send_password_reset(
+        to=user.email, link=f"{site}/reset-password?token={raw}", ttl_minutes=ttl
     )
     return confirmation
 
@@ -202,7 +202,7 @@ def confirm_password_reset():
     expired = ApiError("This reset link has expired. Request a new one.", status=400)
     if record is None or record.used_at is not None:
         raise expired
-    if record.expires_at <= datetime.now(timezone.utc):
+    if _aware(record.expires_at) <= datetime.now(timezone.utc):
         raise expired
     if not reset_tokens_match(record.token_hash, raw):
         raise expired

@@ -37,7 +37,7 @@ from ..translation_service import (
     fresh as fresh_translation, note as translation_note, pending as translation_pending, request_lang,
 )
 from ..scoring_service import load_settings, rescore_article
-from ..security import login_required, roles_required
+from ..security import current_user, roles_required
 from ..validation import json_body, require_int, require_list, require_str
 
 bp = Blueprint("articles", __name__)
@@ -531,15 +531,20 @@ def my_articles():
 
 
 @bp.get("/articles/<int:article_id>/revisions")
-@login_required
 def revision_history(article_id: int):
+    """Public once published, so a reader can trace a correction. Bodies are left
+    out, so this cannot get around the paywall. Anything unpublished stays private."""
     article = Article.query.get(article_id)
     if article is None:
         raise ApiError("Article not found.", status=404)
 
-    is_author = article.contributor_id == g.current_user.id
-    if not is_author and g.current_user.role not in {Role.EDITOR, Role.SYSTEM_ADMIN}:
-        raise ApiError("You cannot view this article's history.", status=403)
+    if article.status != ArticleStatus.PUBLISHED:
+        viewer = current_user()
+        if viewer is None:
+            raise ApiError("Sign in to continue.", status=401)
+        is_author = article.contributor_id == viewer.id
+        if not is_author and viewer.role not in {Role.EDITOR, Role.SYSTEM_ADMIN}:
+            raise ApiError("You cannot view this article's history.", status=403)
 
     revisions = (
         ArticleRevision.query.filter_by(article_id=article.id)

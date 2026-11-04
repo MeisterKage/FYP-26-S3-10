@@ -58,11 +58,17 @@ def validate_password_strength(raw: str) -> None:
 #  Tokens
 # --------------------------------------------------------------------------- #
 
+def _password_stamp(user) -> str:
+    """Changes with the password, so a reset ends sessions opened with the old one."""
+    return hashlib.sha256(user.password_hash.encode()).hexdigest()[:16]
+
+
 def issue_access_token(user) -> str:
     now = datetime.now(timezone.utc)
     payload = {
         "sub": str(user.id),
         "role": user.role.value,
+        "pwd": _password_stamp(user),
         "iat": now,
         "exp": now + timedelta(minutes=current_app.config["JWT_ACCESS_TTL_MINUTES"]),
     }
@@ -125,6 +131,8 @@ def load_current_user() -> None:
         raise ApiError("Account no longer exists.", status=401)
     if user.is_suspended:
         raise ApiError("This account is suspended.", status=403)
+    if claims.get("pwd") != _password_stamp(user):
+        raise ApiError("Session expired. Please sign in again.", status=401)
 
     g.current_user = user
 

@@ -30,6 +30,17 @@ class EmailDeliveryService:
         log.info("[email:stub] to=%s subject=%r", to, subject)
         return True
 
+    def send_password_reset(self, *, to: str, link: str, ttl_minutes: int) -> bool:
+        """With no mail provider connected, an administrator passes this link on by hand.
+
+        WARNING, because gunicorn leaves the root logger unconfigured and INFO
+        lines never reach the server log. The link is single use and expires.
+        """
+        log.warning(
+            "[email:stub] password reset for %s, valid for %d minutes: %s", to, ttl_minutes, link
+        )
+        return True
+
 
 # --------------------------------------------------------------------------- #
 #  Payment gateway

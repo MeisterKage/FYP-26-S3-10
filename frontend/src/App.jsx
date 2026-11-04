@@ -86,10 +86,16 @@ function RequireRole({ roles, children }) {
   }
 
   if (roles && !has(...roles)) {
+    // Administrators are on every list, so name the widest group the list admits.
+    const audience = roles.includes(ROLES.CONTRIBUTOR)
+      ? "writers"
+      : roles.includes(ROLES.EDITOR)
+        ? "editors"
+        : "administrators";
     return (
       <Empty title="You don't have access to this page">
-        This area is for {roles.includes(ROLES.EDITOR) ? "editors" : "writers"}. If
-        that should include you, an administrator can change your role.
+        This area is for {audience}. If that should include you, an administrator
+        can change your role.
       </Empty>
     );
   }
