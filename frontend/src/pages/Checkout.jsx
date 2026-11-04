@@ -17,8 +17,8 @@ import { api } from "../api";
 import { Button, Empty, Notice, formatDate } from "../components/UI";
 import { usePageTitle } from "../usePageTitle";
 
-export function money(cents, currency = "AUD") {
-  return new Intl.NumberFormat("en-AU", { style: "currency", currency }).format(cents / 100);
+export function money(cents, currency = "USD") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(cents / 100);
 }
 
 /** Start a subscription checkout and go to it. Shared by the profile and the paywall. */

@@ -53,7 +53,7 @@ def secret(app):
     return app.config["PAYMENT_WEBHOOK_SECRET"]
 
 
-def event(ref, *, kind="payment.succeeded", amount=500, currency="AUD", event_id="evt_1"):
+def event(ref, *, kind="payment.succeeded", amount=500, currency="USD", event_id="evt_1"):
     return json.dumps({"id": event_id, "type": kind, "checkout": ref,
                        "amount": amount, "currency": currency}).encode()
 
@@ -76,7 +76,7 @@ def test_subscribing_starts_a_checkout_and_grants_nothing_yet(client, people):
     assert started["checkoutUrl"].startswith("/checkout/test/sbx_cs_")
     payment = _db.session.get(Payment, started["paymentId"])
     assert payment.status == "pending"
-    assert payment.amount_cents == 500 and payment.currency == "AUD"
+    assert payment.amount_cents == 500 and payment.currency == "USD"
     assert Subscription.query.count() == 0
 
 
@@ -141,7 +141,7 @@ def test_paying_again_extends_rather_than_duplicates(client, people):
 
     # A second checkout started before the first completed (another tab).
     second = Payment(user_id=people["reader"].id, purpose="subscription",
-                     contributor_id=people["writer"].id, amount_cents=500, currency="AUD",
+                     contributor_id=people["writer"].id, amount_cents=500, currency="USD",
                      status="pending", provider="sandbox", provider_ref="sbx_cs_second")
     _db.session.add(second)
     _db.session.commit()

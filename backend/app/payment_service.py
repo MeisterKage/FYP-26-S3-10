@@ -22,7 +22,7 @@ from .payments import (
 
 #: Flat monthly price for a writer's premium tier. Per-writer pricing is a later step.
 SUBSCRIPTION_PRICE_CENTS = 500
-CURRENCY = "AUD"
+CURRENCY = "USD"
 SUBSCRIPTION_DAYS = 30
 
 
@@ -128,7 +128,7 @@ def _apply(payment: Payment, event: PaymentEvent, now: datetime) -> dict:
             user_id=payment.user_id,
             event_type="payment_receipt",
             title="Payment received",
-            body=f"A${payment.amount_cents / 100:.2f} for a monthly subscription. "
+            body=f"US${payment.amount_cents / 100:.2f} for a monthly subscription. "
                  f"Access runs until {_aware(subscription.period_end):%d %B %Y}.",
             link="/account",
         ))

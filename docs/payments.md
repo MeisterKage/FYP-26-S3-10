@@ -4,7 +4,7 @@ Wollongong News takes payments through a provider interface (`backend/app/paymen
 
 ## How a payment works
 
-1. **A reader clicks Subscribe.** The server creates an order (`payments` table) and sets the price itself (A$5.00 a month). The browser is never trusted to say how much something costs.
+1. **A reader clicks Subscribe.** The server creates an order (`payments` table) and sets the price itself (US$5.00 a month). The browser is never trusted to say how much something costs.
 2. **The reader is sent to the provider's checkout page.** Card details go to the provider and never reach this server. That keeps the platform out of scope for most of the card industry's security standard (PCI DSS).
 3. **The provider reports the outcome by webhook** to `POST /api/payments/webhook/<provider>`. The server:
    - checks the signature (HMAC-SHA256, the scheme Stripe uses) and rejects anything unsigned, altered, or more than five minutes old;

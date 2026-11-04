@@ -173,7 +173,7 @@ export function TermsPage() {
 
       <h2>Subscriptions</h2>
       <p>
-        Subscribing to a writer costs A$5.00 a month. While a subscription is active you can read
+        Subscribing to a writer costs US$5.00 a month. While a subscription is active you can read
         subscriber-only articles. You can cancel any time from your account; subscriber-only
         articles close again when you cancel. The checkout is currently a test and takes no money.
       </p>
