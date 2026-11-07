@@ -35,8 +35,8 @@ HEADERS = {
     "Content-Security-Policy": (
         "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
     ),
-    # This API is read with a bearer token, never a cookie, so there is no
-    # reason for a browser to keep a shared cached copy of an authorised reply.
+    #This API is read with a bearer token, never a cookie, so there is no
+    #reason for a browser to keep a shared cached copy of an authorised reply.
     "Cache-Control": "no-store",
 }
 
@@ -45,7 +45,7 @@ def register_security_headers(app: Flask) -> None:
     @app.after_request
     def _apply(response):
         for header, value in HEADERS.items():
-            # setdefault semantics: a route that deliberately sets its own
-            # caching or framing rule keeps it.
+            #setdefault semantics: a route that deliberately sets its own
+            #caching or framing rule keeps it.
             response.headers.setdefault(header, value)
         return response

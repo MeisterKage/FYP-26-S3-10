@@ -71,16 +71,16 @@ def upload_image():
     upload = request.files.get("file")
     if upload is None:
         raise ApiError("Choose an image to upload.", status=422, field="file")
-    # AI-generated images are not allowed. The writer says so for each upload;
-    # the file's own metadata is checked below as well.
+    #AI-generated images are not allowed. The writer says so for each upload;
+    #the file's own metadata is checked below as well.
     if request.form.get("declaration") != "not-ai":
         raise ApiError("Confirm that this image is not AI-generated.", status=422,
                        field="declaration")
 
-    # Read one byte past the limit, so an oversized file is refused without
-    # holding the whole thing in memory.
+    #Read one byte past the limit, so an oversized file is refused without
+    #holding the whole thing in memory.
     data = upload.stream.read(MAX_UPLOAD_BYTES + 1)
-    # Before re-encoding, which drops the metadata this reads.
+    #Before re-encoding, which drops the metadata this reads.
     markers = ai_markers(data[:MAX_UPLOAD_BYTES])
     if markers:
         raise ApiError(
@@ -110,9 +110,9 @@ def _serve(key: str, variant: str) -> Response:
     if row is None:
         raise ApiError("Image not found.", status=404)
     response = Response(row[0], mimetype="image/webp")
-    # The bytes behind a key never change (a new upload gets a new key), so a
-    # browser may keep its copy for a year. This overrides the API-wide
-    # no-store, which exists for authorised JSON, not for public images.
+    #The bytes behind a key never change (a new upload gets a new key), so a
+    #browser may keep its copy for a year. This overrides the API-wide
+    #no-store, which exists for authorised JSON, not for public images.
     response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
 

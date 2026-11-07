@@ -33,7 +33,7 @@ class ExportContent:
     approved_by: str | None
     url: str
     points: list[str] = field(default_factory=list)
-    sources: list[tuple[str, str]] = field(default_factory=list)  # (label, url)
+    sources: list[tuple[str, str]] = field(default_factory=list)  #(label, url)
     lang: str = "en"
     labels: dict = field(default_factory=dict)
 
@@ -73,9 +73,9 @@ def _sections(body_html: str) -> list[tuple[str | None, list[str]]]:
     return [(h, ps) for h, ps in out if ps]
 
 
-# --------------------------------------------------------------------------- #
-#  PDF
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# PDF
+#--------------------------------------------------------------------------- #
 
 def to_pdf(content: ExportContent) -> bytes:
     from xml.sax.saxutils import escape
@@ -177,9 +177,9 @@ def to_pdf(content: ExportContent) -> bytes:
     return out.getvalue()
 
 
-# --------------------------------------------------------------------------- #
-#  PowerPoint
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# PowerPoint
+#--------------------------------------------------------------------------- #
 
 MAX_BULLETS = 5
 
@@ -245,7 +245,7 @@ def to_pptx(content: ExportContent) -> bytes:
         text_box(slide, margin, Inches(6.85), W - 2 * margin, Inches(0.4),
                  [f"{SITE} · {content.url}"], 10, quiet, ui_font)
 
-    # Title slide
+    #Title slide
     slide = prs.slides.add_slide(blank)
     text_box(slide, margin, Inches(0.7), W - 2 * margin, Inches(0.4), [SITE.upper()], 12, quiet, ui_font, True)
     rule(slide, Inches(1.2))
@@ -258,7 +258,7 @@ def to_pptx(content: ExportContent) -> bytes:
                     + (f" · {content.band}" if content.band else ""))
     text_box(slide, margin, Inches(5.6), W - 2 * margin, Inches(1), meta, 14, ink, ui_font)
 
-    # Key points
+    #Key points
     if content.points:
         slide = prs.slides.add_slide(blank)
         text_box(slide, margin, Inches(0.6), W - 2 * margin, Inches(0.8),
@@ -270,7 +270,7 @@ def to_pptx(content: ExportContent) -> bytes:
                  [_label(content, "summary_note")], 11, quiet, ui_font)
         footer(slide)
 
-    # One slide per section of the article
+    #One slide per section of the article
     for heading, paragraphs in _sections(content.body_html):
         slide = prs.slides.add_slide(blank)
         text_box(slide, margin, Inches(0.6), W - 2 * margin, Inches(0.8),
@@ -280,7 +280,7 @@ def to_pptx(content: ExportContent) -> bytes:
                  _bullets_for(paragraphs), 18, ink, font, bullets=True, spacing=12)
         footer(slide)
 
-    # Sourcing and score
+    #Sourcing and score
     slide = prs.slides.add_slide(blank)
     text_box(slide, margin, Inches(0.6), W - 2 * margin, Inches(0.8),
              [_label(content, "sourcing")], 28, ink, font, True)

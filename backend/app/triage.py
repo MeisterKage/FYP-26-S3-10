@@ -46,27 +46,27 @@ from .originality import DEFAULTS as ORIGINALITY_DEFAULTS
 #: same names. Kept apart from credibility.DEFAULTS so the scoring engine stays
 #: about scoring; the admin endpoint validates against the union of the two.
 DEFAULTS: dict[str, float] = {
-    # ---- queue ordering ----
-    "triage_new_contributor_weight": 40.0,  # a writer with no record yet
-    "triage_accuracy_baseline": 90.0,       # accuracy at or above adds nothing
-    "triage_accuracy_weight": 1.0,          # per accuracy point below baseline
-    "triage_expected_sources": 3,           # sourcing below this adds priority
-    "triage_missing_source_weight": 10.0,   # per missing source
-    "triage_duplicate_weight": 30.0,        # title matches another article
-    # Text matching elsewhere, scaled by how much: 50% overlap adds 30, 100%
-    # adds 60, as much as a new writer and an unsourced article combined.
-    # Applied only at or above originality_flag_percent.
+    #---- queue ordering ----
+    "triage_new_contributor_weight": 40.0,  #a writer with no record yet
+    "triage_accuracy_baseline": 90.0,       #accuracy at or above adds nothing
+    "triage_accuracy_weight": 1.0,          #per accuracy point below baseline
+    "triage_expected_sources": 3,           #sourcing below this adds priority
+    "triage_missing_source_weight": 10.0,   #per missing source
+    "triage_duplicate_weight": 30.0,        #title matches another article
+    #Text matching elsewhere, scaled by how much: 50% overlap adds 30, 100%
+    #adds 60, as much as a new writer and an unsourced article combined.
+    #Applied only at or above originality_flag_percent.
     "triage_similarity_weight": 60.0,
     **ORIGINALITY_DEFAULTS,
-    "triage_wait_weight": 0.1,              # per hour waiting: 2.4 a day, see below
-    # ---- auto-publish valve ----
-    "autopublish_enabled": 0,               # 0 = off, 1 = on. Off by default.
-    "autopublish_queue_depth": 25,          # opens above this many pending...
-    "autopublish_max_wait_hours": 48,       # ...or once the oldest waits this long
-    "autopublish_min_accuracy": 90.0,       # writer must be at least this accurate
-    "autopublish_min_articles": 10,         # over at least this many articles
-    "autopublish_suspension_days": 90,      # lost after a correction on one
-    "autopublish_max_per_run": 20,          # blast radius of a single sweep
+    "triage_wait_weight": 0.1,              #per hour waiting: 2.4 a day, see below
+    #---- auto-publish valve ----
+    "autopublish_enabled": 0,               #0 = off, 1 = on. Off by default.
+    "autopublish_queue_depth": 25,          #opens above this many pending...
+    "autopublish_max_wait_hours": 48,       #...or once the oldest waits this long
+    "autopublish_min_accuracy": 90.0,       #writer must be at least this accurate
+    "autopublish_min_articles": 10,         #over at least this many articles
+    "autopublish_suspension_days": 90,      #lost after a correction on one
+    "autopublish_max_per_run": 20,          #blast radius of a single sweep
 }
 
 @dataclass(frozen=True)
@@ -213,11 +213,11 @@ def autopublish_eligibility(
     if similarity_percent is None:
         reasons.append("originality has not been checked")
     elif similarity_percent >= float(cfg["originality_flag_percent"]):
-        # Anything flagged waits for a person. Auto-publish is for articles
-        # with nothing to judge, and matching text is always a judgement.
+        #Anything flagged waits for a person. Auto-publish is for articles
+        #with nothing to judge, and matching text is always a judgement.
         reasons.append("text matches another article or a cited source")
     if is_premium:
-        # A reader who is paying gets an article a human has read.
+        #A reader who is paying gets an article a human has read.
         reasons.append("premium articles always need an editor")
 
     return Eligibility(eligible=not reasons, reasons=reasons)

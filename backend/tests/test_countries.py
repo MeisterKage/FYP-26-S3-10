@@ -19,7 +19,7 @@ PASSWORD = "CountriesTest123!"
 def test_the_list_is_the_249_current_iso_countries():
     assert len(countries.COUNTRIES) == 249
     assert countries.COUNTRIES["AU"] == "Australia"
-    assert "SU" not in countries.COUNTRIES  # the Soviet Union is history
+    assert "SU" not in countries.COUNTRIES  #the Soviet Union is history
 
 
 @pytest.mark.parametrize("raw,expected", [("au", "AU"), (" nz ", "NZ"), (None, None), ("", None)])
@@ -38,7 +38,7 @@ def test_name_search_needs_three_letters():
     assert countries.codes_matching("an") == []
 
 
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
 
 @pytest.fixture()
 def world(app):
@@ -91,7 +91,7 @@ def test_a_writer_sets_and_changes_the_country(client, world):
     cleared = client.patch(
         f"/api/articles/{created['id']}", json={"countryCode": None}, headers=headers
     ).get_json()
-    assert cleared["country"] is None  # international
+    assert cleared["country"] is None  #international
 
 
 def test_an_invalid_country_is_refused_with_a_field_error(client, world):
@@ -130,7 +130,7 @@ def test_a_country_page_filters_by_section(client, world):
     sport = client.get("/api/countries/AU/articles?category=sport").get_json()
     assert [a["title"] for a in sport["articles"]] == ["Carnival"]
     assert sport["selectedSection"] == "sport"
-    # Every chip stays visible while one is selected.
+    #Every chip stays visible while one is selected.
     assert len(sport["sections"]) == 2
 
 
@@ -159,7 +159,7 @@ def test_the_demo_seed_gives_six_countries_at_least_five_articles(app):
     for code in ("AU", "NZ", "SG", "JP", "GB", "US"):
         assert rows.get(code, 0) >= 5, (code, rows.get(code))
 
-    # Running it again adds nothing.
+    #Running it again adds nothing.
     before = Article.query.count()
     seed.seed_countries()
     assert Article.query.count() == before

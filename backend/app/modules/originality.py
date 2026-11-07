@@ -37,8 +37,8 @@ def _article_for(article_id: int) -> Article:
         or (user.role in REVIEW_ROLES and editor_owns_category(article.category_id))
     )
     if not allowed:
-        # 404 rather than 403: whether an article exists is itself private
-        # while it is a draft.
+        #404 rather than 403: whether an article exists is itself private
+        #while it is a draft.
         raise ApiError("Article not found.", status=404)
     return article
 

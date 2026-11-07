@@ -46,8 +46,8 @@ def valid_source_count(article: Article) -> int:
 
 
 def has_duplicate_title(article: Article) -> bool:
-    # Imported here, not at module level: moderation imports this module for
-    # revocation, and a top-level import back would be circular.
+    #Imported here, not at module level: moderation imports this module for
+    #revocation, and a top-level import back would be circular.
     from .modules.moderation import duplicate_titles
 
     return bool(duplicate_titles(article.title, exclude_article_id=article.id))
@@ -67,8 +67,8 @@ def duplicated_titles(articles: list[Article]) -> set[int]:
     wanted = {norm(a.title) for a in articles}
     if not wanted:
         return set()
-    # Exactly has_duplicate_title's rule: this article's normalised title
-    # against other articles' lower-cased titles as stored.
+    #Exactly has_duplicate_title's rule: this article's normalised title
+    #against other articles' lower-cased titles as stored.
     owners: dict[str, set[int]] = {}
     rows = db.session.query(Article.id, func.lower(Article.title)).filter(
         func.lower(Article.title).in_(wanted))
@@ -82,9 +82,9 @@ def is_suspended(user: User, now: datetime) -> bool:
     return until is not None and until > now
 
 
-# --------------------------------------------------------------------------- #
-#  Queue ordering
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Queue ordering
+#--------------------------------------------------------------------------- #
 
 def priority_for(article: Article, settings: dict, now: datetime,
                  duplicate: bool | None = None) -> triage.PriorityBreakdown:
@@ -99,9 +99,9 @@ def priority_for(article: Article, settings: dict, now: datetime,
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Publishing
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Publishing
+#--------------------------------------------------------------------------- #
 
 CATEGORY_REQUIRED = "Choose a section other than Uncategorised before this article can be published."
 
@@ -150,8 +150,8 @@ def publish_article(
 
     breakdown = rescore_article(article)
 
-    # Into Mandarin and Malay, in the background once this is committed, where
-    # the site translates articles itself.
+    #Into Mandarin and Malay, in the background once this is committed, where
+    #the site translates articles itself.
     from .translation_service import translate_when_published
     translate_when_published(article)
 
@@ -201,15 +201,15 @@ def confirm_article(article: Article, *, reviewer_id: int, now: datetime) -> Non
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Auto-publish
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Auto-publish
+#--------------------------------------------------------------------------- #
 
 def eligibility_for(article: Article, settings: dict, now: datetime) -> triage.Eligibility:
     published, _ = _published_counts(article.contributor_id)
     if article.originality_percent is None:
-        # Submitted before checking existed, or never checked: check now,
-        # rather than let an unchecked article through or hold it forever.
+        #Submitted before checking existed, or never checked: check now,
+        #rather than let an unchecked article through or hold it forever.
         from .originality_service import check
         check(article, settings=settings, now=now)
     return triage.autopublish_eligibility(
@@ -316,7 +316,7 @@ def lift_suspension_if_cleared(writer: User) -> bool:
     if writer.autopublish_suspended_until is None:
         return False
 
-    # Imported here for the same reason as has_duplicate_title.
+    #Imported here for the same reason as has_duplicate_title.
     from .models import Correction
 
     standing = (

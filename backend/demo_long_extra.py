@@ -6,7 +6,7 @@ person is named. "## " starts a subheading.
 """
 
 EXTRA = {
-    # --- Australia ------------------------------------------------------------
+    #--- Australia ------------------------------------------------------------
     "Researchers publish open dataset on coastal erosion": [
         "## How the surveys were made",
         "The oldest part of the record comes from aerial photographs flown by state agencies, which "
@@ -149,7 +149,7 @@ EXTRA = {
         "The researchers said that local knowledge had helped them choose where to fly and had "
         "flagged several meadows they had not known about.",
     ],
-    # --- New Zealand ----------------------------------------------------------
+    #--- New Zealand ----------------------------------------------------------
     "Public transport ridership returns to pre-pandemic levels": [
         "## Students and the young",
         "Half-price fares for under-25s, introduced several years ago, are credited with bringing a "
@@ -251,7 +251,7 @@ EXTRA = {
         "requests through each stage. The watchdog said those that had invested in such tools tended "
         "to respond more quickly, and recommended that others follow.",
     ],
-    # --- Singapore ------------------------------------------------------------
+    #--- Singapore ------------------------------------------------------------
     "Regional startups raise record funding despite slowdown": [
         "## Singapore's role",
         "Singapore has spent two decades building itself into a base for startups, with government "
@@ -351,7 +351,7 @@ EXTRA = {
         "ships with alternative fuels on a trial basis and says it wants to be among the first hubs "
         "able to refuel vessels running on ammonia or methanol at scale.",
     ],
-    # --- Japan ----------------------------------------------------------------
+    #--- Japan ----------------------------------------------------------------
     "Semiconductor shortage eases as new fabrication capacity opens": [
         "## How the shortage began",
         "The shortage began during the pandemic, when carmakers cancelled chip orders expecting sales "
@@ -463,7 +463,7 @@ EXTRA = {
         "matters to elderly patients. Hospitals involved in the trial said the devices were intended "
         "to free nurses to spend more time talking with patients, not less.",
     ],
-    # --- United Kingdom -------------------------------------------------------
+    #--- United Kingdom -------------------------------------------------------
     "New study links urban green space to lower stress markers": [
         "## Why hair?",
         "Cortisol levels in blood or saliva change throughout the day and in response to momentary "
@@ -582,7 +582,7 @@ EXTRA = {
         "core research has long been collaborative, partly because of the cost of working in "
         "Antarctica and partly because comparing cores from different sites strengthens the results.",
     ],
-    # --- United States --------------------------------------------------------
+    #--- United States --------------------------------------------------------
     "Retail sector reports uneven recovery across segments": [
         "## Prices and wages",
         "Prices for many goods rose sharply over the past few years, and while inflation has eased, "
@@ -697,7 +697,7 @@ EXTRA = {
         "next few years. Hospital groups said reliable internet was now as essential to rural health "
         "care as roads.",
     ],
-    # --- Politics -------------------------------------------------------------
+    #--- Politics -------------------------------------------------------------
     "Cabinet reshuffle brings three new ministers into portfolio roles": [
         "## The new faces",
         "The new health minister, a former hospital doctor, has spent the past two years as a junior "

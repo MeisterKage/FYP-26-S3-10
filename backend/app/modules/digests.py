@@ -57,9 +57,9 @@ def edition(month: str, key: str):
     return jsonify({"edition": full(row, category, viewer=current_user())})
 
 
-# --------------------------------------------------------------------------- #
-#  Subscriptions
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Subscriptions
+#--------------------------------------------------------------------------- #
 
 def _subscription_view(sub: DigestSubscription, category: Category) -> dict:
     return {
@@ -122,9 +122,9 @@ def unsubscribe(subscription_id: int):
     return "", 204
 
 
-# --------------------------------------------------------------------------- #
-#  Compiling (administrators; normally the monthly CLI job)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Compiling (administrators; normally the monthly CLI job)
+#--------------------------------------------------------------------------- #
 
 @bp.post("/admin/digests/compile")
 @roles_required(Role.SYSTEM_ADMIN)

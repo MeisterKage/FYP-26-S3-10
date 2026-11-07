@@ -70,7 +70,7 @@ WIKINEWS_PICKS = [
     ("Caloundra win round 3 game in Australian soccer's Football Queensland Premier League 2 competition",
      "Sport", "AU"),
 ]
-MIN_WORDS = 600  # the point of importing is articles worth reading
+MIN_WORDS = 600  #the point of importing is articles worth reading
 MAX_SOURCES = 8
 
 PUBLISHERS = {
@@ -139,7 +139,7 @@ def publisher_account(name: str) -> User:
     if user is None:
         user = User(email=info["email"], display_name=name, bio=info["bio"],
                     role=Role.VERIFIED_CONTRIBUTOR,
-                    # Nobody signs in as a publisher: an unguessable password.
+                    #Nobody signs in as a publisher: an unguessable password.
                     password_hash=hash_password(secrets.token_urlsafe(32)))
         db.session.add(user)
         db.session.flush()
@@ -187,11 +187,11 @@ def wikinews_items() -> list[dict]:
             print(f"  not found on Wikinews: {title}")
             continue
         raw = data["parse"]["text"]
-        # Keep the report: paragraphs and subheadings before "Sources".
+        #Keep the report: paragraphs and subheadings before "Sources".
         raw = re.split(r'<h2[^>]*>\s*(?:<span[^>]*>)?\s*(?:Sources|Related news)', raw)[0]
         blocks = re.findall(r"<(?:p|h2|h3|ul|blockquote)\b[^>]*>.*?</(?:p|h2|h3|ul|blockquote)>", raw, flags=re.S)
         body = "".join(b for b in blocks if not re.search(r'class="[^"]*(?:published|dateline)', b))
-        # The first paragraph is the dateline ("Sunday, March 15, 2026"); drop it.
+        #The first paragraph is the dateline ("Sunday, March 15, 2026"); drop it.
         body = re.sub(r"^<p>\s*<strong[^>]*>[^<]*</strong>\s*</p>", "", body)
         rq = urllib.parse.urlencode({"action": "query", "prop": "revisions", "titles": title,
                                      "rvlimit": 1, "rvdir": "newer", "rvprop": "timestamp",

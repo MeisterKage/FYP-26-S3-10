@@ -30,7 +30,7 @@ from flask import Flask, Response, current_app, request
 CACHEABLE = frozenset({
     "discovery.list_categories",
     "discovery.trending",
-    "discovery.personalised",   # a signed-out visitor gets trending
+    "discovery.personalised",   #a signed-out visitor gets trending
     "discovery.by_category",
     "discovery.list_countries",
     "discovery.all_countries",
@@ -80,7 +80,7 @@ def put(key: str, value) -> None:
         return
     with _lock:
         if len(_store) >= MAX_ENTRIES:
-            # Drop the entry closest to expiring; simple and good enough here.
+            #Drop the entry closest to expiring; simple and good enough here.
             del _store[min(_store, key=lambda k: _store[k][0])]
         _store[key] = (time.monotonic() + _ttl(), value)
 

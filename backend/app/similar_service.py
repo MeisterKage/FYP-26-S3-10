@@ -55,7 +55,7 @@ def similar_to(article: Article, limit: int = 4) -> list[Article]:
     docs, vecs = _corpus()
     target = next((d for d in docs if d.id == article.id), None)
     if target is None:
-        # Not published (a writer previewing a draft): compare it all the same.
+        #Not published (a writer previewing a draft): compare it all the same.
         target = similar.Doc(article.id, article.category_id, article.country_code,
                              similar.terms(article.title, article.summary, article.body))
         vecs = {**vecs, **similar.vectors(docs + [target])}

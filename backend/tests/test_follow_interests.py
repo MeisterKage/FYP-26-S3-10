@@ -61,7 +61,7 @@ def test_unfollowing_takes_it_off_again(client, world):
     assert r["countryCodes"] == [] and r["categoryIds"] == [world["sport"].id]
     r = client.delete(f"/api/me/interests/categories/{world['sport'].id}", headers=h).get_json()
     assert r["categoryIds"] == []
-    # Nothing followed: trending, not an empty page.
+    #Nothing followed: trending, not an empty page.
     assert "articles" in client.get("/api/feed/personalised", headers=h).get_json()
 
 

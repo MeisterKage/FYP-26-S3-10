@@ -53,7 +53,7 @@ def require_int(
     if raw is None and default is not MISSING:
         return None
 
-    # bool is a subclass of int; True would silently become 1.
+    #bool is a subclass of int; True would silently become 1.
     if isinstance(raw, bool) or not isinstance(raw, (int, str, float)):
         raise ApiError(f"'{field}' must be a whole number.", status=422, field=field)
 

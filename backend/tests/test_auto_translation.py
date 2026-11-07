@@ -145,7 +145,7 @@ def test_a_translation_that_loses_the_layout_is_refused(client, world, api, app)
     read(client)
     ts.run_held()
     assert ArticleTranslation.query.filter_by(article_id=a.id).count() == 0
-    # And it is not asked for again straight away.
+    #And it is not asked for again straight away.
     again = read(client)["translation"]
     assert again["preparing"] is False and again["note"] == ts.LABELS["zh"]["unavailable"]
     assert ts.run_held() == 0

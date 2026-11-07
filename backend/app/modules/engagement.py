@@ -30,9 +30,9 @@ def _published_article(article_id: int) -> Article:
     return article
 
 
-# --------------------------------------------------------------------------- #
-#  Likes  (PDD Figures 5.17, 5.18)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Likes  (PDD Figures 5.17, 5.18)
+#--------------------------------------------------------------------------- #
 
 @bp.post("/articles/<int:article_id>/like")
 @login_required
@@ -58,15 +58,15 @@ def unlike(article_id: int):
         article_id=article.id, user_id=g.current_user.id
     ).delete()
     if deleted:
-        # Guard against drift if the counter and rows ever disagree.
+        #Guard against drift if the counter and rows ever disagree.
         article.like_count = max(0, article.like_count - 1)
     db.session.commit()
     return jsonify({"liked": False, "likeCount": article.like_count})
 
 
-# --------------------------------------------------------------------------- #
-#  Comments  (PDD Figures 5.29, 5.30)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Comments  (PDD Figures 5.29, 5.30)
+#--------------------------------------------------------------------------- #
 
 @bp.get("/articles/<int:article_id>/comments")
 def list_comments(article_id: int):
@@ -108,10 +108,10 @@ def add_comment(article_id: int):
     if not body:
         raise ApiError("Write something first.", status=422, field="body")
 
-    # A parent id is a foreign key arriving straight from the client. Left
-    # unvalidated, a nonexistent id becomes a database error on Postgres (SQLite
-    # silently accepts it), and an id belonging to a *different* article would
-    # graft this reply onto someone else's discussion.
+    #A parent id is a foreign key arriving straight from the client. Left
+    #unvalidated, a nonexistent id becomes a database error on Postgres (SQLite
+    #silently accepts it), and an id belonging to a *different* article would
+    #graft this reply onto someone else's discussion.
     parent_id = require_int(data, "parentId", default=None, minimum=1)
     if parent_id is not None:
         parent = Comment.query.filter_by(id=parent_id, article_id=article.id).first()
@@ -163,9 +163,9 @@ def remove_own_comment(comment_id: int):
     return jsonify({"message": "Comment removed."})
 
 
-# --------------------------------------------------------------------------- #
-#  Follows and saved articles  (PDD Figures 5.32-5.35)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Follows and saved articles  (PDD Figures 5.32-5.35)
+#--------------------------------------------------------------------------- #
 
 @bp.post("/contributors/<int:contributor_id>/follow")
 @login_required
@@ -252,18 +252,18 @@ def liked_articles():
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Share and report  (PDD Figures 5.8, 5.36)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Share and report  (PDD Figures 5.8, 5.36)
+#--------------------------------------------------------------------------- #
 
 @bp.get("/articles/<int:article_id>/share")
 def share(article_id: int):
     from .share import article_url as web_url, share_page_url
 
     article = _published_article(article_id)
-    # The copy-link address is the article itself. The platform buttons use the
-    # preview page, which carries the headline, score and picture for the card
-    # and forwards the reader on (see modules/share.py).
+    #The copy-link address is the article itself. The platform buttons use the
+    #preview page, which carries the headline, score and picture for the card
+    #and forwards the reader on (see modules/share.py).
     article_url = web_url(article)
     preview_url = share_page_url(article)
 

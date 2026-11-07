@@ -49,9 +49,9 @@ class TimestampMixin:
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Users and access
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Users and access
+#--------------------------------------------------------------------------- #
 
 class User(TimestampMixin, db.Model):
     __tablename__ = "users"
@@ -187,9 +187,9 @@ class PasswordResetToken(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
-# --------------------------------------------------------------------------- #
-#  Articles
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Articles
+#--------------------------------------------------------------------------- #
 
 class Article(TimestampMixin, db.Model):
     __tablename__ = "articles"
@@ -624,9 +624,9 @@ class Report(TimestampMixin, db.Model):
     article: Mapped[Article] = relationship(back_populates="reports")
 
 
-# --------------------------------------------------------------------------- #
-#  Engagement
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Engagement
+#--------------------------------------------------------------------------- #
 
 class Comment(TimestampMixin, db.Model):
     __tablename__ = "comments"
@@ -640,7 +640,7 @@ class Comment(TimestampMixin, db.Model):
         ForeignKey("comments.id", ondelete="CASCADE")
     )
     body: Mapped[str] = mapped_column(Text)
-    is_hidden: Mapped[bool] = mapped_column(Boolean, default=False)  # moderated
+    is_hidden: Mapped[bool] = mapped_column(Boolean, default=False)  #moderated
 
 
 class Like(db.Model):
@@ -678,9 +678,9 @@ class SavedArticle(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
-# --------------------------------------------------------------------------- #
-#  Notifications, money, ops
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Notifications, money, ops
+#--------------------------------------------------------------------------- #
 
 class Notification(TimestampMixin, db.Model):
     __tablename__ = "notifications"

@@ -24,9 +24,9 @@ from .errors import ApiError
 _hasher = PasswordHasher()
 
 
-# --------------------------------------------------------------------------- #
-#  Passwords  (PRD 5.1 Security)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Passwords  (PRD 5.1 Security)
+#--------------------------------------------------------------------------- #
 
 def hash_password(raw: str) -> str:
     return _hasher.hash(raw)
@@ -54,9 +54,9 @@ def validate_password_strength(raw: str) -> None:
         )
 
 
-# --------------------------------------------------------------------------- #
-#  Tokens
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Tokens
+#--------------------------------------------------------------------------- #
 
 def _password_stamp(user) -> str:
     """Changes with the password, so a reset ends sessions opened with the old one."""
@@ -98,9 +98,9 @@ def reset_tokens_match(stored_hash: str, raw: str) -> bool:
     return hmac.compare_digest(stored_hash, hash_reset_token(raw))
 
 
-# --------------------------------------------------------------------------- #
-#  Request context
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Request context
+#--------------------------------------------------------------------------- #
 
 def load_current_user() -> None:
     """Populate g.current_user from the Authorization header, if present.
@@ -117,9 +117,9 @@ def load_current_user() -> None:
 
     claims = decode_access_token(header[7:])
 
-    # The signature is valid, but the payload shape is not guaranteed, a token
-    # issued by an earlier version of this code may not carry a usable subject.
-    # That is an invalid session, not a server crash.
+    #The signature is valid, but the payload shape is not guaranteed, a token
+    #issued by an earlier version of this code may not carry a usable subject.
+    #That is an invalid session, not a server crash.
     try:
         user_id = int(claims["sub"])
     except (KeyError, TypeError, ValueError):
@@ -141,9 +141,9 @@ def current_user():
     return getattr(g, "current_user", None)
 
 
-# --------------------------------------------------------------------------- #
-#  Decorators
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Decorators
+#--------------------------------------------------------------------------- #
 
 def login_required(fn):
     @wraps(fn)

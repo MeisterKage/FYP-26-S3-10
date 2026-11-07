@@ -59,15 +59,15 @@ def upgrade():
         return
 
     for role in EXPOSED_ROLES:
-        # Existing tables.
+        #Existing tables.
         op.execute(f"REVOKE ALL ON ALL TABLES IN SCHEMA public FROM {role}")
         op.execute(f"REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM {role}")
         op.execute(f"REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM {role}")
-        # Nothing should be able to discover the schema either.
+        #Nothing should be able to discover the schema either.
         op.execute(f"REVOKE USAGE ON SCHEMA public FROM {role}")
 
-        # Future tables. Supabase installs default privileges as `postgres`;
-        # matching that grantor is what makes the revoke actually apply.
+        #Future tables. Supabase installs default privileges as `postgres`;
+        #matching that grantor is what makes the revoke actually apply.
         op.execute(
             f"ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public "
             f"REVOKE ALL ON TABLES FROM {role}"
@@ -77,9 +77,9 @@ def upgrade():
             f"REVOKE ALL ON SEQUENCES FROM {role}"
         )
 
-    # Default-deny backstop. No policies are created on purpose: a table with RLS
-    # enabled and zero policies returns no rows to any role the policy system
-    # applies to, which is exactly what we want for tables only Flask should read.
+    #Default-deny backstop. No policies are created on purpose: a table with RLS
+    #enabled and zero policies returns no rows to any role the policy system
+    #applies to, which is exactly what we want for tables only Flask should read.
     for table in _public_tables(conn):
         op.execute(f'ALTER TABLE public."{table}" ENABLE ROW LEVEL SECURITY')
 

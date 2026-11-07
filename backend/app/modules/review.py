@@ -53,7 +53,7 @@ def review_queue():
     """
     category_ids = _assigned_category_ids()
     if category_ids is not None and not category_ids:
-        # An editor with no assigned category has an empty queue, not an error.
+        #An editor with no assigned category has an empty queue, not an error.
         return jsonify(
             {
                 "articles": [],
@@ -75,16 +75,16 @@ def review_queue():
     settings = load_settings()
     now = utcnow()
 
-    # A pending article has never been scored, so its stored credibility_score is
-    # still the 0.0 default. Serving that reads to an editor as "this article is
-    # worthless" rather than "not yet scored". That is the opposite of true, on
-    # the one screen where it would bias the decision. Compute the score the article
-    # *would* carry on publication instead. Read-only: explain_article persists
-    # nothing.
+    #A pending article has never been scored, so its stored credibility_score is
+    #still the 0.0 default. Serving that reads to an editor as "this article is
+    #worthless" rather than "not yet scored". That is the opposite of true, on
+    #the one screen where it would bias the decision. Compute the score the article
+    #*would* carry on publication instead. Read-only: explain_article persists
+    #nothing.
     payload = []
     articles = pending.order_by(Article.submitted_at.asc()).all()
-    # What each article's score and priority need, counted for the whole queue
-    # at once rather than once per article.
+    #What each article's score and priority need, counted for the whole queue
+    #at once rather than once per article.
     record_counts: dict = {}
     upheld = upheld_report_counts([a.id for a in articles])
     duplicates = duplicated_titles(articles)
@@ -98,8 +98,8 @@ def review_queue():
         data["priority"] = priority_for(article, settings, now, article.id in duplicates).as_dict()
         payload.append(data)
 
-    # Highest priority first. The sort is stable, so articles of equal priority
-    # keep the oldest-first order the query produced.
+    #Highest priority first. The sort is stable, so articles of equal priority
+    #keep the oldest-first order the query produced.
     payload.sort(key=lambda d: d["priority"]["priority"], reverse=True)
 
     return jsonify(
@@ -290,15 +290,15 @@ def _pending_article(article_id: int) -> Article:
     if not editor_owns_category(article.category_id):
         raise ApiError("This article is outside your assigned categories.", status=403)
 
-    # Separation of duties. Editors may write (AUTHORING_ROLES includes them),
-    # and without this an editor could write, submit, and approve their own
-    # article inside their own section, skipping the only human check between a
-    # claim and a published credibility score. PRD 7.4.2 commits to review
-    # before publication, which a review by the author is not.
+    #Separation of duties. Editors may write (AUTHORING_ROLES includes them),
+    #and without this an editor could write, submit, and approve their own
+    #article inside their own section, skipping the only human check between a
+    #claim and a published credibility score. PRD 7.4.2 commits to review
+    #before publication, which a review by the author is not.
     #
-    # Administrators are exempt: PRD 1.3.2 grants them oversight of everything,
-    # and an administrator publishing their own piece is a deliberate act by the
-    # one role that can already override any editorial decision.
+    #Administrators are exempt: PRD 1.3.2 grants them oversight of everything,
+    #and an administrator publishing their own piece is a deliberate act by the
+    #one role that can already override any editorial decision.
     if (
         article.contributor_id == g.current_user.id
         and g.current_user.role != Role.SYSTEM_ADMIN

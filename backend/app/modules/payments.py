@@ -30,8 +30,8 @@ def webhook(provider_name: str):
     except WebhookRejected as e:
         current_app.logger.warning("Rejected payment webhook from %s: %s",
                                    client_address(), e)
-        # 400 tells a real provider to stop retrying a request that will never
-        # verify; it gives an attacker nothing they did not send.
+        #400 tells a real provider to stop retrying a request that will never
+        #verify; it gives an attacker nothing they did not send.
         raise ApiError("Webhook rejected.", status=400)
     return jsonify({"received": True, **result})
 
@@ -62,9 +62,9 @@ def payment_history():
     return jsonify({"payments": [serialize(p) for p in rows]})
 
 
-# --------------------------------------------------------------------------- #
-#  Sandbox checkout: stands in for a provider's hosted page
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Sandbox checkout: stands in for a provider's hosted page
+#--------------------------------------------------------------------------- #
 
 def _sandbox_payment(ref: str) -> Payment:
     if not isinstance(provider(), SandboxProvider):

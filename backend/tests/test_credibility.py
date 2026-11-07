@@ -8,9 +8,9 @@ import pytest
 from app.credibility import DEFAULTS, accuracy_rate, band_for, credibility_score
 
 
-# --------------------------------------------------------------------------- #
-#  Accuracy rate
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Accuracy rate
+#--------------------------------------------------------------------------- #
 
 def test_accuracy_withheld_below_minimum():
     """PRD 1.3.3: the rate appears only after a set minimum number of articles."""
@@ -75,13 +75,13 @@ def test_crossing_the_minimum_does_not_jump_the_back_catalogue():
 
     assert accuracy_rate(4, 0) is None
     assert accuracy_rate(5, 0) == at
-    # A single further article moves the input by a couple of points, not twenty.
+    #A single further article moves the input by a couple of points, not twenty.
     assert 0 < at - below < 3
 
 
-# --------------------------------------------------------------------------- #
-#  Credibility score
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Credibility score
+#--------------------------------------------------------------------------- #
 
 def _score(**overrides):
     kwargs = {
@@ -115,7 +115,7 @@ def test_each_source_is_worth_its_stated_points():
 def test_new_contributor_uses_provisional_accuracy():
     result = _score(contributor_accuracy=None, source_count=2)
     assert result.used_provisional_accuracy is True
-    # 0.75 * 70 provisional  +  2 * 5 sources  =  62.5
+    #0.75 * 70 provisional  +  2 * 5 sources  =  62.5
     assert result.score == 62.5
 
 
@@ -170,7 +170,7 @@ def test_score_is_clamped_to_100():
 def test_engine_is_deterministic():
     """The disclosure claim in PRD 1.3.3 requires identical inputs to give
     identical outputs, every time."""
-    # 0.75 * 100 accuracy  +  3 * 5 sources  =  90.0
+    #0.75 * 100 accuracy  +  3 * 5 sources  =  90.0
     assert [_score(source_count=3).score for _ in range(20)].count(90.0) == 20
 
 
@@ -183,12 +183,12 @@ def test_admin_thresholds_change_the_result():
         upheld_report_count=0,
         settings={"correction_penalty": 50.0},
     )
-    assert strict.score == 30.0  # 75 + 5 - 50
+    assert strict.score == 30.0  #75 + 5 - 50
 
 
-# --------------------------------------------------------------------------- #
-#  Disclosure
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Disclosure
+#--------------------------------------------------------------------------- #
 
 def test_breakdown_components_reconstruct_the_score():
     """Readers must be able to trace exactly why a score is what it is."""

@@ -53,9 +53,9 @@ def article_in(status, category, contributor, title, slug):
     return article
 
 
-# --------------------------------------------------------------------------- #
-#  Article moderation (Figure 5.93)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Article moderation (Figure 5.93)
+#--------------------------------------------------------------------------- #
 
 def test_an_administrator_can_suspend_a_published_article(client, category):
     make_user("modadmin@example.com", Role.SYSTEM_ADMIN)
@@ -69,8 +69,8 @@ def test_an_administrator_can_suspend_a_published_article(client, category):
     )
 
     assert response.status_code == 200
-    # Unpublished, never deleted: a corrected article is the record of that
-    # correction, and dropping the row takes the evidence with it.
+    #Unpublished, never deleted: a corrected article is the record of that
+    #correction, and dropping the row takes the evidence with it.
     assert Article.query.get(article.id).status == ArticleStatus.UNPUBLISHED
 
 
@@ -132,9 +132,9 @@ def test_an_editor_cannot_moderate_platform_wide(client, category):
     assert response.status_code == 403
 
 
-# --------------------------------------------------------------------------- #
-#  Credibility disputes (Figure 5.94)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Credibility disputes (Figure 5.94)
+#--------------------------------------------------------------------------- #
 
 @pytest.fixture()
 def corrected(client, category):

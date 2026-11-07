@@ -75,7 +75,7 @@ def _paginate(query, page: int):
 @bp.get("/categories")
 def list_categories():
     categories = Category.query.filter_by(deleted_at=None).order_by(Category.name).all()
-    # Published articles per section, for the All topics page. One grouped query.
+    #Published articles per section, for the All topics page. One grouped query.
     counts = dict(
         db.session.query(Article.category_id, func.count(Article.id))
         .filter(Article.status == ArticleStatus.PUBLISHED)
@@ -253,9 +253,9 @@ def by_country(code: str):
 
     query = _published().filter(Article.country_code == code)
 
-    # Sections that actually have articles for this country, for the filter
-    # chips. Counted before the section filter is applied, so every chip stays
-    # visible while one is selected.
+    #Sections that actually have articles for this country, for the filter
+    #chips. Counted before the section filter is applied, so every chip stays
+    #visible while one is selected.
     section_rows = (
         db.session.query(Category, func.count(Article.id))
         .join(Article, Article.category_id == Category.id)
@@ -311,9 +311,9 @@ def search():
                 Article.tags.ilike(like),
                 Article.summary.ilike(like),
                 Category.name.ilike(like),
-                # "japan" finds articles tagged Japan even if the word is not
-                # in the headline. Names are matched in Python against the
-                # fixed list, then filtered by code.
+                #"japan" finds articles tagged Japan even if the word is not
+                #in the headline. Names are matched in Python against the
+                #fixed list, then filtered by code.
                 Article.country_code.in_(codes_matching(q) or ["--"]),
             )
         )
@@ -360,7 +360,7 @@ def _count_view(article_id: int) -> None:
             update(Article).where(Article.id == article_id)
             .values(view_count=Article.view_count + 1)
         )
-        # And today's row in the history behind the total.
+        #And today's row in the history behind the total.
         today = utcnow().date()
         bumped = db.session.execute(
             update(ArticleDailyView)
@@ -380,9 +380,9 @@ def read_article(slug: str):
     """PDD Figure 5.6. Byline, publish time, credibility score, accuracy rate, body."""
     viewer = current_user()
 
-    # A signed-out reader gets the same page as every other signed-out reader,
-    # so it is remembered for a minute (app/response_cache.py). The view is
-    # still counted every time.
+    #A signed-out reader gets the same page as every other signed-out reader,
+    #so it is remembered for a minute (app/response_cache.py). The view is
+    #still counted every time.
     cache_key = f"article:{slug}:{request_lang()}"
     if viewer is None:
         cached = response_cache.cached_copy(cache_key)
@@ -400,21 +400,21 @@ def read_article(slug: str):
         raise ApiError("Article not found.", status=404)
 
     payload = serialize(article, viewer=viewer)
-    # This view is counted below, once the page is built.
+    #This view is counted below, once the page is built.
     payload["viewCount"] = article.view_count + 1
 
-    # PRD 1.3.3 promises a reader can trace exactly why a score is what it is.
-    # The breakdown travels with the article so the promise is kept on the page
-    # rather than in a document nobody opens.
+    #PRD 1.3.3 promises a reader can trace exactly why a score is what it is.
+    #The breakdown travels with the article so the promise is kept on the page
+    #rather than in a document nobody opens.
     if article.status in {ArticleStatus.PUBLISHED, ArticleStatus.RETRACTED}:
         payload["credibility"] = {
             **payload["credibility"],
             **explain_article(article).as_dict(),
         }
 
-    # Whether this reader has already liked or saved it. Two small lookups on a
-    # single article, deliberately not in serialize(): a list of twenty would
-    # turn that into forty extra queries for something no list displays.
+    #Whether this reader has already liked or saved it. Two small lookups on a
+    #single article, deliberately not in serialize(): a list of twenty would
+    #turn that into forty extra queries for something no list displays.
     payload["viewer"] = {"liked": False, "saved": False}
     if viewer is not None:
         payload["viewer"] = {
@@ -428,8 +428,8 @@ def read_article(slug: str):
             ).scalar(),
         }
 
-    # The writer, for the card at the end of the article: a reader who liked it
-    # can follow or subscribe there, without a trip to the profile.
+    #The writer, for the card at the end of the article: a reader who liked it
+    #can follow or subscribe there, without a trip to the profile.
     writer = article.contributor
     payload["writer"] = {
         "id": writer.id,
@@ -437,15 +437,15 @@ def read_article(slug: str):
         "bio": writer.bio if not writer.deleted_at else None,
         "accuracyRate": writer.accuracy_rate,
         "followerCount": Follow.query.filter_by(contributor_id=writer.id).count(),
-        # A republishing account is not a writer anyone can subscribe to.
+        #A republishing account is not a writer anyone can subscribe to.
         "offersSubscription": (writer.role in AUTHORING_ROLES and not writer.deleted_at
                                and not article.republication),
         "monthlyPriceCents": SUBSCRIPTION_PRICE_CENTS,
         **_relation(viewer, writer.id),
     }
 
-    # "In brief" key points, with narration, for long articles. Not for a
-    # reader who cannot open the article: the points are its own sentences.
+    #"In brief" key points, with narration, for long articles. Not for a
+    #reader who cannot open the article: the points are its own sentences.
     payload["inBrief"] = None if payload.get("paywalled") else in_brief(article)
     lang = request_lang()
     if payload["inBrief"] and lang != "en":
@@ -457,8 +457,8 @@ def read_article(slug: str):
         payload["inBrief"]["narration"]["voice"] = {
             **payload["inBrief"]["narration"]["voice"], "lang": VOICE_LANG[lang]}
 
-    # "More like this", shown after the article: the published articles closest
-    # in subject (app/similar.py).
+    #"More like this", shown after the article: the published articles closest
+    #in subject (app/similar.py).
     payload["similar"] = [
         serialize(a, include_body=False, viewer=viewer) for a in similar_to(article)
     ]
@@ -546,8 +546,8 @@ def scoring_formula():
                                    "editorial review.",
                 },
             ],
-            # How each source is graded (app/source_rating.py). Served from the
-            # rules themselves, so this page cannot drift from what they do.
+            #How each source is graded (app/source_rating.py). Served from the
+            #rules themselves, so this page cannot drift from what they do.
             "sourceTiers": [
                 {"tier": tier, "label": TIER_LABELS[tier], "points": TIER_POINTS[tier],
                  "description": description}
@@ -618,14 +618,14 @@ def contributor_profile(user_id: int):
                 "id": user.id,
                 "name": user.byline,
                 "bio": user.bio,
-                # NULL accuracy is "New Contributor", not zero (PRD 1.3.3).
+                #NULL accuracy is "New Contributor", not zero (PRD 1.3.3).
                 "accuracyRate": user.accuracy_rate,
                 "isNewContributor": user.accuracy_rate is None,
                 "followerCount": db.session.query(Follow)
                 .filter_by(contributor_id=user.id)
                 .count(),
-                # The profile's Follow button reads this; it was never sent, so
-                # the button always said "Follow", even to a reader following.
+                #The profile's Follow button reads this; it was never sent, so
+                #the button always said "Follow", even to a reader following.
                 "isFollowedByViewer": _relation(current_user(), user.id)["following"],
                 "isSubscribedByViewer": _relation(current_user(), user.id)["subscribed"],
             },

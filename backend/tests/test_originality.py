@@ -42,9 +42,9 @@ def pct(submission, other):
     return engine.coverage(doc, engine.matched_positions(doc, other_hashes))
 
 
-# =========================================================================== #
-#  Engine
-# =========================================================================== #
+#=========================================================================== #
+# Engine
+#=========================================================================== #
 
 def test_a_verbatim_copy_is_a_complete_match():
     assert pct(ORIGINAL, ORIGINAL) == 100.0
@@ -115,9 +115,9 @@ def test_quotes_are_verified_against_the_cited_source():
     assert quotes[0]["source"] == "https://example.org/hansard"
 
 
-# =========================================================================== #
-#  Source fetcher: server-side request forgery guards
-# =========================================================================== #
+#=========================================================================== #
+# Source fetcher: server-side request forgery guards
+#=========================================================================== #
 
 @pytest.mark.parametrize("url", [
     "file:///etc/passwd",
@@ -126,7 +126,7 @@ def test_quotes_are_verified_against_the_cited_source():
     "http://127.0.0.1:5000/",
     "http://10.0.0.5/",
     "http://192.168.1.1/",
-    "http://169.254.169.254/latest/meta-data/",   # cloud metadata
+    "http://169.254.169.254/latest/meta-data/",   #cloud metadata
     "http://[::1]/",
     "http://user:pass@example.org/",
     "http://example.org:5432/",
@@ -171,9 +171,9 @@ def test_a_non_page_is_refused(monkeypatch):
         source_fetch.fetch("https://example.com/report.pdf")
 
 
-# =========================================================================== #
-#  Workflow
-# =========================================================================== #
+#=========================================================================== #
+# Workflow
+#=========================================================================== #
 
 PASSWORD = "OriginalityTest1!"
 

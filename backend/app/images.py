@@ -58,7 +58,7 @@ def _encode(image: Image.Image, width: int) -> bytes:
         height = round(image.height * width / image.width)
         image = image.resize((width, height), Image.Resampling.LANCZOS)
     out = io.BytesIO()
-    # No exif=, no icc_profile=: only pixels are written.
+    #No exif=, no icc_profile=: only pixels are written.
     image.save(out, format="WEBP", quality=QUALITY, method=6)
     return out.getvalue()
 
@@ -79,8 +79,8 @@ def process(data: bytes) -> ProcessedImage:
 
     if fmt not in ACCEPTED_FORMATS:
         raise ImageRejected("Use a JPEG, PNG or WebP image.")
-    # Checked from the header before decoding, so a bomb is refused without
-    # ever being expanded into memory.
+    #Checked from the header before decoding, so a bomb is refused without
+    #ever being expanded into memory.
     if width * height > MAX_PIXELS:
         raise ImageRejected("That image is too large. Keep it under 40 megapixels.")
     if width < MIN_WIDTH:
@@ -89,9 +89,9 @@ def process(data: bytes) -> ProcessedImage:
     try:
         with Image.open(io.BytesIO(data)) as source:
             source.load()
-            # A phone stores "rotate 90 degrees" in EXIF rather than rotating
-            # the pixels. Dropping EXIF without applying it first would put
-            # every portrait photo on its side.
+            #A phone stores "rotate 90 degrees" in EXIF rather than rotating
+            #the pixels. Dropping EXIF without applying it first would put
+            #every portrait photo on its side.
             image = ImageOps.exif_transpose(source)
             image = image.convert("RGBA" if "A" in image.getbands() else "RGB")
     except (OSError, ValueError, Image.DecompressionBombError):

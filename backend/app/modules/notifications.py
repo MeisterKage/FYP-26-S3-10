@@ -95,13 +95,13 @@ def dispatch_pending(limit: int = 200) -> int:
     failed = 0
 
     for notification in pending:
-        # One bad address must not abort the batch. Without this, a single
-        # provider error leaves every later notification unsent, and the whole
-        # run is lost because the commit below never happens.
+        #One bad address must not abort the batch. Without this, a single
+        #provider error leaves every later notification unsent, and the whole
+        #run is lost because the commit below never happens.
         try:
             user = User.query.get(notification.user_id)
             if user is None or not user.is_active:
-                notification.emailed_at = utcnow()  # do not retry forever
+                notification.emailed_at = utcnow()  #do not retry forever
                 continue
 
             preference = NotificationPreference.query.filter_by(
@@ -118,7 +118,7 @@ def dispatch_pending(limit: int = 200) -> int:
                 sent += 1
         except Exception:  # noqa: BLE001 - one failure must not stop the queue
             failed += 1
-            # emailed_at is left unset, so the next run retries this one.
+            #emailed_at is left unset, so the next run retries this one.
             log.exception("Could not dispatch notification %s", notification.id)
 
     try:

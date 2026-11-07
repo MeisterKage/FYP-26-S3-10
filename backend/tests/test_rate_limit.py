@@ -37,7 +37,7 @@ def limited_app():
         _db.session.remove()
         _db.drop_all()
 
-    # Limiter state is process-global; clear it so ordering cannot couple tests.
+    #Limiter state is process-global; clear it so ordering cannot couple tests.
     from app.ratelimit import limiter
 
     limiter.reset()
@@ -56,7 +56,7 @@ def test_repeated_failed_logins_are_eventually_blocked(limited_client):
     statuses = [attempt(limited_client).status_code for _ in range(15)]
 
     assert 429 in statuses, "brute force was never throttled"
-    # The limit must not be so tight that a couple of typos lock someone out.
+    #The limit must not be so tight that a couple of typos lock someone out.
     assert statuses[:3] == [401, 401, 401]
 
 
@@ -89,7 +89,7 @@ def test_throttling_one_target_does_not_lock_out_another(limited_client):
     for _ in range(15):
         attempt(limited_client, email="victim@example.com")
 
-    # A different account is still served (401 for unknown, not 429).
+    #A different account is still served (401 for unknown, not 429).
     other = attempt(limited_client, email="bystander@example.com")
     assert other.status_code == 401
 

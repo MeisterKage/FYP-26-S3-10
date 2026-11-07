@@ -67,9 +67,9 @@ def signed(app, body, ts=None):
     return sign(body, secret(app), int(ts if ts is not None else time.time()))
 
 
-# =========================================================================== #
-#  The happy path, through the test checkout
-# =========================================================================== #
+#=========================================================================== #
+# The happy path, through the test checkout
+#=========================================================================== #
 
 def test_subscribing_starts_a_checkout_and_grants_nothing_yet(client, people):
     started = start(client, people)
@@ -139,7 +139,7 @@ def test_paying_again_extends_rather_than_duplicates(client, people):
     client.post(f"/api/payments/sandbox/{ref}/complete", json={"outcome": "pay"}, headers=headers)
     first_end = Subscription.query.one().period_end
 
-    # A second checkout started before the first completed (another tab).
+    #A second checkout started before the first completed (another tab).
     second = Payment(user_id=people["reader"].id, purpose="subscription",
                      contributor_id=people["writer"].id, amount_cents=500, currency="USD",
                      status="pending", provider="sandbox", provider_ref="sbx_cs_second")
@@ -152,9 +152,9 @@ def test_paying_again_extends_rather_than_duplicates(client, people):
     assert (subs[0].period_end - first_end).days == 30
 
 
-# =========================================================================== #
-#  Attacks on the webhook
-# =========================================================================== #
+#=========================================================================== #
+# Attacks on the webhook
+#=========================================================================== #
 
 def test_a_forged_signature_is_rejected(client, app, people):
     ref = ref_of(start(client, people))
@@ -215,9 +215,9 @@ def test_a_refund_ends_access(client, app, people):
     assert _db.session.get(User, people["reader"].id).has_premium_access() is False
 
 
-# =========================================================================== #
-#  Signatures and providers
-# =========================================================================== #
+#=========================================================================== #
+# Signatures and providers
+#=========================================================================== #
 
 def test_signature_check_is_exact():
     body = b'{"x":1}'

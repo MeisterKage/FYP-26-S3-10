@@ -167,7 +167,7 @@ def test_an_admin_sets_title_and_credentials(client, world):
     assert response.status_code == 200
     entry = client.get(f"/api/editors/{ed.id}").get_json()["editor"]
     assert entry["title"] == "Senior Editor"
-    assert entry["credentials"] == "Twelve years."  # markup stripped
+    assert entry["credentials"] == "Twelve years."  #markup stripped
 
 
 def test_empty_text_clears_a_field(client, world):

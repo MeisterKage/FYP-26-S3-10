@@ -58,7 +58,7 @@ def domains_in(uses: str) -> list[str]:
     for part in uses.split("|"):
         part = part.strip().lower()
         if not part or "=" in part:
-            continue  # named parameters, not domains
+            continue  #named parameters, not domains
         part = re.sub(r"^https?://", "", part).split("/")[0]
         if part.startswith("www."):
             part = part[4:]
@@ -92,8 +92,8 @@ def main() -> None:
         revisions[title] = page["revid"]
         for row in parse(page["text"]):
             for domain in row["domains"]:
-                # A domain listed twice keeps its first classification; the
-                # list is maintained so that this does not happen in practice.
+                #A domain listed twice keeps its first classification; the
+                #list is maintained so that this does not happen in practice.
                 entries.setdefault(domain, {"name": row["name"], "status": row["status"]})
         time.sleep(1)
 

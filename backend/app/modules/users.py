@@ -26,7 +26,7 @@ NOTIFICATION_EVENTS = (
     "breaking_news",
     "comment_reply",
     "followed_contributor_article",
-    # Was "weekly_digest", which nothing ever sent. Monthly digests replaced it.
+    #Was "weekly_digest", which nothing ever sent. Monthly digests replaced it.
     "monthly_digest",
     "account_security",
 )
@@ -73,9 +73,9 @@ def update_profile():
     return jsonify({"message": "Profile updated."})
 
 
-# --------------------------------------------------------------------------- #
-#  Following a section or a country, one at a time (the follow buttons)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Following a section or a country, one at a time (the follow buttons)
+#--------------------------------------------------------------------------- #
 
 def _interests(user) -> dict:
     return {
@@ -89,7 +89,7 @@ def _interests(user) -> dict:
 
 
 def _followable_category(category_id: int) -> Category:
-    # Uncategorised only holds articles whose section was deleted: not a topic.
+    #Uncategorised only holds articles whose section was deleted: not a topic.
     category = Category.query.filter_by(id=category_id, deleted_at=None, is_system=False).first()
     if category is None:
         raise ApiError("That section was not found.", status=404)
@@ -156,7 +156,7 @@ def get_notification_preferences():
         p.event_type: p.enabled
         for p in NotificationPreference.query.filter_by(user_id=g.current_user.id)
     }
-    # An unset toggle defaults to on, so a new account is not silently muted.
+    #An unset toggle defaults to on, so a new account is not silently muted.
     return jsonify(
         {"preferences": {event: stored.get(event, True) for event in NOTIFICATION_EVENTS}}
     )

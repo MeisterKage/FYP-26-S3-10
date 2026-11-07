@@ -93,8 +93,8 @@ def _records(editors: list[User]) -> list[dict]:
                     "articlesReturned": rejected.get(e.id, 0),
                     "correctionsIssued": n_issued,
                     "correctionsOverturned": n_overturned,
-                    # Withheld rather than shown as 100% when there is nothing
-                    # to measure, the same rule as a new writer's accuracy rate.
+                    #Withheld rather than shown as 100% when there is nothing
+                    #to measure, the same rule as a new writer's accuracy rate.
                     "correctionsUpheldRate": (
                         round(100 * (n_issued - n_overturned) / n_issued, 1)
                         if n_issued else None

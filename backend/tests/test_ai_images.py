@@ -14,7 +14,7 @@ XMP_AI = (b'<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w
 
 def with_software(name, fmt="JPEG"):
     exif = Image.Exif()
-    exif[0x0131] = name  # Software
+    exif[0x0131] = name  #Software
     return picture(fmt=fmt, exif=exif)
 
 

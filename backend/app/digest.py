@@ -37,7 +37,7 @@ class Candidate:
 class CorrectionRecord:
     article_id: int
     article_title: str
-    kind: str          # "correction" or "retraction"
+    kind: str          #"correction" or "retraction"
     reason: str
     issued_at: datetime
     overturned: bool

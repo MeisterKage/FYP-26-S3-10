@@ -41,7 +41,7 @@ def clean_article_body(raw_html: str) -> str:
         protocols=ALLOWED_PROTOCOLS,
         strip=True,
     )
-    # Outbound links from user content get noopener/noreferrer.
+    #Outbound links from user content get noopener/noreferrer.
     return bleach.linkifier.Linker(
         callbacks=[bleach.callbacks.nofollow, bleach.callbacks.target_blank],
         skip_tags=["pre", "code"],

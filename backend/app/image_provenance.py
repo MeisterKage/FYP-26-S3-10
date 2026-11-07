@@ -51,13 +51,13 @@ def _jpeg_metadata(data: bytes) -> list[bytes]:
     out, i = [], 2
     while i + 4 <= len(data) and data[i] == 0xFF:
         marker = data[i + 1]
-        if marker == 0xDA:  # start of scan: pixel data follows
+        if marker == 0xDA:  #start of scan: pixel data follows
             break
         if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
             i += 2
             continue
         length = struct.unpack(">H", data[i + 2:i + 4])[0]
-        if 0xE0 <= marker <= 0xEF or marker == 0xFE:  # APPn and comments
+        if 0xE0 <= marker <= 0xEF or marker == 0xFE:  #APPn and comments
             out.append(data[i + 4:i + 2 + length])
         i += 2 + length
     return out
@@ -102,7 +102,7 @@ def metadata_text(data: bytes) -> str:
     text = []
     for part in parts:
         text.append(part.decode("latin-1"))
-        # EXIF UserComment and some XMP are UTF-16.
+        #EXIF UserComment and some XMP are UTF-16.
         text.append(part.decode("utf-16-le", errors="ignore"))
         if part[:4] == b"zTXt" or part[:4] == b"iTXt":
             text.append(_inflate_text(part))
@@ -121,8 +121,8 @@ def _inflate_text(part: bytes) -> str:
         key, _, rest = body.partition(b"\x00")
         compressed = rest[:1] == b"\x01"
         rest = rest[2:]
-        _, _, rest = rest.partition(b"\x00")  # language tag
-        _, _, rest = rest.partition(b"\x00")  # translated keyword
+        _, _, rest = rest.partition(b"\x00")  #language tag
+        _, _, rest = rest.partition(b"\x00")  #translated keyword
         return (zlib.decompress(rest) if compressed else rest).decode("utf-8", errors="ignore")
     except (zlib.error, ValueError):
         return ""

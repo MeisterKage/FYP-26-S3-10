@@ -37,7 +37,7 @@ def test_a_repeat_signed_out_request_is_served_from_memory(client, world):
     first, _ = titles(client)
     second, _ = titles(client)
     assert first.headers["X-Cache"] == "MISS" and second.headers["X-Cache"] == "HIT"
-    # The security headers still apply to a cached answer.
+    #The security headers still apply to a cached answer.
     assert second.headers["Content-Security-Policy"].startswith("default-src 'none'")
 
 
@@ -51,7 +51,7 @@ def test_signed_in_requests_bypass_the_cache(client, world):
 
 def test_any_write_through_the_api_clears_it(client, world):
     titles(client)
-    # A failed write changes nothing, so the cache stays.
+    #A failed write changes nothing, so the cache stays.
     client.post("/api/auth/login", json={"email": "w@example.com", "password": "wrong"})
     assert titles(client)[0].headers["X-Cache"] == "HIT"
     client.post("/api/auth/login", json={"email": "w@example.com", "password": PASSWORD})
@@ -72,5 +72,5 @@ def test_changes_outside_the_api_show_once_the_entry_expires(client, world, app)
                             body="<p>b</p>", status=ArticleStatus.PUBLISHED, published_at=utcnow()))
     _db.session.commit()
     assert "Second" not in titles(client)[1]
-    response_cache.clear()          # what expiry does after a minute
+    response_cache.clear()          #what expiry does after a minute
     assert "Second" in titles(client)[1]

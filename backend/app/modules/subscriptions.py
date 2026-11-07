@@ -110,8 +110,8 @@ def subscribe(contributor_id: int):
             status=503,
         ) from None
 
-    # Nothing is granted here. Access starts when the provider confirms the
-    # payment by webhook (payment_service.process_webhook).
+    #Nothing is granted here. Access starts when the provider confirms the
+    #payment by webhook (payment_service.process_webhook).
     return jsonify({"paymentId": payment.id, "checkoutUrl": checkout_url}), 201
 
 
@@ -175,8 +175,8 @@ def earnings_dashboard():
         .all()
     )
 
-    # The next band, and how far off it is. PDD Figure 5.62 asks for a progress
-    # indicator; a writer cannot plan against a share they cannot see coming.
+    #The next band, and how far off it is. PDD Figure 5.62 asks for a progress
+    #indicator; a writer cannot plan against a share they cannot see coming.
     next_tier = None
     for threshold, name, share in REVENUE_TIERS:
         if threshold > subscriber_count:

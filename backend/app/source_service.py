@@ -180,14 +180,14 @@ def rate_sources(article: Article, *, now: datetime | None = None,
                      doi_status=statuses.get(dois[source.id]) if dois[source.id] else None)
         rating = source_rating.classify(source.url, **facts)
         if rating.tier == "unrated":
-            # Nothing else decided it: ask who owns the domain. Only here, so
-            # Wikidata is consulted for the few domains the lists miss.
+            #Nothing else decided it: ask who owns the domain. Only here, so
+            #Wikidata is consulted for the few domains the lists miss.
             owner = official_owner(source_rating.host_of(source.url), now, fetch=fetch_sources)
             if owner:
                 rating = source_rating.classify(source.url, official_owner=owner, **facts)
         key = source.url.strip().rstrip("/").lower()
         if key in seen:
-            # The same link cited twice earns its points once.
+            #The same link cited twice earns its points once.
             rating = source_rating.Rating("invalid", 0.0, "The same link is already cited above.")
         seen.add(key)
 

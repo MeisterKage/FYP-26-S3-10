@@ -54,9 +54,9 @@ MIN_MATCH_PERCENT = 2.0
 REPORT_VERSION = 1
 
 
-# --------------------------------------------------------------------------- #
-#  Index
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Index
+#--------------------------------------------------------------------------- #
 
 def index_article(article: Article) -> None:
     """Rewrite an article's fingerprints. Call whenever its body changes. Does not commit."""
@@ -121,9 +121,9 @@ def _candidates(article: Article, hashes: set[int], before: datetime) -> dict[in
     return found
 
 
-# --------------------------------------------------------------------------- #
-#  Cited sources
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Cited sources
+#--------------------------------------------------------------------------- #
 
 def _url_key(url: str) -> str:
     return sha256(url.encode()).hexdigest()
@@ -166,7 +166,7 @@ def fetch_pages(urls: list[str], now: datetime, *, fetch_sources: bool) -> dict:
         elif fetch_sources:
             to_fetch.append(url)
     if to_fetch:
-        # In parallel, so ten slow sources cost one timeout, not ten.
+        #In parallel, so ten slow sources cost one timeout, not ten.
         with ThreadPoolExecutor(max_workers=min(6, len(to_fetch))) as pool:
             results = list(pool.map(_fetch_one, to_fetch))
         for url, text, error, status in results:
@@ -208,9 +208,9 @@ def source_documents(article: Article, now: datetime, *, fetch_sources: bool):
     return docs, lines
 
 
-# --------------------------------------------------------------------------- #
-#  The check
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# The check
+#--------------------------------------------------------------------------- #
 
 def _other_excerpt(other: engine.Document, matched_hashes: list[int]) -> str:
     grams = engine.kgrams(other.tokens)
@@ -249,7 +249,7 @@ def check(article: Article, *, settings: dict | None = None, now: datetime | Non
     matches: list[dict] = []
     all_positions: set[int] = set()
 
-    # ---- other articles on the platform ----
+    #---- other articles on the platform ----
     found = _candidates(article, own_hashes, _reference_time(article, now))
     likely = sorted(found, key=lambda i: -len(found[i]))[:MAX_CANDIDATES_MEASURED]
     measured = []
@@ -276,12 +276,12 @@ def check(article: Article, *, settings: dict | None = None, now: datetime | Non
             "passages": _passage_list(doc, positions, other_doc),
         })
 
-    # ---- the article's own cited sources ----
+    #---- the article's own cited sources ----
     source_docs, source_lines = source_documents(article, now, fetch_sources=fetch_sources)
     labels = {s.url: s.label for s in article.sources}
-    # A licensed republication matches its original word for word, by design.
-    # That is the one source it is allowed to copy, so it is reported as the
-    # original rather than counted as copying.
+    #A licensed republication matches its original word for word, by design.
+    #That is the one source it is allowed to copy, so it is reported as the
+    #original rather than counted as copying.
     republished = json.loads(article.republication) if article.republication else None
     original_url = republished.get("url") if republished else None
     for url, src in source_docs.items():

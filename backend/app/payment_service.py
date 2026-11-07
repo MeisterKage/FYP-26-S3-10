@@ -92,7 +92,7 @@ def process_webhook(provider_name: str, body: bytes, headers) -> dict:
     if payment is None:
         raise WebhookRejected("No order matches this event.")
     if event.amount_cents != payment.amount_cents or event.currency.upper() != payment.currency:
-        # Never trust the amount in the event: check it against what we charged.
+        #Never trust the amount in the event: check it against what we charged.
         current_app.logger.critical(
             "Payment webhook amount mismatch: payment=%s expected=%s %s got=%s %s",
             payment.id, payment.amount_cents, payment.currency,
@@ -104,8 +104,8 @@ def process_webhook(provider_name: str, body: bytes, headers) -> dict:
         provider=gateway.name, event_id=event.event_id, kind=event.kind, payment_id=payment.id,
     ))
     try:
-        # Claim the event before acting on it. Two deliveries racing each
-        # other cannot both pass the unique constraint.
+        #Claim the event before acting on it. Two deliveries racing each
+        #other cannot both pass the unique constraint.
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
@@ -169,8 +169,8 @@ def _activate_subscription(payment: Payment, now: datetime) -> Subscription:
         status=SubscriptionStatus.ACTIVE,
     ).first()
     if existing is not None and _aware(existing.period_end) > now:
-        # Paid twice (two tabs, say): the second payment buys the next period
-        # rather than vanishing.
+        #Paid twice (two tabs, say): the second payment buys the next period
+        #rather than vanishing.
         existing.period_end = _aware(existing.period_end) + timedelta(days=SUBSCRIPTION_DAYS)
         existing.gateway_ref = payment.provider_ref
         return existing
@@ -186,8 +186,8 @@ def _activate_subscription(payment: Payment, now: datetime) -> Subscription:
     db.session.add(subscription)
     db.session.flush()
 
-    # The role label follows payment; access itself is always checked against
-    # the live subscription (security.premium_required).
+    #The role label follows payment; access itself is always checked against
+    #the live subscription (security.premium_required).
     user = db.session.get(User, payment.user_id)
     if user.role == Role.FREE_REGISTERED:
         user.role = Role.PREMIUM_REGISTERED

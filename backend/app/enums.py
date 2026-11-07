@@ -19,7 +19,7 @@ class Role(str, Enum):
     EDITOR = "editor"
     SYSTEM_ADMIN = "system_admin"
 
-    # Unregistered is the absence of a session, never a stored row.
+    #Unregistered is the absence of a session, never a stored row.
 
 
 #: Tiers that may author articles.
@@ -30,18 +30,18 @@ REVIEW_ROLES = frozenset({Role.EDITOR, Role.SYSTEM_ADMIN})
 
 class ArticleStatus(str, Enum):
     DRAFT = "draft"
-    PENDING = "pending"        # submitted, awaiting editor review
-    SCHEDULED = "scheduled"    # approved, publishes at published_at
+    PENDING = "pending"        #submitted, awaiting editor review
+    SCHEDULED = "scheduled"    #approved, publishes at published_at
     PUBLISHED = "published"
     REJECTED = "rejected"
-    UNPUBLISHED = "unpublished"  # taken down by editor/admin
+    UNPUBLISHED = "unpublished"  #taken down by editor/admin
     RETRACTED = "retracted"
 
 
 class DisputeStatus(str, Enum):
     OPEN = "open"
-    UPHELD = "upheld"       # the correction stands
-    REVERSED = "reversed"   # the correction is overturned and scores restored
+    UPHELD = "upheld"       #the correction stands
+    REVERSED = "reversed"   #the correction is overturned and scores restored
 
 
 class CorrectionType(str, Enum):
@@ -51,7 +51,7 @@ class CorrectionType(str, Enum):
 
 class ReportStatus(str, Enum):
     OPEN = "open"
-    UPHELD = "upheld"      # confirmed inaccurate -> feeds the score penalty
+    UPHELD = "upheld"      #confirmed inaccurate -> feeds the score penalty
     DISMISSED = "dismissed"
 
 
@@ -63,5 +63,5 @@ class ApplicationStatus(str, Enum):
 
 class SubscriptionStatus(str, Enum):
     ACTIVE = "active"
-    CANCELLED = "cancelled"   # active until period_end, then lapses
+    CANCELLED = "cancelled"   #active until period_end, then lapses
     EXPIRED = "expired"

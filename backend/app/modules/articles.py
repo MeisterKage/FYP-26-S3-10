@@ -162,10 +162,10 @@ def list_loads() -> tuple:
     cover image, sources and corrections one at a time: over fifty round trips
     to the database for one list. Image bytes stay deferred; only the row is read.
     """
-    # All joined into the one article query. The database is a long way from
-    # the API server, so each round trip costs far more than the few duplicate
-    # rows the joined collections add (a page is twenty articles, each with a
-    # handful of sources and rarely more than one correction).
+    #All joined into the one article query. The database is a long way from
+    #the API server, so each round trip costs far more than the few duplicate
+    #rows the joined collections add (a page is twenty articles, each with a
+    #handful of sources and rarely more than one correction).
     loads = (
         joinedload(Article.contributor),
         joinedload(Article.reviewer),
@@ -173,7 +173,7 @@ def list_loads() -> tuple:
         joinedload(Article.sources),
         joinedload(Article.corrections),
     )
-    # In another language, the translations too: one more query for the list.
+    #In another language, the translations too: one more query for the list.
     if request_lang() != "en":
         loads += (selectinload(Article.translations),)
     return loads
@@ -212,13 +212,13 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
         ),
         "coverImageUrl": article.cover_image_url,
         "coverImage": _cover(article),
-        # Republished under licence: who really wrote it and where it first
-        # appeared. Readers are told on the page; the byline is not the author.
+        #Republished under licence: who really wrote it and where it first
+        #appeared. Readers are told on the page; the byline is not the author.
         "republication": json.loads(article.republication) if article.republication else None,
         "tags": [t for t in (article.tags or "").split(",") if t],
         "publishedAt": article.published_at.isoformat() if article.published_at else None,
         "submittedAt": article.submitted_at.isoformat() if article.submitted_at else None,
-        # The writer has to be able to read why an editor sent it back.
+        #The writer has to be able to read why an editor sent it back.
         "rejectionReason": article.rejection_reason,
         "viewCount": article.view_count,
         "likeCount": article.like_count,
@@ -226,10 +226,10 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
             "score": article.credibility_score,
             "band": article.credibility_band,
         },
-        # Public, and deliberately separate from the score. The score is the
-        # arithmetic; this says whether an editor has read the article yet. A
-        # reader should never mistake one published by the system during a
-        # backlog for one a human approved.
+        #Public, and deliberately separate from the score. The score is the
+        #arithmetic; this says whether an editor has read the article yet. A
+        #reader should never mistake one published by the system during a
+        #backlog for one a human approved.
         "review": {
             "awaitingReview": article.awaiting_review,
             "autoPublishedAt": (
@@ -242,12 +242,12 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
             "name": article.contributor.byline,
             "accuracyRate": article.contributor.accuracy_rate,
         },
-        # Each source carries its rating and the reason for it, so a reader
-        # can see why one link counts for more than another.
+        #Each source carries its rating and the reason for it, so a reader
+        #can see why one link counts for more than another.
         "sources": [serialize_source(s) for s in article.sources],
-        # Public. A correction is why a score fell, and the product's claim is
-        # that a reader can trace that. It is also how the writer finds the
-        # correction they want to dispute.
+        #Public. A correction is why a score fell, and the product's claim is
+        #that a reader can trace that. It is also how the writer finds the
+        #correction they want to dispute.
         "corrections": [
             {
                 "id": c.id,
@@ -263,14 +263,14 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
     is_author = viewer is not None and viewer.id == article.contributor_id
     privileged = viewer is not None and viewer.role in {Role.EDITOR, Role.SYSTEM_ADMIN}
     if is_author or privileged:
-        # An editorial tool, never shown to readers.
+        #An editorial tool, never shown to readers.
         payload["originality"] = originality_summary(article)
 
-    # Another language: the translation's words, if there is a current one.
+    #Another language: the translation's words, if there is a current one.
     lang = request_lang()
     translation = fresh_translation(article, lang) if lang != "en" else None
     if lang != "en":
-        # None yet: where the site translates articles itself, one is on its way.
+        #None yet: where the site translates articles itself, one is on its way.
         preparing = translation is None and translation_pending(article, lang)
         payload["translation"] = translation_note(lang, translation, preparing)
         if translation is not None:
@@ -284,7 +284,7 @@ def serialize(article: Article, *, include_body: bool = True, viewer=None) -> di
     if may_read(article, viewer):
         payload["body"] = body
     else:
-        # PDD Figure 5.6: a paywalled article shows a preview and a prompt.
+        #PDD Figure 5.6: a paywalled article shows a preview and a prompt.
         payload["bodyPreview"] = preview_text(body)
         payload["paywalled"] = True
 
@@ -330,7 +330,7 @@ def create_article():
     db.session.add(article)
     db.session.flush()
 
-    # Slug needs the id to guarantee uniqueness across identical titles.
+    #Slug needs the id to guarantee uniqueness across identical titles.
     article.slug = slugify(title, article.id)
     _replace_sources(article, require_list(data, "sources", default=None, max_items=MAX_SOURCES))
     _apply_cover(article, data)
@@ -365,9 +365,9 @@ def update_article(article_id: int):
             )
         )
 
-    # Each field is coerced before it reaches the sanitiser: bleach raises
-    # TypeError on a non-string, which would surface as a 500 rather than a
-    # message naming the offending field.
+    #Each field is coerced before it reaches the sanitiser: bleach raises
+    #TypeError on a non-string, which would surface as a 500 rather than a
+    #message naming the offending field.
     if "title" in data:
         article.title = (
             clean_plain_text(require_str(data, "title", max_length=255)) or article.title
@@ -378,7 +378,7 @@ def update_article(article_id: int):
     if "body" in data:
         article.body = clean_article_body(require_str(data, "body", allow_empty=True))
         index_article(article)
-        # The last report described different text.
+        #The last report described different text.
         article.originality_percent = None
         article.originality_report = None
         article.originality_checked_at = None
@@ -396,13 +396,13 @@ def update_article(article_id: int):
         article.country_code = _country(data)
     _apply_cover(article, data)
     if article.status == ArticleStatus.PUBLISHED:
-        # A live article never shows an image without its description and source.
+        #A live article never shows an image without its description and source.
         _require_image_provenance(article)
     if "sources" in data:
         _replace_sources(article, require_list(data, "sources", max_items=MAX_SOURCES))
-        # Sources are a scoring input, so a live article's new sources are
-        # rated at once and the score moves with them. A draft's are rated
-        # when it is submitted.
+        #Sources are a scoring input, so a live article's new sources are
+        #rated at once and the score moves with them. A draft's are rated
+        #when it is submitted.
         if article.status == ArticleStatus.PUBLISHED:
             db.session.flush()
             db.session.expire(article, ["sources"])
@@ -430,10 +430,10 @@ def submit_article(article_id: int):
         raise ApiError(problem, status=422, field="categoryId")
     _require_image_provenance(article)
 
-    # Every submission reaches the editor with its sources rated and its
-    # originality report. Both inform the review; neither blocks submission.
-    # Sources are rated first: the originality check compares only with the
-    # sources that count.
+    #Every submission reaches the editor with its sources rated and its
+    #originality report. Both inform the review; neither blocks submission.
+    #Sources are rated first: the originality check compares only with the
+    #sources that count.
     rate_sources(article)
     check_originality(article, settings=load_settings())
 

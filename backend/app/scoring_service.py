@@ -55,8 +55,8 @@ def _published_counts(contributor_id: int) -> tuple[int, int]:
         or 0
     )
 
-    # An article counts as blemished if it was retracted, or carries at least one
-    # correction that has not been overturned on appeal (PRD 1.3.2, admin power 4).
+    #An article counts as blemished if it was retracted, or carries at least one
+    #correction that has not been overturned on appeal (PRD 1.3.2, admin power 4).
     blemished = (
         db.session.query(func.count(func.distinct(Article.id)))
         .outerjoin(Correction, Correction.article_id == Article.id)
@@ -151,10 +151,10 @@ def rescore_article(article: Article, settings: dict | None = None):
     """
     cfg = settings if settings is not None else load_settings()
 
-    # Two different figures on purpose. `recalculate_accuracy` persists the
-    # public rate, which is withheld below the minimum article count. The score
-    # uses the same curve without that cutoff, so a contributor crossing the
-    # minimum does not shift their whole back catalogue in one step.
+    #Two different figures on purpose. `recalculate_accuracy` persists the
+    #public rate, which is withheld below the minimum article count. The score
+    #uses the same curve without that cutoff, so a contributor crossing the
+    #minimum does not shift their whole back catalogue in one step.
     published_rate = recalculate_accuracy(article.contributor, cfg)
     accuracy = _accuracy_input(article, cfg)
 
@@ -195,8 +195,8 @@ def explain_article(article: Article, settings: dict | None = None,
     """
     cfg = settings if settings is not None else load_settings()
 
-    # A list of articles (the review queue) often has several by one writer;
-    # `record_counts` lets the caller count each writer's record once.
+    #A list of articles (the review queue) often has several by one writer;
+    #`record_counts` lets the caller count each writer's record once.
     if record_counts is not None and article.contributor_id in record_counts:
         published, blemished = record_counts[article.contributor_id]
     else:
@@ -205,7 +205,7 @@ def explain_article(article: Article, settings: dict | None = None,
             record_counts[article.contributor_id] = (published, blemished)
     accuracy = _accuracy_input(article, cfg, (published, blemished))
 
-    # Likewise `upheld_counts` ({article id: upheld reports}) for a whole list.
+    #Likewise `upheld_counts` ({article id: upheld reports}) for a whole list.
     if upheld_counts is not None:
         upheld = upheld_counts.get(article.id, 0)
     else:

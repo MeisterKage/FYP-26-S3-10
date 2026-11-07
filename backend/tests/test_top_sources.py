@@ -37,7 +37,7 @@ def test_flat_counting_stops_at_five_sources():
 def test_weak_links_cannot_pad_a_score_to_the_cap(app):
     article = make_article([("reliable", 5.0)] * 3 + [("unrated", 2.0)] * 5)
     b = explain_article(article)
-    assert b.source_component == 19.0          # 5 + 5 + 5 + 2 + 2
+    assert b.source_component == 19.0          #5 + 5 + 5 + 2 + 2
     assert b.as_dict()["sourcing"] == {"cited": 8, "counted": 5}
 
 
@@ -50,5 +50,5 @@ def test_a_republished_article_does_not_count_its_own_original(app):
     original = "https://theconversation.com/some-article-123"
     article = make_article([("reliable", 5.0)] + [("unrated", 2.0)] * 3, republished_from=original)
     b = explain_article(article)
-    assert b.source_component == 6.0           # the three unrated sources only
+    assert b.source_component == 6.0           #the three unrated sources only
     assert b.as_dict()["sourcing"]["cited"] == 3

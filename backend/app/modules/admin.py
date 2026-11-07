@@ -55,9 +55,9 @@ def _audit(action: str, entity_type: str, entity_id: int, detail: str | None = N
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Users  (PDD Figures 5.51-5.53, 5.56)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Users  (PDD Figures 5.51-5.53, 5.56)
+#--------------------------------------------------------------------------- #
 
 @bp.get("/admin/users")
 @admin_only
@@ -181,14 +181,14 @@ def _target_user(user_id: int) -> User:
     if user is None:
         raise ApiError("User not found.", status=404)
     if user.id == g.current_user.id:
-        # An admin locking themselves out is an easy and unrecoverable mistake.
+        #An admin locking themselves out is an easy and unrecoverable mistake.
         raise ApiError("You cannot perform this action on your own account.", status=422)
     return user
 
 
-# --------------------------------------------------------------------------- #
-#  Contributor applications  (PDD Figures 5.54-5.55)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Contributor applications  (PDD Figures 5.54-5.55)
+#--------------------------------------------------------------------------- #
 
 @bp.get("/admin/applications")
 @admin_only
@@ -208,9 +208,9 @@ def list_applications():
                     "writingSample": a.writing_sample,
                     "background": a.background,
                     "submittedAt": a.created_at.isoformat(),
-                    # PDD Figure 5.89 wants context beyond the application text,
-                    # so the administrator is not judging a writing sample in a
-                    # vacuum.
+                    #PDD Figure 5.89 wants context beyond the application text,
+                    #so the administrator is not judging a writing sample in a
+                    #vacuum.
                     "history": {
                         "memberSince": a.user.created_at.isoformat(),
                         "currentRole": a.user.role.value,
@@ -255,8 +255,8 @@ def decide_application(application_id: int):
         if not reason:
             raise ApiError("Tell the applicant why.", status=422, field="reason")
         application.status = ApplicationStatus.REJECTED
-        # Bounded: an unchecked int() here crashes on "abc", and an unbounded one
-        # lets a typo set a reapply date centuries out.
+        #Bounded: an unchecked int() here crashes on "abc", and an unbounded one
+        #lets a typo set a reapply date centuries out.
         cooldown_days = require_int(
             data, "reapplyAfterDays", default=30, minimum=1, maximum=365
         )
@@ -278,14 +278,14 @@ def decide_application(application_id: int):
     return jsonify({"status": application.status.value})
 
 
-# --------------------------------------------------------------------------- #
-#  Editor assignments
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Editor assignments
+#--------------------------------------------------------------------------- #
 #
-#  PRD 1.3.2 says editors "work within a specific assigned content category", and
-#  review.py enforces exactly that. Without these routes the assignment could
-#  only be made by writing to the table directly, so a newly promoted editor had
-#  a permanently empty review queue and no administrator could fix it.
+# PRD 1.3.2 says editors "work within a specific assigned content category", and
+# review.py enforces exactly that. Without these routes the assignment could
+# only be made by writing to the table directly, so a newly promoted editor had
+# a permanently empty review queue and no administrator could fix it.
 
 @bp.get("/admin/editors")
 @admin_only
@@ -316,8 +316,8 @@ def list_editor_assignments():
                     "title": editor.editor_title,
                     "credentials": editor.editor_credentials,
                     "categories": assignments.get(editor.id, []),
-                    # Surfaced deliberately: this is the state that silently
-                    # produces an empty review queue.
+                    #Surfaced deliberately: this is the state that silently
+                    #produces an empty review queue.
                     "hasNoCategories": not assignments.get(editor.id),
                 }
                 for editor in editors
@@ -411,9 +411,9 @@ def set_editor_profile(editor_id: int):
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Source grades: the administrators' list (source_rating.py, step 3)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Source grades: the administrators' list (source_rating.py, step 3)
+#--------------------------------------------------------------------------- #
 
 def _rule_view(rule: SourceDomainRule) -> dict:
     return {
@@ -490,9 +490,9 @@ def delete_source_rule(rule_id: int):
     return jsonify({"deleted": domain, "regraded": regraded})
 
 
-# --------------------------------------------------------------------------- #
-#  Categories  (PDD Figure 5.59)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Categories  (PDD Figure 5.59)
+#--------------------------------------------------------------------------- #
 
 @bp.post("/admin/categories")
 @admin_only
@@ -578,9 +578,9 @@ def delete_category(category_id: int):
     return jsonify({"message": f"Category removed. {moved} articles reassigned."})
 
 
-# --------------------------------------------------------------------------- #
-#  Platform thresholds  (PDD Figure 5.60)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Platform thresholds  (PDD Figure 5.60)
+#--------------------------------------------------------------------------- #
 
 #: Every tunable constant, whichever engine owns it. Each engine keeps its own
 #: defaults so the scoring engine stays about scoring; this is the one place
@@ -629,17 +629,17 @@ def update_settings():
             status=422, field="settings",
         )
 
-    # Validate every key before writing any, so a bad third value cannot leave
-    # the first two applied.
+    #Validate every key before writing any, so a bad third value cannot leave
+    #the first two applied.
     for key in data:
         if key not in ALL_SETTINGS:
             raise ApiError(f"Unknown setting '{key}'.", status=422, field=key)
 
     for key in data:
-        # require_number rejects NaN and infinity. Both survive a naive `< 0`
-        # check (every comparison with NaN is False), and Postgres stores both
-        # happily, which would drive every credibility score to nonsense with
-        # no error anywhere.
+        #require_number rejects NaN and infinity. Both survive a naive `< 0`
+        #check (every comparison with NaN is False), and Postgres stores both
+        #happily, which would drive every credibility score to nonsense with
+        #no error anywhere.
         numeric = require_number(data, key, minimum=0, maximum=SETTING_CEILING)
 
         row = PlatformSetting.query.get(key)
@@ -673,9 +673,9 @@ def update_settings():
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Dashboard and logs  (PDD Figures 5.61, 5.62)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Dashboard and logs  (PDD Figures 5.61, 5.62)
+#--------------------------------------------------------------------------- #
 
 @bp.get("/admin/dashboard")
 @admin_only
@@ -701,10 +701,10 @@ def dashboard():
                 or 0,
                 1,
             ),
-            # PDD Figure 5.97: the dashboard is read-only, and each item links
-            # out to the screen where the work is actually done. Only non-zero
-            # counts are returned, so a quiet platform shows a short list rather
-            # than a column of noughts.
+            #PDD Figure 5.97: the dashboard is read-only, and each item links
+            #out to the screen where the work is actually done. Only non-zero
+            #counts are returned, so a quiet platform shows a short list rather
+            #than a column of noughts.
             "attention": [
                 item
                 for item in (
@@ -778,9 +778,9 @@ def logs():
     )
 
 
-# --------------------------------------------------------------------------- #
-#  Article moderation  (PDD Figure 5.93)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Article moderation  (PDD Figure 5.93)
+#--------------------------------------------------------------------------- #
 
 #: What an administrator may do to an article, keyed by its current status. The
 #: interface renders only the relevant actions, and the server enforces the same

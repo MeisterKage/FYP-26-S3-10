@@ -69,9 +69,9 @@ def register_error_handlers(app):
 
     @app.errorhandler(ApiError)
     def _api_error(exc: ApiError):
-        # An ApiError can be raised after rows were staged but before commit.
-        # Discarding them stops a rejected request leaking a partial write into
-        # whatever the next request commits on this connection.
+        #An ApiError can be raised after rows were staged but before commit.
+        #Discarding them stops a rejected request leaking a partial write into
+        #whatever the next request commits on this connection.
         _safe_rollback(db)
         return exc.to_response()
 
@@ -131,8 +131,8 @@ def register_error_handlers(app):
 
     @app.teardown_request
     def _teardown(exc):
-        # Belt and braces: if anything escaped the handlers above, the session is
-        # still returned to the pool clean.
+        #Belt and braces: if anything escaped the handlers above, the session is
+        #still returned to the pool clean.
         if exc is not None:
             _safe_rollback(db)
 

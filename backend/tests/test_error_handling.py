@@ -44,9 +44,9 @@ def auth_for(client, email):
     return {"Authorization": f"Bearer {token}"}
 
 
-# --------------------------------------------------------------------------- #
-#  Every response is JSON in one shape
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Every response is JSON in one shape
+#--------------------------------------------------------------------------- #
 
 def assert_error_shape(response):
     """The contract frontend/src/api.js is written against."""
@@ -95,9 +95,9 @@ def test_error_messages_do_not_leak_internals(client):
             assert leak not in message, f"{leak!r} leaked in: {message!r}"
 
 
-# --------------------------------------------------------------------------- #
-#  NaN and infinity in the scoring thresholds
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# NaN and infinity in the scoring thresholds
+#--------------------------------------------------------------------------- #
 
 def test_nan_threshold_is_rejected(client, category):
     """The worst of the bugs found: `nan < 0` is False, so a naive range check
@@ -165,9 +165,9 @@ def test_a_bad_value_applies_none_of_the_batch(client):
     assert PlatformSetting.query.get("source_points") is None
 
 
-# --------------------------------------------------------------------------- #
-#  Wrong-typed fields
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Wrong-typed fields
+#--------------------------------------------------------------------------- #
 
 def test_string_where_a_list_belongs_is_a_422_not_a_500(client, category):
     """This raised an unhandled SQLAlchemy ArgumentError before the fix."""
@@ -213,7 +213,7 @@ def test_valid_tags_still_work(client, category):
         headers=headers,
     )
     assert response.status_code == 201
-    # Duplicates collapse.
+    #Duplicates collapse.
     assert response.get_json()["tags"] == ["policy", "analysis"]
 
 
@@ -228,7 +228,7 @@ def test_non_string_title_is_a_422_not_a_sanitiser_crash(client, category):
     )
     article_id = created.get_json()["id"]
 
-    # bleach raises TypeError on a non-string, which would be a 500.
+    #bleach raises TypeError on a non-string, which would be a 500.
     response = client.patch(
         f"/api/articles/{article_id}", json={"title": {"nested": "object"}}, headers=headers
     )
@@ -248,9 +248,9 @@ def test_non_numeric_category_id_is_a_422(client, category):
     assert response.get_json()["error"]["field"] == "categoryId"
 
 
-# --------------------------------------------------------------------------- #
-#  Foreign keys arriving from the client
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Foreign keys arriving from the client
+#--------------------------------------------------------------------------- #
 
 def test_comment_on_a_nonexistent_parent_is_rejected(client, category):
     """SQLite accepts a dangling FK by default; Postgres raises. Validating here
@@ -323,9 +323,9 @@ def test_a_valid_reply_still_works(client, category):
     assert response.status_code == 201
 
 
-# --------------------------------------------------------------------------- #
-#  Bad tokens
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Bad tokens
+#--------------------------------------------------------------------------- #
 
 @pytest.mark.parametrize(
     "header",
@@ -350,9 +350,9 @@ def test_token_without_a_usable_subject_is_a_401(client):
     assert_error_shape(response)
 
 
-# --------------------------------------------------------------------------- #
-#  Session hygiene
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Session hygiene
+#--------------------------------------------------------------------------- #
 
 def test_session_is_usable_after_a_rejected_request(client, category):
     """A failed request must not leave staged rows or a dirty session behind for
@@ -370,7 +370,7 @@ def test_session_is_usable_after_a_rejected_request(client, category):
     )
     assert bad.status_code == 422
 
-    # Nothing partial was left staged, and the next request works normally.
+    #Nothing partial was left staged, and the next request works normally.
     assert Article.query.count() == before
 
     good = client.post(
@@ -405,9 +405,9 @@ def test_bounded_reapply_window(client):
     assert_error_shape(response)
 
 
-# --------------------------------------------------------------------------- #
-#  Security response headers
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Security response headers
+#--------------------------------------------------------------------------- #
 
 def test_every_response_refuses_to_be_framed(client):
     """Clickjacking: without this, any site can frame ours and overlay a

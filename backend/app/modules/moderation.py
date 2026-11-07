@@ -49,9 +49,9 @@ def flagged_content():
 
     flagged = [(a, c) for a, c in rows if editor_owns_category(a.category_id)]
 
-    # The individual reports behind each count. Resolving works on one report at
-    # a time, so a count alone gives a moderator nothing to act on. Fetched in
-    # one query for the whole page rather than one per article.
+    #The individual reports behind each count. Resolving works on one report at
+    #a time, so a count alone gives a moderator nothing to act on. Fetched in
+    #one query for the whole page rather than one per article.
     open_reports: dict[int, list] = {}
     corrections: dict[int, list] = {}
     if flagged:
@@ -175,8 +175,8 @@ def log_correction(article_id: int):
 
     db.session.flush()
     rescore_contributor_articles(article.contributor)
-    # A correction on something that skipped review costs the writer the right
-    # to skip it again. See review_service.suspend_after_correction.
+    #A correction on something that skipped review costs the writer the right
+    #to skip it again. See review_service.suspend_after_correction.
     suspend_after_correction(article)
 
     db.session.add(
@@ -257,9 +257,9 @@ def hide_comment(comment_id: int):
     return jsonify({"hidden": True})
 
 
-# --------------------------------------------------------------------------- #
-#  Rule-based submission checks (PDD Section 2.2)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Rule-based submission checks (PDD Section 2.2)
+#--------------------------------------------------------------------------- #
 
 def duplicate_titles(title: str, exclude_article_id: int | None = None) -> list[int]:
     """Rule-based duplicate check. Exact normalised title match, no fuzzy logic."""
@@ -270,9 +270,9 @@ def duplicate_titles(title: str, exclude_article_id: int | None = None) -> list[
     return [a.id for a in query]
 
 
-# --------------------------------------------------------------------------- #
-#  Credibility disputes  (PDD Figure 5.94)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Credibility disputes  (PDD Figure 5.94)
+#--------------------------------------------------------------------------- #
 
 @bp.post("/corrections/<int:correction_id>/dispute")
 @roles_required(*AUTHORING_ROLES)

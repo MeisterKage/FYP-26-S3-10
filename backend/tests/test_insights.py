@@ -72,7 +72,7 @@ def read(client, slug):
     return client.get(f"/api/articles/{slug}").get_json()["article"]
 
 
-# --- key points ------------------------------------------------------------- #
+#--- key points ------------------------------------------------------------- #
 
 def test_key_points_are_the_articles_own_sentences_in_order():
     body = body_for(LONG)
@@ -81,7 +81,7 @@ def test_key_points_are_the_articles_own_sentences_in_order():
     assert 3 <= len(points) <= 4
     positions = [text.index(p) for p in points]
     assert positions == sorted(positions)
-    assert not any("“" in p or '"' in p for p in points)  # quotes stay with their speaker
+    assert not any("“" in p or '"' in p for p in points)  #quotes stay with their speaker
 
 
 def test_sentence_splitting_survives_abbreviations_and_quotes():
@@ -112,7 +112,7 @@ def test_an_unconfigured_provider_hides_the_block_instead_of_failing(client, wor
     assert r.status_code == 200 and r.get_json()["article"]["inBrief"] is None
 
 
-# --- writing signals -------------------------------------------------------- #
+#--- writing signals -------------------------------------------------------- #
 
 def test_generated_prose_shows_many_signals_and_reporting_few():
     assert insights.writing_signals(GENERATED)["level"] == "many"

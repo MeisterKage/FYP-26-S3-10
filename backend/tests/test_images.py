@@ -31,15 +31,15 @@ def picture(width=800, height=600, fmt="JPEG", exif=None, mode="RGB"):
 
 def gps_exif():
     exif = Image.Exif()
-    # GPSInfo IFD: latitude/longitude of the Wollongong lighthouse, roughly.
+    #GPSInfo IFD: latitude/longitude of the Wollongong lighthouse, roughly.
     exif[0x8825] = {1: "S", 2: (34.0, 25.0, 12.0), 3: "E", 4: (150.0, 54.0, 36.0)}
-    exif[0x010F] = "PhoneMaker"  # camera make
+    exif[0x010F] = "PhoneMaker"  #camera make
     return exif
 
 
-# --------------------------------------------------------------------------- #
-#  Pure processing
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Pure processing
+#--------------------------------------------------------------------------- #
 
 def test_a_photo_is_resized_to_two_known_sizes():
     out = images.process(picture(4000, 3000))
@@ -52,7 +52,7 @@ def test_a_photo_is_resized_to_two_known_sizes():
 
 def test_location_and_camera_metadata_do_not_survive():
     original = picture(exif=gps_exif())
-    assert Image.open(io.BytesIO(original)).getexif()  # the fixture really has it
+    assert Image.open(io.BytesIO(original)).getexif()  #the fixture really has it
 
     out = images.process(original)
     for data in (out.large, out.thumb):
@@ -102,9 +102,9 @@ def test_a_decompression_bomb_is_refused_from_its_header(monkeypatch):
         images.process(picture(800, 600))
 
 
-# --------------------------------------------------------------------------- #
-#  API
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# API
+#--------------------------------------------------------------------------- #
 
 def make_user(email, role):
     user = User(email=email, display_name=email.split("@")[0],

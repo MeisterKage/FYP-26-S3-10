@@ -75,7 +75,7 @@ def test_assigning_categories_makes_the_review_queue_work(client, categories):
 
     editor_headers = auth_for(client, "editor2@example.com")
 
-    # Before assignment: empty queue, with an explanation rather than silence.
+    #Before assignment: empty queue, with an explanation rather than silence.
     before = client.get("/api/review/queue", headers=editor_headers).get_json()
     assert before["articles"] == []
     assert "note" in before
@@ -140,7 +140,7 @@ def test_unknown_category_is_rejected_without_partial_write(client, categories):
         headers=auth_for(client, "admin6@example.com"),
     )
     assert response.status_code == 422
-    # The valid half of the request must not have been applied.
+    #The valid half of the request must not have been applied.
     assert EditorCategory.query.filter_by(editor_id=editor.id).count() == 0
 
 
@@ -163,9 +163,9 @@ def test_listing_requires_an_administrator(client):
     ).status_code == 403
 
 
-# --------------------------------------------------------------------------- #
-#  Deleting an account: what happens to what they published (PDD Figure 5.87)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Deleting an account: what happens to what they published (PDD Figure 5.87)
+#--------------------------------------------------------------------------- #
 
 def _published_by(writer, categories, title, slug):
     article = Article(
@@ -202,8 +202,8 @@ def test_an_administrator_can_take_the_articles_down_with_the_account(client, ca
     )
 
     assert response.status_code == 200
-    # Unpublished, never destroyed: the revision and correction history is the
-    # record of what was corrected, and deleting the row takes the evidence too.
+    #Unpublished, never destroyed: the revision and correction history is the
+    #record of what was corrected, and deleting the row takes the evidence too.
     assert Article.query.get(article.id).status == ArticleStatus.UNPUBLISHED
 
 
@@ -219,9 +219,9 @@ def test_an_unknown_articles_choice_is_rejected(client, categories):
     assert response.status_code == 422
 
 
-# --------------------------------------------------------------------------- #
-#  Renaming a category (PDD Figure 5.95)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Renaming a category (PDD Figure 5.95)
+#--------------------------------------------------------------------------- #
 
 def test_renaming_a_category_keeps_its_address(client, categories):
     """Renaming "Tech" to "Technology" must not break every link anyone has

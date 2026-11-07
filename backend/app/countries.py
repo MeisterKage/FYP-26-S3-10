@@ -284,6 +284,6 @@ def codes_matching(text: str) -> list[str]:
     """Countries whose name contains `text`, for keyword search. Case-insensitive."""
     needle = text.strip().lower()
     if len(needle) < 3:
-        # "an" would match half the world; a two-letter query is not a country.
+        #"an" would match half the world; a two-letter query is not a country.
         return []
     return [code for code, name in COUNTRIES.items() if needle in name.lower()]

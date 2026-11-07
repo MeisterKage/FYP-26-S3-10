@@ -44,8 +44,8 @@ W = 4
 #: Settings, overridable by an administrator through PlatformSetting. Kept with
 #: the review-automation settings (triage.DEFAULTS) because they act on review.
 DEFAULTS: dict[str, float] = {
-    "originality_flag_percent": 20.0,         # at or above: flagged to the editor
-    "originality_substantial_percent": 50.0,  # at or above: "substantially matches"
+    "originality_flag_percent": 20.0,         #at or above: flagged to the editor
+    "originality_substantial_percent": 50.0,  #at or above: "substantially matches"
 }
 
 STOPWORDS = frozenset("""
@@ -77,7 +77,7 @@ def _stem(word: str) -> str:
         if word.endswith(suffix) and len(word) - len(suffix) >= 3:
             word = word[: -len(suffix)]
             break
-    # "complete" and "completed" should meet at "complet".
+    #"complete" and "completed" should meet at "complet".
     if word.endswith("e") and len(word) > 4:
         word = word[:-1]
     return word
@@ -85,13 +85,13 @@ def _stem(word: str) -> str:
 
 def _hash(gram: tuple[str, ...]) -> int:
     digest = blake2b(" ".join(gram).encode(), digest_size=8).digest()
-    # Shifted to fit a signed 64-bit database column.
+    #Shifted to fit a signed 64-bit database column.
     return int.from_bytes(digest, "big") >> 1
 
 
-# --------------------------------------------------------------------------- #
-#  Text
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Text
+#--------------------------------------------------------------------------- #
 
 class _TextExtractor(HTMLParser):
     """HTML to plain text, recording which character ranges sit in a blockquote."""
@@ -168,8 +168,8 @@ def parse(content: str, *, html: bool = True) -> Document:
     else:
         raw, block_quotes = content or "", []
 
-    # Collapse whitespace while keeping character offsets consistent: offsets
-    # are computed on the collapsed text, so blockquote ranges are remapped.
+    #Collapse whitespace while keeping character offsets consistent: offsets
+    #are computed on the collapsed text, so blockquote ranges are remapped.
     text_chars, index_map = [], []
     previous_space = True
     for i, ch in enumerate(raw):
@@ -185,7 +185,7 @@ def parse(content: str, *, html: bool = True) -> Document:
     text = "".join(text_chars).strip()
 
     def remap(pos: int) -> int:
-        # First collapsed index whose source index is >= pos.
+        #First collapsed index whose source index is >= pos.
         lo, hi = 0, len(index_map)
         while lo < hi:
             mid = (lo + hi) // 2
@@ -222,9 +222,9 @@ def _merge(ranges: list[tuple[int, int]]) -> list[tuple[int, int]]:
     return merged
 
 
-# --------------------------------------------------------------------------- #
-#  Fingerprints
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Fingerprints
+#--------------------------------------------------------------------------- #
 
 def kgrams(tokens: list[Token]) -> list[int]:
     """The hash of every run of K tokens, in order. Position i covers tokens i..i+K-1."""
@@ -255,9 +255,9 @@ def fingerprint(doc: Document) -> list[tuple[int, int]]:
     return winnow(kgrams(doc.tokens))
 
 
-# --------------------------------------------------------------------------- #
-#  Matching
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Matching
+#--------------------------------------------------------------------------- #
 
 @dataclass
 class Passage:

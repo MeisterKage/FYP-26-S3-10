@@ -44,9 +44,9 @@ def edition_title(edition: DigestEdition, category: Category) -> str:
     return f"{topic_label(category.name, edition.country_code)}, {month_label(edition.month)}"
 
 
-# --------------------------------------------------------------------------- #
-#  Compiling
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Compiling
+#--------------------------------------------------------------------------- #
 
 def is_final(edition: DigestEdition) -> bool:
     """Compiled after its month ended. Earlier compilations are provisional."""
@@ -122,8 +122,8 @@ def compile_month(month: str, *, force: bool = False, now: datetime | None = Non
         row.data = json.dumps({"stats": edition.stats, "corrections": edition.corrections})
         row.compiled_at = now
         if existing is not None:
-            # Delete before inserting: the unit of work would otherwise insert
-            # the new entries first and trip the (edition, article) uniqueness.
+            #Delete before inserting: the unit of work would otherwise insert
+            #the new entries first and trip the (edition, article) uniqueness.
             DigestEntry.query.filter_by(edition_id=row.id).delete()
             db.session.flush()
             db.session.expire(row, ["entries"])
@@ -141,9 +141,9 @@ def compile_month(month: str, *, force: bool = False, now: datetime | None = Non
             result["notified"] += _notify_subscribers(row, category)
 
     if final_now:
-        # A provisional edition whose topic no longer has enough articles (one
-        # was taken down before the month ended) would otherwise stay "in
-        # progress" for ever. It never became final, so nobody was notified.
+        #A provisional edition whose topic no longer has enough articles (one
+        #was taken down before the month ended) would otherwise stay "in
+        #progress" for ever. It never became final, so nobody was notified.
         touched = set(result["created"]) | set(result["recompiled"]) | set(result["unchanged"])
         for stale in DigestEdition.query.filter_by(month=month).all():
             if stale.key not in touched and not is_final(stale):
@@ -162,7 +162,7 @@ def _notify_subscribers(edition: DigestEdition, category: Category) -> int:
     for sub in subscribers:
         db.session.add(Notification(
             user_id=sub.user_id,
-            # Matches the "monthly_digest" email toggle in account settings.
+            #Matches the "monthly_digest" email toggle in account settings.
             event_type="monthly_digest",
             title=f"New digest: {title}",
             body="The month's most credible reporting, and what was corrected.",
@@ -171,9 +171,9 @@ def _notify_subscribers(edition: DigestEdition, category: Category) -> int:
     return len(subscribers)
 
 
-# --------------------------------------------------------------------------- #
-#  Presenting
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Presenting
+#--------------------------------------------------------------------------- #
 
 def _since(entry: DigestEntry, compiled_at: datetime) -> str | None:
     """What has happened to an article since the edition was compiled, if anything."""
@@ -208,7 +208,7 @@ def summary(edition: DigestEdition, category: Category) -> dict:
         ),
         "stats": data["stats"],
         "compiledAt": edition.compiled_at.isoformat(),
-        # Compiled before the month ended: the final edition follows.
+        #Compiled before the month ended: the final edition follows.
         "provisional": not is_final(edition),
     }
 
@@ -217,9 +217,9 @@ def full(edition: DigestEdition, category: Category, viewer=None) -> dict:
     from .modules.articles import list_loads, serialize
 
     data = json.loads(edition.data)
-    # Load every ranked article, with what serialize() and the audio edition
-    # read, in one batch; each entry.article is then found without a query.
-    # Held in a variable: the session only keeps objects something refers to.
+    #Load every ranked article, with what serialize() and the audio edition
+    #read, in one batch; each entry.article is then found without a query.
+    #Held in a variable: the session only keeps objects something refers to.
     ids = [e.article_id for e in edition.entries]
     loaded = Article.query.options(*list_loads()).filter(Article.id.in_(ids)).all()  # noqa: F841
     entries = []
@@ -230,7 +230,7 @@ def full(edition: DigestEdition, category: Category, viewer=None) -> dict:
             "rank": entry.rank,
             "scoreAtCompile": entry.score_at_compile,
             "since": note,
-            # An article taken down since is named, but not served.
+            #An article taken down since is named, but not served.
             "article": (
                 serialize(entry.article, include_body=False, viewer=viewer) if public
                 else {"id": entry.article.id, "title": entry.article.title}
@@ -249,8 +249,8 @@ def full(edition: DigestEdition, category: Category, viewer=None) -> dict:
         "entries": entries,
         "corrections": data["corrections"],
         "subscribed": subscribed,
-        # The edition as an audio book: chapters to listen to, with a summary
-        # of every article. None when narration is switched off.
+        #The edition as an audio book: chapters to listen to, with a summary
+        #of every article. None when narration is switched off.
         "listen": audio_edition(edition, category, topic=head["topic"],
                                 month_label=head["monthLabel"],
                                 provisional=head["provisional"], viewer=viewer),

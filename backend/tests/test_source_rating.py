@@ -18,17 +18,17 @@ from app.security import hash_password
 PASSWORD = "SourceRating123!"
 
 
-# =========================================================================== #
-#  Rules
-# =========================================================================== #
+#=========================================================================== #
+# Rules
+#=========================================================================== #
 
 @pytest.mark.parametrize("url,tier", [
     ("https://www.abs.gov.au/statistics", "official"),
     ("https://www.aph.gov.au/Parliamentary_Business", "official"),
     ("https://www.stats.govt.nz/", "official"),
     ("https://www.gov.uk/government/organisations/environment-agency", "official"),
-    # Official bodies on ordinary addresses are found through Wikidata; see
-    # test_a_domain_owned_by_a_government_body_counts_as_official.
+    #Official bodies on ordinary addresses are found through Wikidata; see
+    #test_a_domain_owned_by_a_government_body_counts_as_official.
     ("https://www.bankofengland.co.uk/", "unrated"),
     ("https://data.un.org/", "official"),
     ("https://www.who.int/news", "official"),
@@ -37,11 +37,11 @@ PASSWORD = "SourceRating123!"
     ("https://www.bbc.co.uk/news/articles/x", "reliable"),
     ("https://www.reuters.com/world/", "reliable"),
     ("https://www.dailymail.co.uk/news/x", "deprecated"),
-    ("https://www.breitbart.com/x", "deprecated"),          # blacklisted on the list
+    ("https://www.breitbart.com/x", "deprecated"),          #blacklisted on the list
     ("https://en.wikipedia.org/wiki/Privacy_Act_1988", "unreliable"),
     ("https://x.com/someone/status/1", "unreliable"),
     ("https://someblog.substack.com/p/post", "unreliable"),
-    ("https://www.foxnews.com/politics", "unrated"),        # "no consensus" on the list
+    ("https://www.foxnews.com/politics", "unrated"),        #"no consensus" on the list
     ("https://a-small-local-site.com.au/", "unrated"),
     ("https://example.org/source/1", "invalid"),
     ("https://news.test/", "invalid"),
@@ -100,9 +100,9 @@ def test_an_editor_verdict_overrides_the_tier():
     assert sr.points_for(unrated, None) == 2
 
 
-# =========================================================================== #
-#  Against the database
-# =========================================================================== #
+#=========================================================================== #
+# Against the database
+#=========================================================================== #
 
 def make_user(email, role):
     u = User(email=email, display_name=email.split("@")[0],
@@ -230,9 +230,9 @@ def test_sources_rated_before_this_system_score_as_they_did(app, world):
     assert explain_article(article).source_component == 15
 
 
-# =========================================================================== #
-#  The administrators' list, and Wikidata ownership
-# =========================================================================== #
+#=========================================================================== #
+# The administrators' list, and Wikidata ownership
+#=========================================================================== #
 
 @pytest.mark.parametrize("typed,expected", [
     ("https://www.BankOfEngland.co.uk/monetary-policy", "bankofengland.co.uk"),
@@ -251,7 +251,7 @@ def test_an_admin_rule_overrides_the_lists_and_covers_subdomains():
     rating = sr.classify("https://amp.smh.com.au/story", admin_rules=rules)
     assert rating.tier == "unreliable"
     assert "administrators" in rating.reason
-    assert sr.classify("https://www.smh.com.au/").tier == "reliable"  # untouched without it
+    assert sr.classify("https://www.smh.com.au/").tier == "reliable"  #untouched without it
 
 
 def test_an_admin_rule_cannot_launder_a_retracted_paper():
@@ -289,7 +289,7 @@ def test_wikidata_official_but_not_media(app, monkeypatch):
     assert source_service.official_owner("abc.net.au", now, fetch=True) is None
     assert source_service.official_owner("niwa.co.nz", now, fetch=True).startswith("National Institute")
     assert source_service.official_owner("smh.com.au", now, fetch=True) is None
-    # Cached: asking again does not ask Wikidata again.
+    #Cached: asking again does not ask Wikidata again.
     source_service.official_owner("bankofengland.co.uk", now, fetch=True)
     assert calls.count("bankofengland.co.uk") == 1
     assert DomainLookup.query.count() == 4

@@ -19,9 +19,9 @@ from urllib.parse import quote
 log = logging.getLogger(__name__)
 
 
-# --------------------------------------------------------------------------- #
-#  Email delivery
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Email delivery
+#--------------------------------------------------------------------------- #
 
 class EmailDeliveryService:
     """PRD 5.1: notifications queued for delivery within 60 seconds of the trigger."""
@@ -42,9 +42,9 @@ class EmailDeliveryService:
         return True
 
 
-# --------------------------------------------------------------------------- #
-#  Payment gateway
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Payment gateway
+#--------------------------------------------------------------------------- #
 
 #: Platform cut shrinks as a contributor's subscriber base grows (PRD 1.4.5).
 REVENUE_TIERS: tuple[tuple[int, str, float], ...] = (
@@ -63,9 +63,9 @@ def revenue_tier_for(subscriber_count: int) -> tuple[str, float]:
     return name, share
 
 
-# --------------------------------------------------------------------------- #
-#  Social share
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Social share
+#--------------------------------------------------------------------------- #
 
 class SocialShareService:
     """Builds the preview card carrying headline and credibility score (PDD Fig 5.8).

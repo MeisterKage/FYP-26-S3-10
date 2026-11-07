@@ -47,22 +47,22 @@ from dataclasses import dataclass
 #: Shipped defaults for every tunable constant. Admin overrides live in
 #: PlatformSetting rows keyed by these same names.
 DEFAULTS: dict[str, float] = {
-    # Accuracy rate
-    "min_articles_for_accuracy": 5,     # below this, show "New Contributor"
+    #Accuracy rate
+    "min_articles_for_accuracy": 5,     #below this, show "New Contributor"
     "provisional_accuracy": 70.0,
     #: How many articles' worth of the baseline is blended into an accuracy
     #: rate. Higher means a record moves more slowly and small samples are
     #: treated more cautiously.
-    "smoothing_articles": 5.0,       # stand-in accuracy for new contributors
-    # Credibility score
-    "accuracy_weight": 0.75,            # accuracy 0-100 contributes 0-75
-    "source_points": 5.0,               # points per verifiable source link
-    "source_cap": 25.0,                 # sourcing cannot contribute more than this
-    "sources_counted": 5,               # only the best this many sources earn points
-    "correction_penalty": 15.0,         # per logged correction
-    "retraction_penalty": 40.0,         # one-off, if retracted
-    "report_threshold": 10,             # upheld reports needed to trigger penalty
-    "report_penalty": 10.0,             # applied once the threshold is crossed
+    "smoothing_articles": 5.0,       #stand-in accuracy for new contributors
+    #Credibility score
+    "accuracy_weight": 0.75,            #accuracy 0-100 contributes 0-75
+    "source_points": 5.0,               #points per verifiable source link
+    "source_cap": 25.0,                 #sourcing cannot contribute more than this
+    "sources_counted": 5,               #only the best this many sources earn points
+    "correction_penalty": 15.0,         #per logged correction
+    "retraction_penalty": 40.0,         #one-off, if retracted
+    "report_threshold": 10,             #upheld reports needed to trigger penalty
+    "report_penalty": 10.0,             #applied once the threshold is crossed
 }
 
 #: Disclosed bands, used for the reader-facing label beside the numeric score.
@@ -153,17 +153,17 @@ def accuracy_rate(
     if published_count < int(cfg["min_articles_for_accuracy"]):
         return None
 
-    # Smoothed toward the platform baseline rather than a raw clean/total ratio.
+    #Smoothed toward the platform baseline rather than a raw clean/total ratio.
     #
-    # A raw ratio punishes small records unfairly hard. With five articles, one
-    # correction took a writer from 100% to 80%, removing 15 points from every
-    # article they had ever published; the same correction against a writer with
-    # forty articles cost under two. Same mistake, eight times the penalty,
-    # purely for being new.
+    #A raw ratio punishes small records unfairly hard. With five articles, one
+    #correction took a writer from 100% to 80%, removing 15 points from every
+    #article they had ever published; the same correction against a writer with
+    #forty articles cost under two. Same mistake, eight times the penalty,
+    #purely for being new.
     #
-    # It is the same adjustment used for rating averages everywhere: an average
-    # over few observations is pulled toward the population mean until there is
-    # enough evidence to trust it.
+    #It is the same adjustment used for rating averages everywhere: an average
+    #over few observations is pulled toward the population mean until there is
+    #enough evidence to trust it.
     return smoothed_accuracy(published_count, corrected_or_retracted_count, cfg)
 
 
@@ -197,11 +197,11 @@ def credibility_score(
     used_provisional = accuracy_withheld or contributor_accuracy is None
 
     accuracy_component = cfg["accuracy_weight"] * accuracy
-    # `source_points` is the sum of each cited source's rating
-    # (source_rating.py): a government page or a reliable outlet is worth more
-    # than an unrated site, and a placeholder or retracted paper nothing. Without
-    # it, every source counts the flat `source_points`. Either way only the best
-    # `sources_counted` sources count (the caller picks them for rated sources).
+    #`source_points` is the sum of each cited source's rating
+    #(source_rating.py): a government page or a reliable outlet is worth more
+    #than an unrated site, and a placeholder or retracted paper nothing. Without
+    #it, every source counts the flat `source_points`. Either way only the best
+    #`sources_counted` sources count (the caller picks them for rated sources).
     limit = int(cfg["sources_counted"])
     counted = min(max(0, source_count), limit)
     raw_sources = (

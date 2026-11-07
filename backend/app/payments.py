@@ -105,9 +105,9 @@ class PaymentProvider(ABC):
         """Pay a writer their share. Returns the transfer reference. Raises ProviderError."""
 
 
-# --------------------------------------------------------------------------- #
-#  Signatures: the same scheme real providers use
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Signatures: the same scheme real providers use
+#--------------------------------------------------------------------------- #
 
 def sign(body: bytes, secret: str, timestamp: int) -> str:
     """HMAC-SHA256 over "timestamp.body", in the header format Stripe uses."""
@@ -128,14 +128,14 @@ def check_signature(body: bytes, header: str | None, secret: str, now: float | N
     if abs(now - timestamp) > WEBHOOK_TOLERANCE_SECONDS:
         raise WebhookRejected("Signature too old.")
     expected = sign(body, secret, timestamp).split("v1=")[1]
-    # Constant-time: comparing byte by byte would leak how much was right.
+    #Constant-time: comparing byte by byte would leak how much was right.
     if not hmac.compare_digest(expected, given):
         raise WebhookRejected("Signature does not match.")
 
 
-# --------------------------------------------------------------------------- #
-#  Sandbox
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Sandbox
+#--------------------------------------------------------------------------- #
 
 SIGNATURE_HEADER = "Payment-Signature"
 
@@ -195,9 +195,9 @@ class SandboxProvider(PaymentProvider):
         return f"sbx_tr_{secrets.token_hex(8)}"
 
 
-# --------------------------------------------------------------------------- #
-#  Stripe: the framework for going live
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Stripe: the framework for going live
+#--------------------------------------------------------------------------- #
 
 class StripeProvider(PaymentProvider):
     """Skeleton for Stripe. Not functional until completed; see docs/payments.md.
@@ -226,30 +226,30 @@ class StripeProvider(PaymentProvider):
         )
 
     def create_checkout(self, request: CheckoutRequest) -> Checkout:
-        # POST /v1/checkout/sessions with mode=payment, one line item of
-        # request.amount_cents in request.currency, client_reference_id =
-        # request.payment_id, customer_email, success_url and cancel_url.
-        # Return Checkout(provider_ref=session.id, redirect_url=session.url).
+        #POST /v1/checkout/sessions with mode=payment, one line item of
+        #request.amount_cents in request.currency, client_reference_id =
+        #request.payment_id, customer_email, success_url and cancel_url.
+        #Return Checkout(provider_ref=session.id, redirect_url=session.url).
         self._not_ready()
 
     def verify_webhook(self, body: bytes, headers) -> PaymentEvent:
-        # Stripe signs with the same "t=...,v1=..." scheme as check_signature
-        # above, in the Stripe-Signature header, using STRIPE_WEBHOOK_SECRET.
-        # Map checkout.session.completed to payment.succeeded,
-        # checkout.session.async_payment_failed and checkout.session.expired to
-        # payment.failed, and charge.refunded to refund.succeeded.
+        #Stripe signs with the same "t=...,v1=..." scheme as check_signature
+        #above, in the Stripe-Signature header, using STRIPE_WEBHOOK_SECRET.
+        #Map checkout.session.completed to payment.succeeded,
+        #checkout.session.async_payment_failed and checkout.session.expired to
+        #payment.failed, and charge.refunded to refund.succeeded.
         if not self.webhook_secret:
             raise WebhookRejected("Stripe webhooks are not configured.")
         check_signature(body, headers.get("Stripe-Signature"), self.webhook_secret)
         raise WebhookRejected("Stripe event mapping is not implemented yet.")
 
     def refund(self, provider_ref: str, amount_cents: int) -> str:
-        # POST /v1/refunds with the session's payment_intent and amount.
+        #POST /v1/refunds with the session's payment_intent and amount.
         self._not_ready()
 
     def payout(self, contributor_id: int, amount_cents: int) -> str:
-        # Requires Stripe Connect: each writer onboards a connected account,
-        # then POST /v1/transfers with amount and destination=that account.
+        #Requires Stripe Connect: each writer onboards a connected account,
+        #then POST /v1/transfers with amount and destination=that account.
         self._not_ready()
 
 

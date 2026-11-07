@@ -107,26 +107,26 @@ HEADLINES = [
     "Peatland restoration draws cross-border funding",
 ]
 
-# The article loop below runs ARTICLE_COUNT times and indexes into HEADLINES. If
-# it runs out it wraps and appends "(2)", "(3)" to the repeats, which is how the
-# deployed site ended up showing the same headline three times: eighteen
-# headlines were feeding fifty articles. Assert rather than wrap silently.
+#The article loop below runs ARTICLE_COUNT times and indexes into HEADLINES. If
+#it runs out it wraps and appends "(2)", "(3)" to the repeats, which is how the
+#deployed site ended up showing the same headline three times: eighteen
+#headlines were feeding fifty articles. Assert rather than wrap silently.
 ARTICLE_COUNT = 50
 assert len(HEADLINES) >= ARTICLE_COUNT, (
     f"HEADLINES has {len(HEADLINES)} entries for {ARTICLE_COUNT} articles; "
     "add more headlines rather than letting the seed repeat them."
 )
 
-# Article text comes from demo_bodies.py: one distinct body per headline. The
-# seed once gave every article the same template, which made every demo article
-# a near-total copy of every other.
+#Article text comes from demo_bodies.py: one distinct body per headline. The
+#seed once gave every article the same template, which made every demo article
+#a near-total copy of every other.
 
 
-# ---- countries -------------------------------------------------------------- #
+#---- countries -------------------------------------------------------------- #
 #
-# What each demo headline above is about. Keyed by title, not index, so the same
-# map tags the live database, whose older seed repeated headlines with "(2)" and
-# "(3)" suffixes. None = international.
+#What each demo headline above is about. Keyed by title, not index, so the same
+#map tags the live database, whose older seed repeated headlines with "(2)" and
+#"(3)" suffixes. None = international.
 COUNTRY_OF_HEADLINE = {
     "Parliament passes revised data protection framework": "AU",
     "Regional startups raise record funding despite slowdown": "SG",
@@ -180,11 +180,11 @@ COUNTRY_OF_HEADLINE = {
     "Peatland restoration draws cross-border funding": None,
 }
 
-# Stories written for one country, so each country page has something that could
-# only be about that country. Fictional demo reporting: no real person is named,
-# and every source is a real institution's page (demo_sources.py), not a
-# document supporting the story.
-# (country, section, writer email, title, summary, paragraphs)
+#Stories written for one country, so each country page has something that could
+#only be about that country. Fictional demo reporting: no real person is named,
+#and every source is a real institution's page (demo_sources.py), not a
+#document supporting the story.
+#(country, section, writer email, title, summary, paragraphs)
 COUNTRY_SAMPLES = [
     ("AU", "Politics", "veteran@newsrelease.test",
      "Wollongong council opens consultation on a revised city centre plan",
@@ -387,7 +387,7 @@ def seed_countries() -> None:
     sections = {c.name: c for c in Category.query.filter_by(deleted_at=None)}
     people = {u.email: u for u in User.query.filter(User.deleted_at.is_(None))}
     admin = people["admin@newsrelease.test"]
-    # Each sample is approved by the editor who covers its section.
+    #Each sample is approved by the editor who covers its section.
     editor_for: dict[int, int] = {}
     for row in EditorCategory.query.order_by(EditorCategory.id):
         editor_for.setdefault(row.category_id, row.editor_id)
@@ -515,7 +515,7 @@ def seed_expansion() -> None:
         added += 1
     db.session.flush()
 
-    # Each published demo article is approved by an editor of its own section.
+    #Each published demo article is approved by an editor of its own section.
     editors_of: dict[int, list[int]] = {}
     for row in EditorCategory.query.order_by(EditorCategory.editor_id):
         editors_of.setdefault(row.category_id, []).append(row.editor_id)
@@ -565,7 +565,7 @@ def seed_more() -> None:
             continue
         writer = User.query.filter_by(email=email).one()
         category = sections[section_name]
-        # Spread over the last eight weeks so every page mixes old and new.
+        #Spread over the last eight weeks so every page mixes old and new.
         published_at = now - timedelta(days=1 + (n * 23) % 56, hours=(n * 7) % 18)
         editors = editors_of.get(category.id) or [admin.id]
         article = Article(
@@ -705,8 +705,8 @@ def seed_long_bodies() -> None:
     summaries = 0
     for article in Article.query.filter(Article.republication.is_(None)):
         title = re.sub(r" \(\d+\)$", "", article.title)
-        # The first demo headlines were seeded with a placeholder summary that
-        # only repeated the headline; give them their real standfirst.
+        #The first demo headlines were seeded with a placeholder summary that
+        #only repeated the headline; give them their real standfirst.
         if title in STANDFIRSTS and "What the change means" in (article.summary or ""):
             article.summary = STANDFIRSTS[title]
             summaries += 1
@@ -728,27 +728,27 @@ def seed_long_bodies() -> None:
     print(f"Long bodies: rewrote {len(changed)} article(s) and {summaries} summaries.")
 
 
-# ---- originality ------------------------------------------------------------ #
+#---- originality ------------------------------------------------------------ #
 #
-# One pending submission that copies an existing article and part of a real
-# cited page, so the review queue has a genuine case to show. It also quotes the
-# same page correctly, which the check reports as a verified quote rather than
-# copying.
+#One pending submission that copies an existing article and part of a real
+#cited page, so the review queue has a genuine case to show. It also quotes the
+#same page correctly, which the check reports as a verified quote rather than
+#copying.
 PLANTED_COPY = {
     "title": "New privacy rules give Australians the right to erase their data",
     "summary": "What the revised privacy framework means for households.",
     "source": ("https://en.wikipedia.org/wiki/Privacy_Act_1988", "Privacy Act 1988, Wikipedia"),
     "paragraphs": [
-        # Copied from "Parliament passes revised data protection framework".
+        #Copied from "Parliament passes revised data protection framework".
         "Federal parliament has passed a revised privacy framework that gives individuals a "
         "statutory right to ask organisations to delete personal information they no longer "
         "need. Businesses with annual turnover above the small business threshold will have "
         "eighteen months to update their handling practices.",
-        # Copied from the cited page without quotation marks.
+        #Copied from the cited page without quotation marks.
         "The principles govern when and how personal information can be collected by these "
         "entities. Information can only be collected if it is relevant to the agencies' "
         "functions.",
-        # Quoted from the cited page, correctly.
+        #Quoted from the cited page, correctly.
         "As the legislation already provides, “Australians have the right to know why "
         "information about them is being acquired and who will see the information.”",
         "Consumer advocates in the Illawarra said they would run sessions at local libraries "
@@ -831,10 +831,10 @@ def seed() -> None:
         print("Database already contains data. Re-run with --reset to rebuild.")
         return
 
-    random.seed(20260903)  # deterministic demo -- the same data every run
+    random.seed(20260903)  #deterministic demo -- the same data every run
     now = utcnow()
 
-    # ---- categories ------------------------------------------------------- #
+    #---- categories ------------------------------------------------------- #
     categories = []
     for name, description, is_system in CATEGORIES:
         category = Category(
@@ -846,7 +846,7 @@ def seed() -> None:
 
     real_categories = [c for c in categories if not c.is_system]
 
-    # ---- accounts --------------------------------------------------------- #
+    #---- accounts --------------------------------------------------------- #
     def make_user(email, name, role, bio=None):
         user = User(
             email=email,
@@ -862,8 +862,8 @@ def seed() -> None:
     admin = make_user("admin@newsrelease.test", "Platform Administrator", Role.SYSTEM_ADMIN)
     editor_a = make_user("editor.tech@newsrelease.test", "Priya Raman", Role.EDITOR)
     editor_b = make_user("editor.politics@newsrelease.test", "Daniel Ong", Role.EDITOR)
-    # Placeholder panel details for the demo. Fictional people, generic
-    # experience, no real publication named.
+    #Placeholder panel details for the demo. Fictional people, generic
+    #experience, no real publication named.
     editor_a.editor_title = "Technology and Science Editor"
     editor_a.editor_credentials = (
         "Nine years on a regional daily's science desk. Degree in computer science."
@@ -890,7 +890,7 @@ def seed() -> None:
     premium = make_user("premium@newsrelease.test", "Premium Reader", Role.PREMIUM_REGISTERED)
     db.session.flush()
 
-    # Editors are scoped to categories (PRD 1.3.2).
+    #Editors are scoped to categories (PRD 1.3.2).
     by_name = {c.name: c for c in categories}
     db.session.add(EditorCategory(editor_id=editor_a.id, category_id=by_name["Technology"].id))
     db.session.add(EditorCategory(editor_id=editor_a.id, category_id=by_name["Science"].id))
@@ -917,7 +917,7 @@ def seed() -> None:
     )
     db.session.flush()
 
-    # ---- articles --------------------------------------------------------- #
+    #---- articles --------------------------------------------------------- #
     contributors = [veteran, mixed, newcomer]
     articles: list[Article] = []
 
@@ -930,8 +930,8 @@ def seed() -> None:
         category = real_categories[index % len(real_categories)]
         published_at = now - timedelta(days=index, hours=random.randint(0, 20))
 
-        # A few drafts and pending submissions so the dashboards and review queue
-        # are not empty either.
+        #A few drafts and pending submissions so the dashboards and review queue
+        #are not empty either.
         if index >= 46:
             status = ArticleStatus.PENDING
             published_at = None
@@ -954,8 +954,8 @@ def seed() -> None:
             status=status,
             published_at=published_at,
             submitted_at=published_at or now,
-            # Approved by the editor who covers the section, so the "Approved
-            # by" line agrees with the assignments above.
+            #Approved by the editor who covers the section, so the "Approved
+            #by" line agrees with the assignments above.
             reviewed_by_id=(
                 {"Technology": editor_a, "Science": editor_a,
                  "Politics": editor_b, "Business": editor_b}.get(category.name, admin).id
@@ -968,11 +968,11 @@ def seed() -> None:
         articles.append(article)
     db.session.flush()
 
-    # ---- scoring inputs --------------------------------------------------- #
+    #---- scoring inputs --------------------------------------------------- #
     for index, article in enumerate(articles):
-        # Marcus sources heavily, Sam barely at all, so their scores differ for
-        # a reason a reader can inspect. Real institutions and outlets
-        # (demo_sources.py); `flask rate-sources` grades them after seeding.
+        #Marcus sources heavily, Sam barely at all, so their scores differ for
+        #a reason a reader can inspect. Real institutions and outlets
+        #(demo_sources.py); `flask rate-sources` grades them after seeding.
         email = {veteran.id: veteran.email, mixed.id: mixed.email,
                  newcomer.id: newcomer.email}[article.contributor_id]
         section = next(c.name for c in categories if c.id == article.category_id)
@@ -982,7 +982,7 @@ def seed() -> None:
 
     published = [a for a in articles if a.status == ArticleStatus.PUBLISHED]
 
-    # Two corrections and one retraction against Aisha, so accuracy is not 100%.
+    #Two corrections and one retraction against Aisha, so accuracy is not 100%.
     for article in [a for a in published if a.contributor_id == mixed.id][:2]:
         db.session.add(
             Correction(
@@ -1004,7 +1004,7 @@ def seed() -> None:
         )
     )
 
-    # Engagement, and enough reports on one article to reach the moderation queue.
+    #Engagement, and enough reports on one article to reach the moderation queue.
     flagged = published[3]
     for n in range(12):
         filler = make_user(
@@ -1034,7 +1034,7 @@ def seed() -> None:
 
     db.session.flush()
 
-    # ---- scores ----------------------------------------------------------- #
+    #---- scores ----------------------------------------------------------- #
     for contributor in contributors:
         rescore_contributor_articles(contributor)
 

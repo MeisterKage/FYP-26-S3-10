@@ -5,7 +5,7 @@ analysts are unnamed or invented. "## " starts a subheading.
 """
 
 LONG_WEST = {
-    # --- United Kingdom -----------------------------------------------------
+    #--- United Kingdom -----------------------------------------------------
     "New study links urban green space to lower stress markers": [
         "People living within a short walk of a park or other green space had lower levels of a "
         "hormone linked to stress than those living further away, according to a study of several "
@@ -166,7 +166,7 @@ LONG_WEST = {
         "the climate responded to past changes.",
         "The first results are expected within two years.",
     ],
-    # --- United States ------------------------------------------------------
+    #--- United States ------------------------------------------------------
     "Retail sector reports uneven recovery across segments": [
         "Retail sales in the United States rose last quarter, but the gains were concentrated in a few "
         "segments, with department stores and furniture retailers lagging well behind online sellers "
@@ -317,7 +317,7 @@ LONG_WEST = {
         "listens, and I am home in time for lunch.”",
         "Hospital groups are urging Congress to make the telehealth payment rules permanent.",
     ],
-    # --- Politics drafts and pending ----------------------------------------
+    #--- Politics drafts and pending ----------------------------------------
     "Cabinet reshuffle brings three new ministers into portfolio roles": [
         "The prime minister has reshuffled the cabinet, bringing three new ministers into senior roles "
         "and moving two others to different portfolios, in the first major changes to the front bench "

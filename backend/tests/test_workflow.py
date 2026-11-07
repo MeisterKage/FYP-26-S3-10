@@ -44,9 +44,9 @@ def auth(token):
     return {"Authorization": f"Bearer {token}"}
 
 
-# --------------------------------------------------------------------------- #
-#  Health and registration
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Health and registration
+#--------------------------------------------------------------------------- #
 
 def test_health(client):
     assert client.get("/api/health").get_json() == {"status": "ok"}
@@ -65,7 +65,7 @@ def test_register_creates_a_free_reader(client, category):
     assert response.status_code == 201
     body = response.get_json()
     assert body["user"]["role"] == Role.FREE_REGISTERED.value
-    # Email is normalised to lowercase, or duplicate detection can be bypassed.
+    #Email is normalised to lowercase, or duplicate detection can be bypassed.
     assert body["user"]["email"] == "new.reader@example.com"
     assert body["token"]
 
@@ -114,9 +114,9 @@ def test_password_reset_does_not_reveal_whether_an_email_exists(client):
     assert known.get_json() == unknown.get_json()
 
 
-# --------------------------------------------------------------------------- #
-#  RBAC
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# RBAC
+#--------------------------------------------------------------------------- #
 
 def test_reader_cannot_create_an_article(client, category):
     make_user("reader@example.com", Role.FREE_REGISTERED)
@@ -146,7 +146,7 @@ def test_suspended_account_cannot_use_a_valid_token(client):
 
 def test_editor_cannot_review_outside_assigned_categories(client, category):
     contributor = make_user("writer@example.com", Role.VERIFIED_CONTRIBUTOR)
-    make_user("editor@example.com", Role.EDITOR)  # assigned to nothing
+    make_user("editor@example.com", Role.EDITOR)  #assigned to nothing
 
     article = Article(
         contributor_id=contributor.id,
@@ -164,9 +164,9 @@ def test_editor_cannot_review_outside_assigned_categories(client, category):
     assert response.status_code == 403
 
 
-# --------------------------------------------------------------------------- #
-#  The publishing workflow
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# The publishing workflow
+#--------------------------------------------------------------------------- #
 
 def test_draft_to_published_journey(client, category):
     contributor = make_user("author@example.com", Role.VERIFIED_CONTRIBUTOR)
@@ -208,13 +208,13 @@ def test_draft_to_published_journey(client, category):
     payload = approved.get_json()
 
     assert payload["article"]["status"] == "published"
-    # PRD 1.3.3: the score is visible from the moment the article goes live.
+    #PRD 1.3.3: the score is visible from the moment the article goes live.
     assert payload["article"]["credibility"]["score"] > 0
-    # First article, so the contributor is still "New Contributor".
+    #First article, so the contributor is still "New Contributor".
     assert payload["credibility"]["provisional"] is True
-    # One clean article smooths to 75% rather than the bare 70% baseline, so a
-    # first piece counts slightly in the writer's favour instead of being
-    # ignored: 0.75 * 75 + 2 sources * 5 = 66.25.
+    #One clean article smooths to 75% rather than the bare 70% baseline, so a
+    #first piece counts slightly in the writer's favour instead of being
+    #ignored: 0.75 * 75 + 2 sources * 5 = 66.25.
     assert payload["credibility"]["score"] == 66.25
 
     slug = payload["article"]["slug"]
@@ -260,15 +260,15 @@ def test_unpublished_article_is_not_publicly_readable(client, category):
     assert client.get("/api/articles/draft-only").status_code == 404
 
 
-# --------------------------------------------------------------------------- #
-#  The paywall  (the response must not contain the body at all)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# The paywall  (the response must not contain the body at all)
+#--------------------------------------------------------------------------- #
 
 def test_premium_body_is_omitted_for_a_non_subscriber(client, category):
     contributor = make_user("premium.author@example.com", Role.VERIFIED_CONTRIBUTOR)
     make_user("freeloader@example.com", Role.FREE_REGISTERED)
 
-    # The paywall permits a short opening preview, so the marker goes past it.
+    #The paywall permits a short opening preview, so the marker goes past it.
     article = Article(
         contributor_id=contributor.id,
         category_id=category.id,
@@ -287,7 +287,7 @@ def test_premium_body_is_omitted_for_a_non_subscriber(client, category):
 
     assert payload["paywalled"] is True
     assert "body" not in payload
-    # The preview is bounded, and the withheld content is nowhere in the bytes.
+    #The preview is bounded, and the withheld content is nowhere in the bytes.
     assert len(payload["bodyPreview"]) <= 310
     assert b"SECRET_PREMIUM_CONTENT" not in response.data
 
@@ -313,9 +313,9 @@ def test_author_can_always_read_their_own_premium_article(client, category):
     assert payload["body"] == "<p>Mine</p>"
 
 
-# --------------------------------------------------------------------------- #
-#  Sanitisation
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Sanitisation
+#--------------------------------------------------------------------------- #
 
 def test_script_tags_are_stripped_from_an_article_body(client, category):
     make_user("xss@example.com", Role.VERIFIED_CONTRIBUTOR)
@@ -353,9 +353,9 @@ def test_html_in_a_title_is_stripped(client, category):
     assert response.get_json()["title"] == "Clean headline"
 
 
-# --------------------------------------------------------------------------- #
-#  Disclosure — the score's arithmetic reaches the reader and the editor
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Disclosure — the score's arithmetic reaches the reader and the editor
+#--------------------------------------------------------------------------- #
 
 def test_published_article_carries_its_breakdown(client, category):
     """PRD 1.3.3 promises a reader can trace exactly why a score is what it is,
@@ -372,7 +372,7 @@ def test_published_article_carries_its_breakdown(client, category):
     payload = client.get("/api/articles/traceable").get_json()["article"]
     breakdown = payload["credibility"]["breakdown"]
 
-    # The parts must reconstruct the whole, or the disclosure is decorative.
+    #The parts must reconstruct the whole, or the disclosure is decorative.
     total = (
         breakdown["accuracy"] + breakdown["sources"] + breakdown["corrections"]
         + breakdown["retraction"] + breakdown["reports"]
@@ -398,7 +398,7 @@ def test_review_queue_shows_the_prospective_score_not_zero(client, category):
     _db.session.add(ArticleSource(article_id=article.id, url="https://example.org/a"))
     _db.session.commit()
 
-    assert article.credibility_score == 0.0  # nothing has scored it yet
+    assert article.credibility_score == 0.0  #nothing has scored it yet
 
     queue = client.get(
         "/api/review/queue", headers=auth(token_for(client, "queue.editor@example.com"))
@@ -419,7 +419,7 @@ def test_what_counts_is_public(client):
     assert "Contributor accuracy" in names
     assert "Sources" in names
     assert {i["effect"] for i in payload["inputs"]} == {"raises", "lowers"}
-    # "New contributor" is otherwise an unexplained state on a profile.
+    #"New contributor" is otherwise an unexplained state on a profile.
     assert "New contributor" in payload["newContributor"]
 
 
@@ -445,9 +445,9 @@ def test_the_tuning_constants_are_not_published(client):
         assert key not in body, f"{key} is exposed on the public formula endpoint"
 
 
-# --------------------------------------------------------------------------- #
-#  Authoring: what the editing screen needs (PDD Figures 5.41-5.42)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Authoring: what the editing screen needs (PDD Figures 5.41-5.42)
+#--------------------------------------------------------------------------- #
 
 def test_the_writers_list_withholds_bodies(client, category):
     """/articles/mine is a list, so it omits bodies on purpose.
@@ -542,9 +542,9 @@ def test_a_rejected_article_carries_its_reason_back_to_the_writer(client, catego
     assert mine["rejectionReason"] == "Second source needed for the funding figure."
 
 
-# --------------------------------------------------------------------------- #
-#  Moderation queue (PDD Figure 5.50)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Moderation queue (PDD Figure 5.50)
+#--------------------------------------------------------------------------- #
 
 def test_the_flagged_list_carries_the_reports_behind_each_count(client, category):
     """A count alone gives a moderator nothing to act on: resolving works one
@@ -554,7 +554,7 @@ def test_the_flagged_list_carries_the_reports_behind_each_count(client, category
     contributor = make_user("flagged@example.com", Role.VERIFIED_CONTRIBUTOR)
     editor = make_user("moderator@example.com", Role.EDITOR)
     _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
-    # Drop the escalation threshold so two reports are enough to surface it.
+    #Drop the escalation threshold so two reports are enough to surface it.
     _db.session.add(PlatformSetting(key="report_threshold", value=2))
 
     article = Article(
@@ -594,7 +594,7 @@ def test_a_moderator_only_sees_flagged_articles_in_their_own_categories(client, 
     contributor = make_user("flagged2@example.com", Role.VERIFIED_CONTRIBUTOR)
     editor = make_user("moderator2@example.com", Role.EDITOR)
     _db.session.commit()
-    # Assigned to `category`, but the flagged article is in `other`.
+    #Assigned to `category`, but the flagged article is in `other`.
     _db.session.add(EditorCategory(editor_id=editor.id, category_id=category.id))
     _db.session.add(PlatformSetting(key="report_threshold", value=1))
 
@@ -618,9 +618,9 @@ def test_a_moderator_only_sees_flagged_articles_in_their_own_categories(client, 
     assert all(f["articleId"] != article.id for f in payload["flagged"])
 
 
-# --------------------------------------------------------------------------- #
-#  Separation of duties: an editor may not approve their own article
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Separation of duties: an editor may not approve their own article
+#--------------------------------------------------------------------------- #
 
 def _own_pending_article(author, category, title):
     article = Article(
@@ -650,7 +650,7 @@ def test_an_editor_cannot_approve_their_own_article(client, category):
 
     assert response.status_code == 403
     assert "another editor" in response.get_json()["error"]["message"]
-    # And it must genuinely not have published.
+    #And it must genuinely not have published.
     assert Article.query.get(article.id).status == ArticleStatus.PENDING
 
 
@@ -696,9 +696,9 @@ def test_an_administrator_may_still_approve_their_own(client, category):
     assert client.post(f"/api/review/{article.id}/approve", headers=auth(token)).status_code == 200
 
 
-# --------------------------------------------------------------------------- #
-#  Reporting an article: a fixed reason list (PDD Figure 5.26)
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Reporting an article: a fixed reason list (PDD Figure 5.26)
+#--------------------------------------------------------------------------- #
 
 def test_the_report_reasons_are_served_by_the_api(client):
     """The form is built from this, so a hard-coded copy cannot drift from it."""

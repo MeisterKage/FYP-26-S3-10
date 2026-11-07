@@ -22,9 +22,9 @@ from app.security import hash_password
 PASSWORD = "AutomationTest123!"
 
 
-# =========================================================================== #
-#  Pure rules
-# =========================================================================== #
+#=========================================================================== #
+# Pure rules
+#=========================================================================== #
 
 def priority(**overrides):
     inputs = dict(
@@ -148,9 +148,9 @@ def test_any_single_failing_rule_blocks_auto_publish(override):
     assert not eligibility(**override).eligible
 
 
-# =========================================================================== #
-#  Fixtures for the integration tests
-# =========================================================================== #
+#=========================================================================== #
+# Fixtures for the integration tests
+#=========================================================================== #
 
 @pytest.fixture()
 def category(app):
@@ -235,9 +235,9 @@ def people(app, category):
     }
 
 
-# =========================================================================== #
-#  Risk-ordered queue
-# =========================================================================== #
+#=========================================================================== #
+# Risk-ordered queue
+#=========================================================================== #
 
 def test_the_queue_puts_a_risky_new_article_above_an_older_safe_one(client, category, people):
     safe_and_older = make_article(people["veteran"], category, sources=3, submitted_hours_ago=5)
@@ -267,9 +267,9 @@ def test_a_duplicate_title_is_flagged_in_the_queue(client, category, people):
     assert response.get_json()["articles"][0]["priority"]["breakdown"]["duplicate"] > 0
 
 
-# =========================================================================== #
-#  Batch approval
-# =========================================================================== #
+#=========================================================================== #
+# Batch approval
+#=========================================================================== #
 
 def test_batch_approve_publishes_every_chosen_article(client, category, people):
     a = make_article(people["veteran"], category, sources=2)
@@ -360,9 +360,9 @@ def test_a_reader_cannot_batch_approve(client, category, people):
     assert response.status_code == 403
 
 
-# =========================================================================== #
-#  Auto-publish
-# =========================================================================== #
+#=========================================================================== #
+# Auto-publish
+#=========================================================================== #
 
 @pytest.fixture()
 def valve_open(app):
@@ -457,9 +457,9 @@ def test_the_cli_sweep_reports_what_it_did(app, category, people, valve_open):
     assert "Published 1" in output
 
 
-# =========================================================================== #
-#  Confirmation
-# =========================================================================== #
+#=========================================================================== #
+# Confirmation
+#=========================================================================== #
 
 def test_confirming_clears_the_label(client, category, people, valve_open):
     give_record(people["veteran"], category, 12)
@@ -500,9 +500,9 @@ def test_an_editor_cannot_confirm_their_own_article(client, category, people):
     assert response.status_code == 403
 
 
-# =========================================================================== #
-#  Revocation
-# =========================================================================== #
+#=========================================================================== #
+# Revocation
+#=========================================================================== #
 
 def correct(client, article, token):
     return client.post(
@@ -524,7 +524,7 @@ def test_a_correction_on_an_auto_published_article_suspends_the_writer(
     writer = _db.session.get(User, people["veteran"].id)
     assert writer.autopublish_suspended_until is not None
 
-    # And the next article waits for a human.
+    #And the next article waits for a human.
     next_one = make_article(people["veteran"], category, sources=2)
     result = run_autopublish()
     assert next_one.id not in result["published"]
@@ -557,9 +557,9 @@ def test_overturning_the_correction_lifts_the_suspension(client, category, peopl
     assert AuditLog.query.filter_by(action="user.autopublish_restored").count() == 1
 
 
-# =========================================================================== #
-#  Settings
-# =========================================================================== #
+#=========================================================================== #
+# Settings
+#=========================================================================== #
 
 def test_review_settings_appear_in_their_own_group(client, people):
     response = client.get("/api/admin/settings", headers=auth(token_for(client, "admin@example.com")))

@@ -99,7 +99,7 @@ def share_page(slug: str):
 </body>
 </html>"""
     response = Response(body, mimetype="text/html")
-    # Crawlers and people may cache this briefly; a score change shows within minutes.
+    #Crawlers and people may cache this briefly; a score change shows within minutes.
     response.headers["Cache-Control"] = "public, max-age=600"
     return response
 

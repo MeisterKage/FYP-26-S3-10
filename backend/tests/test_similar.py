@@ -22,8 +22,8 @@ def test_articles_on_the_same_subject_rank_first():
     vecs = similar.vectors(docs)
     ranked = similar.most_similar(docs[0], docs, vecs)
     assert ranked[0][0] == 2
-    assert all(i != 1 for i, _ in ranked)          # never itself
-    assert 4 not in [i for i, _ in ranked]          # nothing in common, not listed
+    assert all(i != 1 for i, _ in ranked)          #never itself
+    assert 4 not in [i for i, _ in ranked]          #nothing in common, not listed
 
 
 @pytest.fixture()
@@ -48,4 +48,4 @@ def world(app):
 def test_the_article_page_lists_published_similar_articles(client, world):
     titles = [a["title"] for a in client.get("/api/articles/wind").get_json()["article"]["similar"]]
     assert titles[0] == "Wind and solar power set a grid record"
-    assert "Wind and solar draft" not in titles             # drafts are never suggested
+    assert "Wind and solar draft" not in titles             #drafts are never suggested

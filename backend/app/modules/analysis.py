@@ -44,8 +44,8 @@ def article_analysis(slug: str):
     today = utcnow().date()
     since = today - timedelta(days=DAYS - 1)
 
-    # Paywalled text is not analysed for readers who cannot open it: the tone
-    # strip would describe paragraphs they have not been shown.
+    #Paywalled text is not analysed for readers who cannot open it: the tone
+    #strip would describe paragraphs they have not been shown.
     from .articles import may_read
     readable = may_read(article, viewer)
     tone = analysis.tone(article.body) if readable else None
@@ -64,8 +64,8 @@ def article_analysis(slug: str):
     )
     view_series = analysis.daily_series(views, today, DAYS)
 
-    # The topic around it: how much the section has published each week, and
-    # how this article's tone compares with the section's recent articles.
+    #The topic around it: how much the section has published each week, and
+    #how this article's tone compares with the section's recent articles.
     category = db.session.get(Category, article.category_id)
     window = today - timedelta(days=7 * WEEKS - 1)
     peers = (

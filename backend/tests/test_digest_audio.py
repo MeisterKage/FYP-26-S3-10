@@ -71,7 +71,7 @@ def test_the_edition_reads_as_a_book_in_chapters(client, world):
     assert kinds[:2] == ["intro", "overview"] and kinds[-1] == "closing"
     assert kinds.count("article") == 4
     assert "The Technology digest for September 2026" in book["chapters"][0]["parts"][0]
-    assert len(book["chapters"][1]["parts"]) == 4          # one line per article
+    assert len(book["chapters"][1]["parts"]) == 4          #one line per article
     assert book["minutes"] >= 1 and all(c["seconds"] > 0 for c in book["chapters"])
     assert book["narration"]["mode"] == "browser"
 

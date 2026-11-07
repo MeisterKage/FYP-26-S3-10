@@ -91,7 +91,7 @@ def check_url(url: str) -> urllib.parse.ParseResult:
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
-        return None  # surface 3xx to the caller, which validates the next hop
+        return None  #surface 3xx to the caller, which validates the next hop
 
 
 _opener = urllib.request.build_opener(_NoRedirect)

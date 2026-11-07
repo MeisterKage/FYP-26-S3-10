@@ -19,7 +19,7 @@ from . import insights
 
 SAME_SECTION = 0.05
 SAME_COUNTRY = 0.03
-MIN_SCORE = 0.06  # below this, two articles share little more than common words
+MIN_SCORE = 0.06  #below this, two articles share little more than common words
 
 
 @dataclass(frozen=True)

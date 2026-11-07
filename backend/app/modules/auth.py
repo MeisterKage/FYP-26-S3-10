@@ -38,12 +38,12 @@ def _serialize(user: User) -> dict:
         "bio": user.bio,
         "accuracyRate": user.accuracy_rate,
         "hasPremiumAccess": user.has_premium_access(),
-        # The sections chosen for the front page, so the account page can show
-        # them ticked. Without this every save looked as if it had not stuck.
+        #The sections chosen for the front page, so the account page can show
+        #them ticked. Without this every save looked as if it had not stuck.
         "categoryIds": [
             p.category_id for p in UserCategoryPreference.query.filter_by(user_id=user.id)
         ],
-        # And the countries whose news they follow, for the follow buttons.
+        #And the countries whose news they follow, for the follow buttons.
         "countryCodes": sorted(
             p.country_code for p in UserCountryPreference.query.filter_by(user_id=user.id)
         ),
@@ -70,7 +70,7 @@ def register():
     email = (data.get("email") or "").strip().lower()
     password = data.get("password") or ""
     display_name = clean_plain_text(data.get("displayName") or "")
-    # A bare string here used to reach SQLAlchemy's IN clause and raise a 500.
+    #A bare string here used to reach SQLAlchemy's IN clause and raise a 500.
     category_ids = require_id_list(data, "categoryIds", max_items=50)
 
     if not email or "@" not in email:
@@ -80,7 +80,7 @@ def register():
     validate_password_strength(password)
 
     if User.query.filter_by(email=email).first():
-        # PDD Figure 5.1: duplicate email rejected with a pointer to the login page.
+        #PDD Figure 5.1: duplicate email rejected with a pointer to the login page.
         raise ApiError(
             "An account with this email already exists. Try signing in instead.",
             status=409, field="email",
@@ -119,7 +119,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
 
-    # One message for both failure modes, so the form cannot enumerate accounts.
+    #One message for both failure modes, so the form cannot enumerate accounts.
     invalid = ApiError("Invalid username or password.", status=401)
     if user is None or user.deleted_at is not None:
         raise invalid

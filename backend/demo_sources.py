@@ -138,8 +138,8 @@ OVERRIDES = {
     "Housing grant changes take effect for first-time buyers": [
         ("https://www.dailymail.co.uk/news/index.html", "Daily Mail"),
     ],
-    # A bowel-screening story citing a discredited paper on bowel inflammation:
-    # the retraction check flags it for the editor.
+    #A bowel-screening story citing a discredited paper on bowel inflammation:
+    #the retraction check flags it for the editor.
     "Health ministry expands subsidised screening programme": [
         ("https://www.moh.gov.sg/", "Ministry of Health"),
         ("https://www.straitstimes.com/", "The Straits Times"),
@@ -165,7 +165,7 @@ OVERRIDES = {
 COUNTS = {"veteran@newsrelease.test": 5, "contributor@newsrelease.test": 3,
           "farah.hashim@newsrelease.test": 3, "rohan.iyer@newsrelease.test": 3}
 
-# Malaysia, China and India, added with the expanded demo (demo_expansion.py).
+#Malaysia, China and India, added with the expanded demo (demo_expansion.py).
 from demo_expansion import OFFICIAL as _MORE_OFFICIAL, OUTLETS as _MORE_OUTLETS  # noqa: E402
 from demo_expansion import STATISTICS as _MORE_STATISTICS  # noqa: E402
 
@@ -183,12 +183,12 @@ def sources_for(title: str, country: str | None, section: str, writer_email: str
     intl = INTERNATIONAL.get(section, INTERNATIONAL["Politics"])
     count = COUNTS.get(writer_email, 1)
     if count == 1:
-        # The newcomer cites a single outlet, which is why their scores are lower.
+        #The newcomer cites a single outlet, which is why their scores are lower.
         return [outlets[-1]]
     picks = ([official, outlets[0], outlets[-1]] if count == 3
              else [official, stats, outlets[0], outlets[1], intl])
-    # A story with no country can draw the same body twice (the UN as both its
-    # official and its international source); fall back to other outlets.
+    #A story with no country can draw the same body twice (the UN as both its
+    #official and its international source); fall back to other outlets.
     spare = [o for o in outlets + OUTLETS[None] if o not in picks]
     unique = []
     for pick in picks:

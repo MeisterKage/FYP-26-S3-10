@@ -94,9 +94,9 @@ def note(lang: str, tr: ArticleTranslation | None, preparing: bool = False) -> d
     return {"lang": lang, "available": True, "provider": tr.provider, "note": labels.get("translated")}
 
 
-# --------------------------------------------------------------------------- #
-#  Providers
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Providers
+#--------------------------------------------------------------------------- #
 
 class ProviderNotConfigured(Exception):
     """The configured translation provider is not set up on this deployment."""
@@ -262,9 +262,9 @@ def automatic() -> bool:
         return False
 
 
-# --------------------------------------------------------------------------- #
-#  Translating articles as they are published
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Translating articles as they are published
+#--------------------------------------------------------------------------- #
 
 #: After a failure, how long before the same article and language are tried again.
 RETRY_AFTER_SECONDS = 600
@@ -311,7 +311,7 @@ def queue_translation(article_id: int, lang: str) -> bool:
             _held.append(key)
             return True
         if _pool is None:
-            # Two at a time: enough to keep up, gentle on the API and the server.
+            #Two at a time: enough to keep up, gentle on the API and the server.
             _pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="translate")
     _pool.submit(_job, app, article_id, lang)
     return True
@@ -350,7 +350,7 @@ def _job(app, article_id: int, lang: str) -> None:
                     and fresh(article, lang) is None):
                 translate_now(article, lang)
                 db.session.commit()
-                # Signed-out pages remembered in English must not outlive the translation.
+                #Signed-out pages remembered in English must not outlive the translation.
                 response_cache.clear()
             with _lock:
                 _failed.pop((article_id, lang), None)

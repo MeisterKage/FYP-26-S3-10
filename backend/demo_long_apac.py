@@ -5,7 +5,7 @@ analysts are unnamed or invented. "## " starts a subheading.
 """
 
 LONG_APAC = {
-    # --- New Zealand --------------------------------------------------------
+    #--- New Zealand --------------------------------------------------------
     "Public transport ridership returns to pre-pandemic levels": [
         "Buses, trains and ferries across New Zealand's three largest cities carried more passengers "
         "in the year to June than in any year before the pandemic, according to figures released by "
@@ -217,7 +217,7 @@ LONG_APAC = {
         "The watchdog said it would publish guidance encouraging agencies to release more information "
         "without waiting to be asked, which it said would reduce the number of requests over time.",
     ],
-    # --- Singapore ----------------------------------------------------------
+    #--- Singapore ----------------------------------------------------------
     "Regional startups raise record funding despite slowdown": [
         "Startups across South-East Asia raised more venture capital in the first half of the year "
         "than in any comparable period, even as global investment slowed, according to a report by "
@@ -384,7 +384,7 @@ LONG_APAC = {
         "The port authority said it would continue to invest in capacity at the new terminal, which "
         "will be expanded in stages over the next two decades.",
     ],
-    # --- Japan --------------------------------------------------------------
+    #--- Japan --------------------------------------------------------------
     "Semiconductor shortage eases as new fabrication capacity opens": [
         "Carmakers and electronics firms in Japan say the shortage of computer chips that disrupted "
         "production for several years has largely eased, as new chip fabrication plants begin "

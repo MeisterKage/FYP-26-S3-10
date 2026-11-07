@@ -30,8 +30,8 @@ WORDS_PER_MINUTE = 230
 _BLOCK = re.compile(r"<(p|h[1-6]|li|blockquote)\b[^>]*>(.*?)</\1>", re.S | re.I)
 _TAG = re.compile(r"<[^>]+>")
 _WORD = re.compile(r"[A-Za-z0-9]+(?:['’][A-Za-z]+)?")
-# A sentence ends at . ! or ? (optionally followed by a closing quote) before a
-# space and a capital or an opening quote. Good enough for edited news copy.
+#A sentence ends at . ! or ? (optionally followed by a closing quote) before a
+#space and a capital or an opening quote. Good enough for edited news copy.
 _SENTENCE_END = re.compile(r"(?<=[.!?])[\"”’]?\s+(?=[\"“‘A-Z0-9])")
 _ABBREV = re.compile(r"\b(?:Mr|Mrs|Ms|Dr|Prof|St|No|vs|etc|e\.g|i\.e|U\.S|U\.K)\.$")
 
@@ -62,7 +62,7 @@ def sentences(text: str) -> list[str]:
         part = part.strip()
         if not part:
             continue
-        # Rejoin a split after an abbreviation ("Dr. Smith").
+        #Rejoin a split after an abbreviation ("Dr. Smith").
         if out and _ABBREV.search(out[-1]):
             out[-1] = f"{out[-1]} {part}"
         else:
@@ -86,9 +86,9 @@ def _content(text: str) -> list[str]:
     return [_stem(w.lower()) for w in words(text) if w.lower() not in STOPWORDS and len(w) > 2]
 
 
-# --------------------------------------------------------------------------- #
-#  Key points
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Key points
+#--------------------------------------------------------------------------- #
 
 def key_points(body_html: str, limit: int | None = None) -> list[str]:
     """The sentences that best cover the article, in reading order.
@@ -98,7 +98,7 @@ def key_points(body_html: str, limit: int | None = None) -> list[str]:
     direct quotes, very short or very long sentences, and near-repeats.
     """
     body = [p for p in paragraphs(body_html) if not p.heading]
-    candidates = []  # (position, paragraph index, sentence)
+    candidates = []  #(position, paragraph index, sentence)
     for pi, para in enumerate(body):
         for sentence in sentences(para.text):
             candidates.append((len(candidates), pi, sentence))
@@ -121,7 +121,7 @@ def key_points(body_html: str, limit: int | None = None) -> list[str]:
         if n < 8 or n > 45:
             continue
         if re.search(r"[\"“”]", s):
-            continue  # a quote belongs to the person who said it, not a summary
+            continue  #a quote belongs to the person who said it, not a summary
         terms = set(_content(s))
         if not terms:
             continue
@@ -130,8 +130,8 @@ def key_points(body_html: str, limit: int | None = None) -> list[str]:
             score *= 1.6 if pos == 0 else 1.25
         scored.append((score, pos, s, terms))
     if not scored:
-        # Nothing passes the filters (a very short piece, or one made of
-        # quotes): its opening sentences still say what it is about.
+        #Nothing passes the filters (a very short piece, or one made of
+        #quotes): its opening sentences still say what it is about.
         return [s for _, _, s in candidates[:limit]]
 
     chosen: list[tuple[int, str, set[str]]] = []
@@ -144,9 +144,9 @@ def key_points(body_html: str, limit: int | None = None) -> list[str]:
     return [s for _, s, _ in sorted(chosen)]
 
 
-# --------------------------------------------------------------------------- #
-#  Writing signals
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Writing signals
+#--------------------------------------------------------------------------- #
 
 #: Phrases that turn up far more often in model-written prose than in edited
 #: news copy. Any one of them is ordinary English; a cluster is the signal.
@@ -204,8 +204,8 @@ def writing_signals(body_html: str) -> dict:
     lengths = [len(words(s)) for s in sents]
     lower = text.lower()
 
-    # 1. Sentence rhythm. People vary sentence length a lot; generated prose
-    #    tends to settle into a steady medium length.
+    #1. Sentence rhythm. People vary sentence length a lot; generated prose
+    #   tends to settle into a steady medium length.
     rhythm = _cv(lengths)
     signals = [Signal(
         "rhythm", "Sentence rhythm", round(rhythm, 2),
@@ -215,7 +215,7 @@ def writing_signals(body_html: str) -> dict:
         "generated text; human writers mix short and long sentences.",
     )]
 
-    # 2. Stock phrases per thousand words.
+    #2. Stock phrases per thousand words.
     hits = []
     for phrase in STOCK_PHRASES:
         found = len(re.findall(rf"(?<![a-z]){re.escape(phrase)}(?![a-z])", lower))
@@ -233,7 +233,7 @@ def writing_signals(body_html: str) -> dict:
         "“it is important to note”. Each is ordinary English; a cluster is the signal.",
     ))
 
-    # 3. Paragraph uniformity.
+    #3. Paragraph uniformity.
     plens = [len(words(p.text)) for p in paras]
     para_cv = _cv(plens)
     signals.append(Signal(
@@ -244,8 +244,8 @@ def writing_signals(body_html: str) -> dict:
         "produces blocks of near-identical length.",
     ))
 
-    # 4. Repeated sentence openings. "The" and "A" are left out: news copy
-    #    opens with them constantly, whoever writes it.
+    #4. Repeated sentence openings. "The" and "A" are left out: news copy
+    #   opens with them constantly, whoever writes it.
     openers: dict[str, int] = {}
     for s in sents:
         first = words(s)[:1]
@@ -263,8 +263,8 @@ def writing_signals(body_html: str) -> dict:
         "or generated prose.",
     ))
 
-    # 5. Concrete detail: numbers, names and quotations per hundred words.
-    #    Reporting is full of them; generated filler tends to stay general.
+    #5. Concrete detail: numbers, names and quotations per hundred words.
+    #   Reporting is full of them; generated filler tends to stay general.
     numbers = len(re.findall(r"\b\d[\d,.%]*\b", text))
     names = sum(1 for s in sents for w in words(s)[1:] if w[:1].isupper() and w.lower() not in STOPWORDS)
     quotes = len(re.findall(r"[\"“][^\"“”]{12,}[\"”]", text))
@@ -295,9 +295,9 @@ def writing_signals(body_html: str) -> dict:
     }
 
 
-# --------------------------------------------------------------------------- #
-#  Share of AI-like text
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Share of AI-like text
+#--------------------------------------------------------------------------- #
 
 PASSAGE_WORDS = 110
 

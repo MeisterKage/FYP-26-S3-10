@@ -28,7 +28,7 @@ BANDS = (
     (-0.05, "neutral", "Neutral"),
     (-0.20, "leans_negative", "Leans negative"),
 )
-STRONG = 0.3  # a sentence this far from zero is worth quoting as an extreme
+STRONG = 0.3  #a sentence this far from zero is worth quoting as an extreme
 
 
 def band(score: float) -> tuple[str, str]:

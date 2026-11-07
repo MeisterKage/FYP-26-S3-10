@@ -6,8 +6,8 @@ analysts are unnamed or invented. "## " starts a subheading.
 
 LONG_AU = {
     "Parliament passes revised data protection framework": [
-        # The first two sentences are kept exactly: the planted-copy demo in
-        # seed.py copies them, and the originality checker must still catch it.
+        #The first two sentences are kept exactly: the planted-copy demo in
+        #seed.py copies them, and the originality checker must still catch it.
         "Federal parliament has passed a revised privacy framework that gives individuals a "
         "statutory right to ask organisations to delete personal information they no longer need. "
         "Businesses with annual turnover above the small business threshold will have eighteen "

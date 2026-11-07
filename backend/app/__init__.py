@@ -26,11 +26,11 @@ def create_app(config_object=Config) -> Flask:
         supports_credentials=True,
     )
 
-    # Import models so Alembic's autogenerate sees every table.
+    #Import models so Alembic's autogenerate sees every table.
     from . import models  # noqa: F401
 
-    # PDD Section 3: every request passes through the auth and role middleware
-    # before it reaches an application service.
+    #PDD Section 3: every request passes through the auth and role middleware
+    #before it reaches an application service.
     app.before_request(load_current_user)
 
     from .modules.auth import bp as auth_bp
@@ -65,8 +65,8 @@ def create_app(config_object=Config) -> Flask:
     register_response_cache(app)
 
     register_error_handlers(app)
-    # Registered after the generic handlers so the 429 keeps the API's error
-    # shape rather than falling through to the HTTPException handler.
+    #Registered after the generic handlers so the 429 keeps the API's error
+    #shape rather than falling through to the HTTPException handler.
     register_rate_limit_handler(app)
 
     from .cli import register_cli

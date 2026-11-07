@@ -70,8 +70,8 @@ def _identity() -> str:
 
 limiter = Limiter(
     key_func=_identity,
-    # No blanket default: a rate limit on article reads would throttle ordinary
-    # browsing. Only the endpoints that need one carry one.
+    #No blanket default: a rate limit on article reads would throttle ordinary
+    #browsing. Only the endpoints that need one carry one.
     default_limits=[],
     headers_enabled=True,
     strategy="fixed-window",
@@ -84,8 +84,8 @@ def register_rate_limit_handler(app) -> None:
 
     @app.errorhandler(RateLimitExceeded)
     def _rate_limited(exc: RateLimitExceeded):
-        # Deliberately vague about which limit was hit and how much budget
-        # remains; that detail is a tuning guide for whoever triggered it.
+        #Deliberately vague about which limit was hit and how much budget
+        #remains; that detail is a tuning guide for whoever triggered it.
         return ApiError(
             "Too many attempts. Please wait a few minutes and try again.",
             status=429,

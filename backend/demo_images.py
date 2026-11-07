@@ -29,7 +29,7 @@ from app.models import Article, ArticleImage
 
 USER_AGENT = "SterlingWireDemo/1.0 (university student project; demo images)"
 
-# (article title, Commons file, photographer as credited, licence, alt text)
+#(article title, Commons file, photographer as credited, licence, alt text)
 PHOTOS = [
     ("Wollongong council opens consultation on a revised city centre plan",
      "File:CrownStreetMall WollongongNSW.jpg", "ColonelLight", "CC0",
@@ -199,7 +199,7 @@ PHOTOS = [
     ("Japanese prefectures pool funds to keep rural bus routes running",
      "File:Kakachu Hiratsuka88.jpg", "Cassiopeia sweet", "public domain",
      "A small bus travels along a road between green rice fields."),
-    # More reporting, ten articles per country
+    #More reporting, ten articles per country
     ('Illawarra councils agree to share one regional waste plan',
      'File:Garbage truck in Geneva.jpg', 'Unnerving duck', 'CC BY-SA 4.0',
      'A rubbish truck working on a city street.'),
@@ -487,7 +487,7 @@ def fetch(url: str) -> bytes:
     raise RuntimeError(f"Rate limited fetching {url}")
 
 
-def commons_url(file_title: str, width: int = 1600) -> str:  # re-sized to LARGE_WIDTH on processing
+def commons_url(file_title: str, width: int = 1600) -> str:  #re-sized to LARGE_WIDTH on processing
     params = urllib.parse.urlencode({
         "action": "query", "format": "json", "titles": file_title,
         "prop": "imageinfo", "iiprop": "url", "iiurlwidth": width,

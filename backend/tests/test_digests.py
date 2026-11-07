@@ -27,9 +27,9 @@ def at(day, month=9, hour=12):
     return datetime(2026, month, day, hour, tzinfo=UTC)
 
 
-# =========================================================================== #
-#  Pure rules
-# =========================================================================== #
+#=========================================================================== #
+# Pure rules
+#=========================================================================== #
 
 def cand(i, score, day=10, writer=1):
     return digest.Candidate(i, writer, score, at(day))
@@ -87,9 +87,9 @@ def test_previous_month_wraps_the_year():
     assert digest.previous_month(at(1, 10)) == "2026-09"
 
 
-# =========================================================================== #
-#  Compiling against the database
-# =========================================================================== #
+#=========================================================================== #
+# Compiling against the database
+#=========================================================================== #
 
 @pytest.fixture()
 def world(app):
@@ -135,8 +135,8 @@ MID_SEPTEMBER = at(20, 9)
 def test_editions_are_made_per_topic_and_per_country(world):
     for score, country in ((90, "AU"), (80, "AU"), (70, "AU"), (60, "JP")):
         publish(world, "tech", score, day=10, country=country)
-    publish(world, "politics", 88, day=10)                        # too few for politics
-    publish(world, "tech", 99, day=3, month=8)                   # wrong month
+    publish(world, "politics", 88, day=10)                        #too few for politics
+    publish(world, "tech", 99, day=3, month=8)                   #wrong month
 
     result = compile_month("2026-09", now=AFTER_SEPTEMBER)
     assert sorted(result["created"]) == ["technology", "technology-au"]
@@ -177,10 +177,10 @@ def test_subscribers_are_notified_once_when_the_edition_becomes_final(client, wo
     for score in (90, 80, 70):
         publish(world, "tech", score, day=5)
 
-    compile_month("2026-09", now=MID_SEPTEMBER)          # provisional: no one told yet
+    compile_month("2026-09", now=MID_SEPTEMBER)          #provisional: no one told yet
     assert Notification.query.filter_by(event_type="monthly_digest").count() == 0
-    compile_month("2026-09", now=AFTER_SEPTEMBER)        # final: told once
-    compile_month("2026-09", force=True, now=AFTER_SEPTEMBER)  # forced again: not twice
+    compile_month("2026-09", now=AFTER_SEPTEMBER)        #final: told once
+    compile_month("2026-09", force=True, now=AFTER_SEPTEMBER)  #forced again: not twice
     notes = Notification.query.filter_by(event_type="monthly_digest").all()
     assert len(notes) == 1
     assert notes[0].link == "/digests/2026-09/technology"
@@ -210,7 +210,7 @@ def test_a_later_correction_is_shown_against_the_article(client, world):
     assert entries[0]["since"] == "Corrected on 12 October 2026."
     assert entries[1]["since"] == "Retracted since this digest was compiled."
     assert entries[2]["since"] is None
-    # Still in its original place: the edition is fixed, the note is the update.
+    #Still in its original place: the edition is fixed, the note is the update.
     assert [e["rank"] for e in entries] == [1, 2, 3]
 
 
@@ -237,9 +237,9 @@ def test_an_unpublished_article_is_named_but_not_served(client, world):
     assert set(first["article"]) == {"id", "title"}
 
 
-# =========================================================================== #
-#  API
-# =========================================================================== #
+#=========================================================================== #
+# API
+#=========================================================================== #
 
 def test_the_archive_is_public_and_filterable(client, world):
     for score in (90, 80, 70):

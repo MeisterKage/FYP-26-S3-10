@@ -40,9 +40,9 @@ class ProviderNotConfigured(Exception):
     """The configured provider is not set up on this deployment."""
 
 
-# --------------------------------------------------------------------------- #
-#  A small cache shared by every provider
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# A small cache shared by every provider
+#--------------------------------------------------------------------------- #
 
 _CACHE: OrderedDict[str, object] = OrderedDict()
 _CACHE_SIZE = 512
@@ -64,14 +64,14 @@ def clear_cache() -> None:
     _CACHE.clear()
 
 
-# --------------------------------------------------------------------------- #
-#  Summaries
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Summaries
+#--------------------------------------------------------------------------- #
 
 @dataclass(frozen=True)
 class Summary:
     points: list[str]
-    method: str          # shown to readers: how the summary was made
+    method: str          #shown to readers: how the summary was made
     provider: str
 
 
@@ -133,13 +133,13 @@ def summariser() -> Summariser:
     raise ProviderNotConfigured(f"Unknown summary provider '{name}'.")
 
 
-# --------------------------------------------------------------------------- #
-#  Narration
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Narration
+#--------------------------------------------------------------------------- #
 
 @dataclass(frozen=True)
 class Narration:
-    mode: str                       # "browser": speak `text` on the device; "audio": play `url`
+    mode: str                       #"browser": speak `text` on the device; "audio": play `url`
     text: str
     url: str | None = None
     provider: str = ""
@@ -204,8 +204,8 @@ class CloudNarrator(Narrator):
         raise ProviderNotConfigured("Recorded narration is not switched on for this site yet.")
 
     def narrate_book(self) -> dict:
-        # One recording per chapter, generated when the edition is compiled:
-        # {"mode": "audio", "chapters": {chapter id: file URL}}.
+        #One recording per chapter, generated when the edition is compiled:
+        #{"mode": "audio", "chapters": {chapter id: file URL}}.
         raise ProviderNotConfigured("Recorded narration is not switched on for this site yet.")
 
 
@@ -219,9 +219,9 @@ def narrator() -> Narrator:
     raise ProviderNotConfigured(f"Unknown narration provider '{name}'.")
 
 
-# --------------------------------------------------------------------------- #
-#  Writing signals
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# Writing signals
+#--------------------------------------------------------------------------- #
 
 class SignalsProvider:
     name = "base"
@@ -270,9 +270,9 @@ def signals_provider() -> SignalsProvider:
     raise ProviderNotConfigured(f"Unknown writing signals provider '{name}'.")
 
 
-# --------------------------------------------------------------------------- #
-#  What the application calls
-# --------------------------------------------------------------------------- #
+#--------------------------------------------------------------------------- #
+# What the application calls
+#--------------------------------------------------------------------------- #
 
 def in_brief(article: Article) -> dict | None:
     """The summary block for the article page, or None if it gets none.
